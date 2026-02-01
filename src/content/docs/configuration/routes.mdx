@@ -1,0 +1,144 @@
+---
+title: Routes Configuration
+description: Type-safe route definitions and navigation helpers
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity provides a centralized routing system with TypeScript support for type-safe navigation.
+
+## Route Definition
+
+Routes are defined in `src/config/routes.ts`:
+
+```typescript
+interface RouteDefinition {
+  path: string;
+  nav?: {
+    show: boolean;    // Show in navigation
+    order: number;    // Sort order (lower = first)
+    label: string;    // Display label
+  };
+}
+
+export const routes = {
+  home: {
+    path: '/',
+    nav: { show: false, order: 0, label: 'Home' },
+  },
+  about: {
+    path: '/about',
+    nav: { show: true, order: 3, label: 'About' },
+  },
+  contact: {
+    path: '/contact',
+    nav: { show: true, order: 4, label: 'Contact' },
+  },
+  blog: {
+    path: '/blog',
+    nav: { show: true, order: 2, label: 'Blog' },
+  },
+} as const;
+```
+
+## Helper Functions
+
+### `getNavRoutes()`
+
+Returns routes configured for navigation, sorted by order.
+
+```typescript
+import { getNavRoutes } from '@/config/routes';
+
+const navItems = getNavRoutes();
+// Returns: [{ routeId, path, label, order }, ...]
+```
+
+### `getRoutePath()`
+
+Get the path for a specific route ID.
+
+```typescript
+import { getRoutePath } from '@/config/routes';
+
+const blogPath = getRoutePath('blog'); // '/blog'
+const aboutPath = getRoutePath('about'); // '/about'
+```
+
+### `isValidRouteId()`
+
+Type guard to validate route IDs.
+
+```typescript
+import { isValidRouteId } from '@/config/routes';
+
+if (isValidRouteId('about')) {
+  // TypeScript knows 'about' is a valid route
+}
+```
+
+## Adding New Routes
+
+<Aside type="note">
+  Adding a route here doesn't create the page. You still need to create the corresponding file in `src/pages/`.
+</Aside>
+
+### Step 1: Add Route Definition
+
+```typescript
+export const routes = {
+  // ... existing routes
+  pricing: {
+    path: '/pricing',
+    nav: { show: true, order: 5, label: 'Pricing' },
+  },
+};
+```
+
+### Step 2: Create the Page
+
+```astro
+---
+// src/pages/pricing.astro
+import PageLayout from '@/layouts/PageLayout.astro';
+---
+
+<PageLayout title="Pricing" description="View our pricing plans">
+  <h1>Pricing</h1>
+  <!-- Content -->
+</PageLayout>
+```
+
+## Navigation Component Usage
+
+The Header component automatically uses these routes:
+
+```astro
+---
+import Header from '@/components/layout/Header.astro';
+---
+
+<!-- Uses routes from getNavRoutes() automatically -->
+<Header />
+
+<!-- Or override with custom navigation -->
+<Header nav={[
+  { label: 'Home', href: '/' },
+  { label: 'Custom', href: '/custom' },
+]} />
+```
+
+## Type Safety
+
+The routes object uses `as const` for full type inference:
+
+```typescript
+// TypeScript knows all valid route IDs
+type RouteId = keyof typeof routes; // 'home' | 'about' | 'contact' | 'blog'
+
+// Type-safe path access
+const path: string = routes.about.path; // ✅ Works
+const invalid = routes.invalid.path;     // ❌ Type error
+```

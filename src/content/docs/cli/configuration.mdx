@@ -1,0 +1,156 @@
+---
+title: Post-Scaffold Configuration
+description: Configure your new Velocity project
+sidebar:
+  order: 5
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+After scaffolding, configure your project for production.
+
+## Environment Variables
+
+Create a `.env` file with your configuration:
+
+```bash
+# Required for production
+SITE_URL=https://your-domain.com
+
+# Analytics (optional)
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+PUBLIC_GTM_ID=GTM-XXXXXXX
+
+# Site Verification (optional)
+GOOGLE_SITE_VERIFICATION=your-verification-code
+BING_SITE_VERIFICATION=your-verification-code
+```
+
+<Aside type="caution">
+  Variables prefixed with `PUBLIC_` are exposed to the browser. Never prefix sensitive values.
+</Aside>
+
+## Site Configuration
+
+Edit `src/config/site.config.ts` to customize your site:
+
+```typescript
+const siteConfig: SiteConfig = {
+  name: 'Your Site Name',
+  description: 'Your site description',
+  url: 'https://your-domain.com',
+  author: 'Your Name',
+  email: 'hello@example.com',
+  phone: '+1 (555) 123-4567',
+
+  address: {
+    street: '123 Main St',
+    city: 'Dallas',
+    state: 'TX',
+    zip: '75001',
+    country: 'US',
+  },
+
+  socialLinks: [
+    'https://github.com/yourname',
+    'https://twitter.com/yourname',
+  ],
+
+  branding: {
+    logo: { alt: 'Your Logo' },
+    favicon: { svg: '/favicon.svg' },
+    colors: {
+      themeColor: '#F94C10',
+      backgroundColor: '#ffffff',
+    },
+  },
+};
+```
+
+## Branding Files
+
+Replace these files with your own branding:
+
+<Steps>
+1. **Favicon**
+
+   Replace `public/favicon.svg` with your icon.
+
+2. **Logos**
+
+   Replace files in `src/assets/branding/`:
+   - `logomark.svg` — Icon for light backgrounds
+   - `logomark-dark.svg` — Icon for dark backgrounds
+   - `logo-full.svg` — Full logo for light backgrounds
+   - `logo-full-dark.svg` — Full logo for dark backgrounds
+
+3. **Theme Color**
+
+   Update `themeColor` in `site.config.ts` to match your brand.
+</Steps>
+
+## Header Configuration
+
+Configure the header in your layouts:
+
+```astro
+<Header
+  layout="default"        <!-- default | centered | minimal -->
+  position="sticky"       <!-- fixed | sticky | static -->
+  size="md"               <!-- sm | md | lg -->
+  variant="default"       <!-- default | solid | transparent -->
+  colorScheme="default"   <!-- default | invert -->
+  showCta={true}
+  showThemeToggle={true}
+  showLanguageSwitcher={true}  <!-- i18n only -->
+/>
+```
+
+## Footer Configuration
+
+Configure the footer in your layouts:
+
+```astro
+<Footer
+  layout="simple"         <!-- simple | columns | minimal | stacked -->
+  background="default"    <!-- default | secondary | invert -->
+  columns={3}             <!-- 2 | 3 | 4 (columns layout only) -->
+  showSocial={true}
+  showCopyright={true}
+  socialLinks={[{ platform: 'github', href: '...' }]}
+  legalLinks={[{ label: 'Privacy', href: '/privacy' }]}
+/>
+```
+
+## Development Commands
+
+After configuration, run:
+
+```bash
+# Start development server
+npm run dev     # localhost:4321
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Type checking
+npm run check
+
+# Linting
+npm run lint
+```
+
+## Deployment
+
+Velocity includes ready-to-use configurations for:
+
+| Platform | Configuration |
+|----------|--------------|
+| Vercel | Zero-config, auto-detected |
+| Netlify | `netlify.toml` included |
+| Cloudflare Pages | SSR-ready with adapter |
+
+See [Deployment](/deployment/) for detailed instructions.

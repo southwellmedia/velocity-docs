@@ -1,0 +1,121 @@
+---
+title: Dynamic OG Images
+description: Automatic Open Graph image generation
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity automatically generates OG images for all pages using [Satori](https://github.com/vercel/satori).
+
+## How It Works
+
+OG images are generated at build time for each page:
+
+```
+/og/[...slug].png
+```
+
+### URL Patterns
+
+| Page | OG Image URL |
+|------|--------------|
+| Homepage | `/og/index.png` |
+| About | `/og/about.png` |
+| Blog post | `/og/blog/my-post.png` |
+
+## Automatic Integration
+
+The SEO component automatically references these paths:
+
+```astro
+<!-- You don't need to specify this -->
+<meta property="og:image" content="https://yoursite.com/og/about.png" />
+```
+
+## Custom OG Images
+
+Override for specific pages:
+
+```astro
+<SEO
+  title="Special Page"
+  image="/custom-og-image.png"
+/>
+```
+
+## Configuration
+
+OG image settings are in `src/lib/og.ts`:
+
+```typescript
+export const ogConfig = {
+  width: 1200,
+  height: 630,
+  fonts: ['Outfit', 'JetBrains Mono'],
+  brandColor: '#F94C10',
+};
+```
+
+## Template Customization
+
+Edit `src/pages/og/[...slug].png.ts`:
+
+```typescript
+export async function GET({ params }) {
+  const title = getPageTitle(params.slug);
+
+  const svg = await satori(
+    {
+      type: 'div',
+      props: {
+        children: [
+          // Your template JSX
+          { type: 'h1', props: { children: title } },
+        ],
+        style: {
+          // Styles
+        },
+      },
+    },
+    {
+      width: 1200,
+      height: 630,
+      fonts: await loadFonts(),
+    }
+  );
+
+  return new Response(svgToPng(svg), {
+    headers: { 'Content-Type': 'image/png' },
+  });
+}
+```
+
+<Aside type="caution">
+  OG images are generated at build time. Changes require a rebuild.
+</Aside>
+
+## Troubleshooting
+
+### Images Not Generating
+
+1. Check that dimensions are valid (1200x630 recommended)
+2. Ensure fonts are available
+3. Check build logs for errors
+
+### Font Issues
+
+Fonts must be loaded as ArrayBuffers:
+
+```typescript
+const fontData = await fetch(fontUrl).then(r => r.arrayBuffer());
+```
+
+### Slow Builds
+
+OG generation can be slow for large sites. Consider:
+
+- Caching generated images
+- Using simpler templates
+- Reducing font complexity

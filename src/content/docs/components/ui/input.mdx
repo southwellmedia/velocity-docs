@@ -1,0 +1,161 @@
+---
+title: Input
+description: Text input component with label, hint, and error states
+sidebar:
+  order: 3
+---
+
+The Input component provides text inputs with built-in label, hint, and error handling.
+
+## Basic Usage
+
+```astro
+---
+import Input from '@/components/ui/Input.astro';
+---
+
+<Input name="email" type="email" placeholder="you@example.com" />
+```
+
+## With Label and Hint
+
+```astro
+<Input
+  label="Email"
+  name="email"
+  type="email"
+  hint="We'll never share your email"
+/>
+```
+
+## Error State
+
+```astro
+<Input
+  label="Password"
+  name="password"
+  type="password"
+  error="Must be at least 8 characters"
+/>
+```
+
+## With Icons
+
+```astro
+<!-- Leading icon -->
+<Input
+  label="Search"
+  name="search"
+  leadingIcon="search"
+  placeholder="Search..."
+/>
+
+<!-- Trailing icon -->
+<Input
+  label="Amount"
+  name="amount"
+  trailingIcon="dollar-sign"
+/>
+
+<!-- Both icons -->
+<Input
+  label="Website"
+  name="website"
+  leadingIcon="globe"
+  trailingIcon="external-link"
+/>
+```
+
+## Sizes
+
+```astro
+<Input size="sm" placeholder="Small" />
+<Input size="md" placeholder="Medium" />
+<Input size="lg" placeholder="Large" />
+```
+
+## Inverted Variant
+
+For inputs on dark backgrounds:
+
+```astro
+<section class="bg-surface-invert p-8">
+  <Input
+    variant="invert"
+    label="Email"
+    name="email"
+    placeholder="you@example.com"
+  />
+</section>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | — | Label text |
+| `error` | `string` | — | Error message |
+| `hint` | `string` | — | Helper text |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Input size |
+| `variant` | `'default' \| 'invert'` | `'default'` | Color variant |
+| `leadingIcon` | `string` | — | Icon at start |
+| `trailingIcon` | `string` | — | Icon at end |
+| `name` | `string` | — | Input name |
+| `type` | `string` | `'text'` | Input type |
+| `placeholder` | `string` | — | Placeholder text |
+| `required` | `boolean` | `false` | Required field |
+| `disabled` | `boolean` | `false` | Disabled state |
+
+## Accessibility
+
+- Label is properly associated with input
+- Error messages are announced
+- Required fields are marked
+- Focus states are visible
+
+## Examples
+
+### Login Form
+
+```astro
+<form class="space-y-4">
+  <Input
+    label="Email"
+    name="email"
+    type="email"
+    required
+  />
+  <Input
+    label="Password"
+    name="password"
+    type="password"
+    required
+  />
+  <Button type="submit" fullWidth>Sign In</Button>
+</form>
+```
+
+### Search Input
+
+```astro
+<Input
+  name="search"
+  leadingIcon="search"
+  placeholder="Search..."
+  size="lg"
+/>
+```
+
+### Newsletter Signup
+
+```astro
+<div class="flex gap-2">
+  <Input
+    name="email"
+    type="email"
+    placeholder="Enter your email"
+    class="flex-1"
+  />
+  <Button type="submit">Subscribe</Button>
+</div>
+```

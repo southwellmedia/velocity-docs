@@ -1,0 +1,157 @@
+---
+title: Blog Components
+description: Components for blog articles and listings
+sidebar:
+  order: 2
+---
+
+Blog components are designed for article pages and blog listings.
+
+## ArticleHero
+
+Displays the article header with title, metadata, and optional cover image:
+
+```astro
+---
+import ArticleHero from '@/components/blog/ArticleHero.astro';
+---
+
+<ArticleHero
+  title="Getting Started with Velocity"
+  publishedAt={new Date('2026-01-28')}
+  author="John Doe"
+  image="/blog/velocity-intro.jpg"
+  imageAlt="Velocity documentation"
+/>
+```
+
+### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `title` | `string` | Article title |
+| `publishedAt` | `Date` | Publication date |
+| `updatedAt` | `Date` | Last updated (optional) |
+| `author` | `string` | Author name |
+| `image` | `string` | Cover image URL |
+| `imageAlt` | `string` | Cover image alt text |
+| `tags` | `string[]` | Article tags |
+
+## BlogCard
+
+Card for blog listings:
+
+```astro
+---
+import BlogCard from '@/components/blog/BlogCard.astro';
+---
+
+<BlogCard
+  title="Article Title"
+  description="Brief description of the article"
+  href="/blog/article-slug"
+  image="/blog/thumbnail.jpg"
+  publishedAt={new Date('2026-01-28')}
+  author="John Doe"
+/>
+```
+
+### Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `title` | `string` | Article title |
+| `description` | `string` | Article excerpt |
+| `href` | `string` | Article URL |
+| `image` | `string` | Thumbnail image |
+| `publishedAt` | `Date` | Publication date |
+| `author` | `string` | Author name |
+| `tags` | `string[]` | Article tags |
+
+## ShareButtons
+
+Social sharing buttons:
+
+```astro
+---
+import ShareButtons from '@/components/blog/ShareButtons.astro';
+---
+
+<ShareButtons
+  url={Astro.url.href}
+  title="Article Title"
+/>
+```
+
+### Features
+
+- Twitter sharing
+- Facebook sharing
+- LinkedIn sharing
+- Copy link button
+
+## RelatedPosts
+
+Shows related articles based on tags:
+
+```astro
+---
+import RelatedPosts from '@/components/blog/RelatedPosts.astro';
+---
+
+<RelatedPosts
+  currentSlug="current-article"
+  tags={['astro', 'tutorial']}
+  limit={3}
+/>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `currentSlug` | `string` | — | Current article slug |
+| `tags` | `string[]` | `[]` | Tags to match |
+| `limit` | `number` | `3` | Max related posts |
+
+## Examples
+
+### Blog Listing Page
+
+```astro
+---
+import { getCollection } from 'astro:content';
+import BlogCard from '@/components/blog/BlogCard.astro';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) =>
+  b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+---
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {sortedPosts.map((post) => (
+    <BlogCard
+      title={post.data.title}
+      description={post.data.description}
+      href={`/blog/${post.id}`}
+      image={post.data.image}
+      publishedAt={post.data.publishedAt}
+      author={post.data.author}
+    />
+  ))}
+</div>
+```
+
+### Article Footer
+
+```astro
+<footer class="mt-12 pt-8 border-t border-border">
+  <ShareButtons url={Astro.url.href} title={title} />
+
+  <div class="mt-12">
+    <h2 class="text-2xl font-bold mb-6">Related Articles</h2>
+    <RelatedPosts currentSlug={slug} tags={tags} />
+  </div>
+</footer>
+```

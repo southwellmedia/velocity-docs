@@ -1,0 +1,226 @@
+---
+title: Card
+description: Flexible container component for content grouping
+sidebar:
+  order: 4
+---
+
+The Card component is a versatile container following the **composition-first** pattern. Props control the container's appearance, while you compose your own content structure inside.
+
+## Basic Usage
+
+```astro
+---
+import Card from '@/components/ui/Card.astro';
+---
+
+<Card>
+  <h3 class="font-semibold text-lg mb-2">Card Title</h3>
+  <p class="text-foreground-muted">Card content goes here.</p>
+</Card>
+```
+
+## Variants
+
+```astro
+<Card variant="default">Default with border</Card>
+<Card variant="solid">Solid background</Card>
+<Card variant="outline">Thick outline</Card>
+<Card variant="ghost">No background</Card>
+<Card variant="elevated">With shadow</Card>
+```
+
+## Padding
+
+```astro
+<Card padding="none">No padding</Card>
+<Card padding="sm">Small padding</Card>
+<Card padding="md">Medium padding (default)</Card>
+<Card padding="lg">Large padding</Card>
+```
+
+## Hover Effect
+
+Enable hover state with lift effect and enhanced border:
+
+```astro
+<Card hover>Hover me for effect</Card>
+```
+
+## As Link
+
+Make the entire card clickable:
+
+```astro
+<Card href="/details" hover>
+  <h3 class="font-semibold">Clickable Card</h3>
+  <p class="text-foreground-muted">Click anywhere to navigate</p>
+</Card>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'default' \| 'solid' \| 'outline' \| 'ghost' \| 'elevated'` | `'default'` | Visual style |
+| `padding` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` | Internal padding |
+| `hover` | `boolean` | `false` | Enable hover effect |
+| `href` | `string` | — | Make card a link |
+
+## Slots
+
+| Slot | Purpose |
+|------|---------|
+| `default` | All card content |
+
+## Composition Patterns
+
+Since Card follows composition-first design, you build your own layouts:
+
+### Feature Card
+
+```astro
+---
+import Card from '@/components/ui/Card.astro';
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<Card padding="lg">
+  <Icon name="zap" class="w-8 h-8 text-brand-500 mb-4" />
+  <h3 class="font-semibold text-lg mb-2">Lightning Fast</h3>
+  <p class="text-foreground-muted">
+    Optimized for performance with sub-second builds.
+  </p>
+</Card>
+```
+
+### Feature Card Grid
+
+```astro
+<div class="grid md:grid-cols-3 gap-6">
+  <Card hover>
+    <Icon name="zap" class="w-8 h-8 text-brand-500 mb-4" />
+    <h3 class="font-semibold mb-2">Fast</h3>
+    <p class="text-foreground-muted text-sm">Lightning quick builds</p>
+  </Card>
+  <Card hover>
+    <Icon name="shield" class="w-8 h-8 text-brand-500 mb-4" />
+    <h3 class="font-semibold mb-2">Secure</h3>
+    <p class="text-foreground-muted text-sm">Built-in security</p>
+  </Card>
+  <Card hover>
+    <Icon name="trending-up" class="w-8 h-8 text-brand-500 mb-4" />
+    <h3 class="font-semibold mb-2">Scalable</h3>
+    <p class="text-foreground-muted text-sm">Grows with you</p>
+  </Card>
+</div>
+```
+
+### Blog Post Card
+
+```astro
+<Card hover href={`/blog/${post.slug}`} padding="none">
+  <img
+    src={post.image}
+    alt={post.title}
+    class="w-full h-48 object-cover rounded-t-xl"
+  />
+  <div class="p-6">
+    <span class="text-xs text-foreground-muted">{post.date}</span>
+    <h3 class="font-semibold text-lg mt-1 mb-2">{post.title}</h3>
+    <p class="text-foreground-muted text-sm line-clamp-2">{post.excerpt}</p>
+  </div>
+</Card>
+```
+
+### Pricing Card
+
+```astro
+---
+import Card from '@/components/ui/Card.astro';
+import Button from '@/components/ui/Button.astro';
+import Badge from '@/components/ui/Badge.astro';
+---
+
+<Card variant="elevated" padding="lg" class="text-center">
+  <Badge variant="brand" class="mb-4">Popular</Badge>
+  <h3 class="text-xl font-bold">Pro Plan</h3>
+  <p class="text-4xl font-bold my-4">
+    $29<span class="text-sm text-foreground-muted">/mo</span>
+  </p>
+  <ul class="text-left space-y-2 mb-6 text-sm">
+    <li class="flex items-center gap-2">
+      <Icon name="check" class="w-4 h-4 text-success" />
+      Unlimited projects
+    </li>
+    <li class="flex items-center gap-2">
+      <Icon name="check" class="w-4 h-4 text-success" />
+      Priority support
+    </li>
+    <li class="flex items-center gap-2">
+      <Icon name="check" class="w-4 h-4 text-success" />
+      Advanced analytics
+    </li>
+  </ul>
+  <Button fullWidth>Get Started</Button>
+</Card>
+```
+
+### Team Member Card
+
+```astro
+<Card padding="lg" class="text-center">
+  <img
+    src={member.avatar}
+    alt={member.name}
+    class="w-20 h-20 rounded-full mx-auto mb-4"
+  />
+  <h3 class="font-semibold">{member.name}</h3>
+  <p class="text-foreground-muted text-sm">{member.role}</p>
+  <div class="flex justify-center gap-3 mt-4">
+    <a href={member.twitter} class="text-foreground-muted hover:text-foreground">
+      <Icon name="twitter" class="w-5 h-5" />
+    </a>
+    <a href={member.linkedin} class="text-foreground-muted hover:text-foreground">
+      <Icon name="linkedin" class="w-5 h-5" />
+    </a>
+  </div>
+</Card>
+```
+
+### Stat Card
+
+```astro
+<Card variant="solid" padding="lg">
+  <p class="text-foreground-muted text-sm">Total Users</p>
+  <p class="text-3xl font-bold mt-1">12,847</p>
+  <p class="text-success text-sm mt-2 flex items-center gap-1">
+    <Icon name="trending-up" class="w-4 h-4" />
+    +12% from last month
+  </p>
+</Card>
+```
+
+## Why Composition-First?
+
+The Card component intentionally has no `title`, `description`, or `icon` props. This follows the shadcn/ui philosophy:
+
+1. **Maximum flexibility** - You control the exact HTML structure
+2. **No edge cases** - No conditional rendering logic to maintain
+3. **Easy customization** - Just write the markup you need
+4. **Semantic control** - You choose heading levels, not the component
+
+```astro
+<!-- You have full control over the structure -->
+<Card>
+  <div class="flex items-start gap-4">
+    <Icon name="star" class="w-6 h-6 text-brand-500 mt-1" />
+    <div>
+      <h4 class="font-medium">Custom Layout</h4>
+      <p class="text-sm text-foreground-muted">
+        Build any card layout you need.
+      </p>
+    </div>
+  </div>
+</Card>
+```

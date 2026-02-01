@@ -1,0 +1,152 @@
+---
+title: Adding Routes
+description: Add new pages and navigation items
+sidebar:
+  order: 4
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Add new pages to your Velocity site.
+
+## Adding a Page
+
+<Steps>
+1. **Define the route** in `src/config/routes.ts`:
+
+   ```typescript
+   export const routes = {
+     // ... existing routes
+     pricing: {
+       path: '/pricing',
+       nav: { show: true, order: 5, label: 'Pricing' },
+     },
+   };
+   ```
+
+2. **Create the page** at `src/pages/pricing.astro`:
+
+   ```astro
+   ---
+   import PageLayout from '@/layouts/PageLayout.astro';
+   ---
+
+   <PageLayout title="Pricing" description="View our pricing plans">
+     <section class="py-16">
+       <div class="container">
+         <h1 class="text-4xl font-bold mb-8">Pricing</h1>
+         <!-- Content -->
+       </div>
+     </section>
+   </PageLayout>
+   ```
+</Steps>
+
+## Route Configuration
+
+### Show in Navigation
+
+```typescript
+pricing: {
+  path: '/pricing',
+  nav: { show: true, order: 5, label: 'Pricing' },
+},
+```
+
+### Hide from Navigation
+
+```typescript
+privacy: {
+  path: '/privacy',
+  nav: { show: false, order: 0, label: 'Privacy' },
+},
+```
+
+### Navigation Order
+
+Lower numbers appear first:
+
+```typescript
+about: { path: '/about', nav: { show: true, order: 1, label: 'About' } },
+blog: { path: '/blog', nav: { show: true, order: 2, label: 'Blog' } },
+pricing: { path: '/pricing', nav: { show: true, order: 3, label: 'Pricing' } },
+contact: { path: '/contact', nav: { show: true, order: 4, label: 'Contact' } },
+```
+
+## Dynamic Routes
+
+For dynamic pages like blog posts:
+
+```astro
+---
+// src/pages/blog/[slug].astro
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogLayout {...post.data}>
+  <Content />
+</BlogLayout>
+```
+
+## Nested Routes
+
+Create folders for nested paths:
+
+```
+src/pages/
+├── docs/
+│   ├── index.astro        # /docs
+│   ├── getting-started.astro  # /docs/getting-started
+│   └── components/
+│       └── button.astro   # /docs/components/button
+```
+
+## API Routes
+
+Create server endpoints:
+
+```typescript
+// src/pages/api/data.ts
+import type { APIRoute } from 'astro';
+
+export const GET: APIRoute = async () => {
+  return new Response(
+    JSON.stringify({ message: 'Hello!' }),
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+```
+
+## Using Route Helpers
+
+```astro
+---
+import { getRoutePath, getNavRoutes } from '@/config/routes';
+
+// Get path for a route
+const pricingPath = getRoutePath('pricing');
+
+// Get all nav routes
+const navRoutes = getNavRoutes();
+---
+
+<a href={pricingPath}>View Pricing</a>
+
+<nav>
+  {navRoutes.map(({ path, label }) => (
+    <a href={path}>{label}</a>
+  ))}
+</nav>
+```

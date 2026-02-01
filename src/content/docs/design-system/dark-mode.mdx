@@ -1,0 +1,144 @@
+---
+title: Dark Mode
+description: How dark mode works in Velocity
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity includes automatic dark mode with system preference detection and manual toggle.
+
+## How It Works
+
+1. On page load, checks `localStorage` for saved preference
+2. Falls back to system preference (`prefers-color-scheme`)
+3. Adds/removes `.dark` class on `<html>`
+4. All semantic tokens automatically switch values
+
+## Theme Toggle Component
+
+```astro
+---
+import ThemeToggle from '@/components/layout/ThemeToggle.astro';
+---
+
+<ThemeToggle />
+```
+
+The toggle:
+- Cycles through: System → Light → Dark
+- Persists choice in `localStorage`
+- Updates immediately without flash
+
+## Token Switching
+
+Semantic tokens swap values automatically:
+
+```css
+/* Light mode (default) */
+:root {
+  --background: var(--gray-0);      /* White */
+  --foreground: var(--gray-900);    /* Near black */
+}
+
+/* Dark mode */
+.dark {
+  --background: var(--gray-950);    /* Near black */
+  --foreground: var(--gray-50);     /* Near white */
+}
+```
+
+## Preventing Flash
+
+The theme is initialized in `<head>` before page render:
+
+```html
+<script is:inline>
+  const theme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (theme === 'dark' || (!theme && prefersDark)) {
+    document.documentElement.classList.add('dark');
+  }
+</script>
+```
+
+<Aside type="tip">
+  The `is:inline` directive ensures this runs before any rendering occurs.
+</Aside>
+
+## Manual Control
+
+### JavaScript API
+
+```javascript
+// Check current theme
+const isDark = document.documentElement.classList.contains('dark');
+
+// Set dark mode
+document.documentElement.classList.add('dark');
+localStorage.setItem('theme', 'dark');
+
+// Set light mode
+document.documentElement.classList.remove('dark');
+localStorage.setItem('theme', 'light');
+
+// Follow system
+localStorage.removeItem('theme');
+// Then check prefers-color-scheme
+```
+
+### CSS Targeting
+
+```css
+/* Target dark mode specifically */
+.dark .my-component {
+  /* Dark mode styles */
+}
+
+/* Or use Tailwind's dark: modifier */
+<div class="bg-white dark:bg-gray-900">
+```
+
+## Component Patterns
+
+### Conditional Rendering
+
+```astro
+---
+// Server-side: use client hint or default
+const theme = Astro.request.headers.get('Sec-CH-Prefers-Color-Scheme');
+---
+
+<!-- Client-side: check class -->
+<script>
+  const isDark = document.documentElement.classList.contains('dark');
+</script>
+```
+
+### Color Scheme Props
+
+Many components accept a `colorScheme` prop:
+
+```astro
+<!-- Automatic (follows theme) -->
+<Button>Default</Button>
+
+<!-- Force inverted colors (for dark backgrounds) -->
+<Button colorScheme="invert">On Dark</Button>
+```
+
+## Inverted Sections
+
+For dark sections on light pages, use inverted tokens:
+
+```astro
+<section class="bg-surface-invert">
+  <h2 class="text-on-invert">Title</h2>
+  <p class="text-on-invert-muted">Description</p>
+  <Button colorScheme="invert">CTA</Button>
+</section>
+```
+
+This works in both light and dark mode, maintaining proper contrast.

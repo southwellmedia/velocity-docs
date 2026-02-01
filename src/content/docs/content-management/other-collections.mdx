@@ -1,0 +1,213 @@
+---
+title: Other Collections
+description: Managing authors, FAQs, and pages
+sidebar:
+  order: 3
+---
+
+Beyond blog posts, Velocity includes collections for authors, FAQs, and pages.
+
+## Authors Collection
+
+Author profiles stored as JSON in `src/content/authors/`.
+
+### Schema
+
+```json
+{
+  "name": "Jane Doe",
+  "bio": "Senior developer at Acme Corp",
+  "avatar": "./avatars/jane.jpg",
+  "social": {
+    "twitter": "@janedoe",
+    "github": "janedoe"
+  }
+}
+```
+
+### Querying Authors
+
+```astro
+---
+import { getCollection } from 'astro:content';
+
+const authors = await getCollection('authors');
+const author = authors.find(a => a.data.name === 'Jane Doe');
+---
+```
+
+### Usage with Posts
+
+```astro
+---
+const post = Astro.props.post;
+const authors = await getCollection('authors');
+const author = authors.find(a => a.data.name === post.data.author);
+---
+
+<div class="flex items-center gap-3">
+  <img src={author.data.avatar} alt={author.data.name} class="w-10 h-10 rounded-full" />
+  <div>
+    <p class="font-medium">{author.data.name}</p>
+    <p class="text-sm text-foreground-muted">{author.data.bio}</p>
+  </div>
+</div>
+```
+
+## FAQs Collection
+
+FAQ entries stored as JSON in `src/content/faqs/`.
+
+### Schema
+
+```json
+{
+  "question": "What is Velocity?",
+  "answer": "Velocity is a modern Astro starterkit with 56 components, a complete design system, and full SEO toolkit.",
+  "category": "general",
+  "order": 1,
+  "locale": "en"
+}
+```
+
+### Querying FAQs
+
+```astro
+---
+import { getCollection } from 'astro:content';
+
+const faqs = await getCollection('faqs');
+
+// Filter by category
+const generalFaqs = faqs.filter(f => f.data.category === 'general');
+
+// Sort by order
+const sortedFaqs = faqs.sort((a, b) => a.data.order - b.data.order);
+---
+```
+
+### Rendering FAQs
+
+```astro
+<div class="space-y-4">
+  {faqs.map((faq) => (
+    <details class="border border-border rounded-lg p-4">
+      <summary class="font-medium cursor-pointer">
+        {faq.data.question}
+      </summary>
+      <p class="mt-2 text-foreground-muted">
+        {faq.data.answer}
+      </p>
+    </details>
+  ))}
+</div>
+```
+
+### FAQ Schema for SEO
+
+```astro
+---
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createFAQSchema } from '@/lib/schema';
+---
+
+<JsonLd schema={createFAQSchema(faqs)} />
+```
+
+## Pages Collection
+
+Static pages stored as MDX in `src/content/pages/`.
+
+### Schema
+
+```yaml
+---
+title: "About Us"
+description: "Learn more about our team"
+updatedAt: 2026-01-15
+locale: en
+---
+```
+
+### Querying Pages
+
+```astro
+---
+import { getCollection, render } from 'astro:content';
+
+const pages = await getCollection('pages');
+const aboutPage = pages.find(p => p.id === 'about');
+const { Content } = await render(aboutPage);
+---
+
+<Content />
+```
+
+## Adding New Collections
+
+### 1. Define Schema
+
+```typescript
+// src/content.config.ts
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+  schema: z.object({
+    title: z.string(),
+    client: z.string(),
+    year: z.number(),
+    image: z.string().optional(),
+    url: z.string().url().optional(),
+  }),
+});
+
+export const collections = {
+  blog,
+  pages,
+  authors,
+  faqs,
+  projects, // Add new collection
+};
+```
+
+### 2. Create Content Folder
+
+```
+src/content/projects/
+├── project-one.md
+└── project-two.md
+```
+
+### 3. Add Content
+
+```yaml
+---
+title: "E-commerce Platform"
+client: "Acme Corp"
+year: 2026
+image: ./screenshot.png
+url: https://acme.example.com
+---
+
+Description of the project...
+```
+
+### 4. Query and Display
+
+```astro
+---
+import { getCollection } from 'astro:content';
+const projects = await getCollection('projects');
+---
+
+<div class="grid md:grid-cols-2 gap-6">
+  {projects.map((project) => (
+    <Card>
+      <h3>{project.data.title}</h3>
+      <p>{project.data.client} • {project.data.year}</p>
+    </Card>
+  ))}
+</div>
+```

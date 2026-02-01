@@ -1,0 +1,101 @@
+---
+title: Layouts Overview
+description: Understanding Velocity's layout system
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity includes 4 layouts for different page types.
+
+## Available Layouts
+
+<CardGrid>
+  <Card title="BaseLayout" icon="setting">
+    Core HTML wrapper with SEO, fonts, and theme initialization. Other layouts extend this.
+  </Card>
+  <Card title="PageLayout" icon="document">
+    Standard content pages with header, footer, and navigation.
+  </Card>
+  <Card title="BlogLayout" icon="pencil">
+    Blog articles with hero, breadcrumbs, and related posts.
+  </Card>
+  <Card title="LandingLayout" icon="rocket">
+    Marketing pages with flexible sections and minimal chrome.
+  </Card>
+</CardGrid>
+
+## Layout Hierarchy
+
+```
+BaseLayout (core)
+├── PageLayout (extends Base)
+├── BlogLayout (extends Base)
+└── LandingLayout (extends Base)
+```
+
+All layouts extend `BaseLayout`, which provides:
+
+- HTML document structure
+- Google Fonts loading
+- Favicon and manifest
+- SEO component
+- JSON-LD schemas
+- Analytics integration
+- Theme initialization
+
+## Quick Usage
+
+### Standard Page
+
+```astro
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+---
+
+<PageLayout title="About Us" description="Learn about our team">
+  <section class="py-16">
+    <h1>About Us</h1>
+    <!-- Content -->
+  </section>
+</PageLayout>
+```
+
+### Blog Post
+
+```astro
+---
+import BlogLayout from '@/layouts/BlogLayout.astro';
+---
+
+<BlogLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishedAt={post.data.publishedAt}
+  author={post.data.author}
+>
+  <Content />
+</BlogLayout>
+```
+
+### Landing Page
+
+```astro
+---
+import LandingLayout from '@/layouts/LandingLayout.astro';
+---
+
+<LandingLayout title="Welcome" description="Your landing page">
+  <Hero />
+  <Features />
+  <CTA />
+</LandingLayout>
+```
+
+## Next Steps
+
+- [BaseLayout](/layouts/base-layout) — Core layout details
+- [PageLayout](/layouts/page-layout) — Standard page layout
+- [BlogLayout](/layouts/blog-layout) — Blog article layout
+- [LandingLayout](/layouts/landing-layout) — Marketing page layout

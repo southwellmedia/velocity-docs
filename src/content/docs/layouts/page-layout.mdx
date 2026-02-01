@@ -1,0 +1,153 @@
+---
+title: PageLayout
+description: Layout for standard content pages
+sidebar:
+  order: 3
+---
+
+`PageLayout` is used for standard content pages like About, Contact, and Services.
+
+## Usage
+
+```astro
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+---
+
+<PageLayout title="About Us" description="Learn more about our team">
+  <section class="py-16">
+    <div class="container max-w-4xl">
+      <h1 class="text-4xl font-bold mb-6">About Us</h1>
+      <p class="text-foreground-muted">
+        We build amazing things...
+      </p>
+    </div>
+  </section>
+</PageLayout>
+```
+
+## Props
+
+Inherits all props from `BaseLayout`, plus:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `showHeader` | `boolean` | `true` | Display header |
+| `showFooter` | `boolean` | `true` | Display footer |
+| `headerProps` | `object` | `{}` | Props to pass to Header |
+| `footerProps` | `object` | `{}` | Props to pass to Footer |
+
+## Features
+
+### Fixed Header
+
+Includes the standard Header with:
+
+- Logo and navigation
+- GitHub action button
+- Theme toggle
+- Mobile menu
+
+### Simple Footer
+
+Includes Footer with:
+
+- Copyright notice
+- Legal links
+- Social links
+
+### Container Classes
+
+Content is not wrapped in a container by default. Add your own:
+
+```astro
+<PageLayout title="Page">
+  <section class="container py-16">
+    <!-- Content with container -->
+  </section>
+
+  <section class="bg-surface-invert py-16">
+    <div class="container">
+      <!-- Full-width background, contained content -->
+    </div>
+  </section>
+</PageLayout>
+```
+
+## Customizing Header/Footer
+
+### Pass Props
+
+```astro
+<PageLayout
+  title="Page"
+  headerProps={{
+    showCta: true,
+    cta: { label: 'Get Started', href: '/signup' }
+  }}
+  footerProps={{
+    layout: 'columns',
+    columns: 3
+  }}
+>
+  <!-- Content -->
+</PageLayout>
+```
+
+### Hide Header or Footer
+
+```astro
+<PageLayout
+  title="Minimal Page"
+  showHeader={false}
+  showFooter={false}
+>
+  <!-- Full control over page -->
+</PageLayout>
+```
+
+## Example Pages
+
+### About Page
+
+```astro
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="About Us"
+  description="Learn about our mission and team"
+>
+  <section class="py-16">
+    <div class="container max-w-4xl">
+      <h1 class="text-4xl font-bold mb-4">About Us</h1>
+      <p class="text-xl text-foreground-muted mb-8">
+        Building the future of web development.
+      </p>
+      <!-- More content -->
+    </div>
+  </section>
+</PageLayout>
+```
+
+### Contact Page
+
+```astro
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ContactForm from '@/components/patterns/ContactForm.astro';
+---
+
+<PageLayout
+  title="Contact"
+  description="Get in touch with our team"
+>
+  <section class="py-16">
+    <div class="container max-w-xl">
+      <h1 class="text-4xl font-bold mb-8">Contact Us</h1>
+      <ContactForm />
+    </div>
+  </section>
+</PageLayout>
+```

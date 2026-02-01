@@ -1,0 +1,148 @@
+---
+title: Netlify
+description: Deploy Velocity to Netlify
+sidebar:
+  order: 3
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Deploy your Velocity site to Netlify.
+
+## Quick Deploy
+
+<Steps>
+1. Push your code to GitHub, GitLab, or Bitbucket
+
+2. Log in to [Netlify](https://app.netlify.com)
+
+3. Click "New site from Git"
+
+4. Select your repository
+
+5. Set environment variables
+
+6. Click Deploy
+</Steps>
+
+## CLI Deployment
+
+```bash
+# Install Netlify CLI
+pnpm add -g netlify-cli
+
+# Login
+netlify login
+
+# Deploy preview
+netlify deploy
+
+# Deploy to production
+netlify deploy --prod
+```
+
+## Configuration
+
+Create `netlify.toml` in project root:
+
+```toml
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+```
+
+## Server-Side Features
+
+For API routes and SSR, add the Netlify adapter:
+
+```bash
+pnpm add @astrojs/netlify
+```
+
+```javascript
+// astro.config.mjs
+import netlify from '@astrojs/netlify';
+
+export default defineConfig({
+  output: 'server',
+  adapter: netlify(),
+});
+```
+
+## Environment Variables
+
+Set in Netlify Dashboard → Site Settings → Environment Variables:
+
+```bash
+SITE_URL=https://your-site.netlify.app
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+Or in `netlify.toml`:
+
+```toml
+[context.production.environment]
+  SITE_URL = "https://yoursite.com"
+```
+
+## Custom Domain
+
+1. Go to Domain Settings
+2. Add custom domain
+3. Configure DNS
+4. Enable HTTPS
+
+## Functions
+
+Netlify Functions for serverless:
+
+```typescript
+// netlify/functions/hello.ts
+export async function handler(event, context) {
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: 'Hello!' }),
+  };
+}
+```
+
+## Build Settings
+
+| Setting | Value |
+|---------|-------|
+| Build Command | `pnpm build` |
+| Publish Directory | `dist` |
+| Node Version | 22 |
+
+## Deploy Previews
+
+Every pull request gets a preview URL:
+
+- `deploy-preview-123--your-site.netlify.app`
+
+## Troubleshooting
+
+### Build Timeout
+
+Increase timeout in `netlify.toml`:
+
+```toml
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[functions]
+  timeout = 60
+```
+
+### Node Version
+
+Ensure Node 22+ in `netlify.toml`:
+
+```toml
+[build.environment]
+  NODE_VERSION = "22"
+```

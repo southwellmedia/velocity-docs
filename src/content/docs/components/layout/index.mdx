@@ -1,0 +1,58 @@
+---
+title: Layout Components Overview
+description: Page structure components - Header, Footer, and utilities
+sidebar:
+  order: 1
+---
+
+Layout components provide the structural elements for your pages.
+
+## Available Components
+
+| Component | Purpose |
+|-----------|---------|
+| `Header.astro` | Site header with navigation |
+| `Footer.astro` | Site footer with links |
+| `ThemeToggle.astro` | Dark mode toggle |
+| `Analytics.astro` | Analytics integration |
+
+## Header
+
+Full-featured header with navigation, actions, and mobile menu:
+
+```astro
+<Header
+  showCta
+  cta={{ label: 'Get Started', href: '/signup' }}
+  showThemeToggle
+/>
+```
+
+[View Header documentation →](/components/layout/header)
+
+## Footer
+
+Flexible footer with multiple layouts:
+
+```astro
+<Footer layout="columns" columns={3} />
+```
+
+[View Footer documentation →](/components/layout/footer)
+
+## ThemeToggle
+
+Dark mode toggle component:
+
+```astro
+<ThemeToggle />
+```
+
+## Analytics
+
+Conditionally loads analytics scripts:
+
+```astro
+<!-- Automatically included in BaseLayout if configured -->
+<Analytics />
+```

@@ -1,0 +1,155 @@
+---
+title: Blog Posts
+description: Creating and managing blog posts
+sidebar:
+  order: 2
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Blog posts are stored in `src/content/blog/` organized by locale.
+
+## Creating a Post
+
+Create a new file in the appropriate locale folder:
+
+```
+src/content/blog/en/my-new-post.mdx
+```
+
+## Frontmatter Schema
+
+```yaml
+---
+title: "Your Post Title" # Required, max 100 chars
+description: "Post description" # Required, max 200 chars
+publishedAt: 2026-01-28 # Required
+updatedAt: 2026-01-29 # Optional
+author: "Author Name" # Optional, defaults to "Team"
+image: ./cover.jpg # Optional, relative image path
+imageAlt: "Image description" # Optional
+tags: # Optional
+  - astro
+  - tutorial
+draft: false # Optional, excludes from production
+featured: false # Optional, for featured sections
+locale: en # Required for i18n
+---
+Your markdown content here...
+```
+
+## Field Reference
+
+| Field         | Type       | Required | Description                      |
+| ------------- | ---------- | -------- | -------------------------------- |
+| `title`       | `string`   | Yes      | Post title (max 100 chars)       |
+| `description` | `string`   | Yes      | Meta description (max 200 chars) |
+| `publishedAt` | `date`     | Yes      | Publication date                 |
+| `updatedAt`   | `date`     | No       | Last updated date                |
+| `author`      | `string`   | No       | Author name (default: "Team")    |
+| `image`       | `string`   | No       | Cover image path                 |
+| `imageAlt`    | `string`   | No       | Cover image alt text             |
+| `tags`        | `string[]` | No       | Post tags for categorization     |
+| `draft`       | `boolean`  | No       | Hide from production             |
+| `featured`    | `boolean`  | No       | Mark as featured                 |
+| `locale`      | `string`   | Yes      | Content locale (en, es, fr)      |
+
+## Example Post
+
+```mdx
+---
+title: "Getting Started with Velocity"
+description: "Learn how to build your first project with Velocity"
+publishedAt: 2026-01-28
+author: "Jane Doe"
+image: ./getting-started-cover.jpg
+imageAlt: "Velocity documentation homepage"
+tags:
+  - getting-started
+  - tutorial
+locale: en
+---
+
+Welcome to Velocity! In this guide, we'll walk through...
+
+## Installation
+
+First, clone the repository:
+
+\`\`\`bash
+git clone https://github.com/southwellmedia/velocity.git
+\`\`\`
+
+## Next Steps
+
+Continue to [configuration](/configuration) to customize your site.
+```
+
+## Images
+
+### Cover Images
+
+Place images next to your post and reference with relative paths:
+
+```
+src/content/blog/en/
+├── my-post.mdx
+└── cover.jpg
+```
+
+```yaml
+image: ./cover.jpg
+```
+
+### Inline Images
+
+```markdown
+![Alt text](./screenshot.png)
+```
+
+<Aside type="tip">Images are automatically optimized during build.</Aside>
+
+## Draft Posts
+
+Mark posts as drafts to hide them in production:
+
+```yaml
+draft: true
+```
+
+Draft posts:
+
+- Visible in development
+- Hidden in production builds
+- Useful for work-in-progress content
+
+## Featured Posts
+
+Mark posts for featured sections:
+
+```yaml
+featured: true
+```
+
+Query featured posts:
+
+```astro
+const featured = posts.filter(post => post.data.featured);
+```
+
+## Localization
+
+Organize posts by locale:
+
+```
+src/content/blog/
+├── en/           # English posts
+├── es/           # Spanish posts
+└── fr/           # French posts
+```
+
+Filter by locale:
+
+```astro
+const enPosts = posts.filter(post => post.data.locale === 'en');
+```

@@ -1,0 +1,145 @@
+---
+title: Cloudflare Pages
+description: Deploy Velocity to Cloudflare Pages
+sidebar:
+  order: 4
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Deploy to Cloudflare's global edge network.
+
+## Quick Deploy
+
+<Steps>
+1. Push your code to GitHub or GitLab
+
+2. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+
+3. Go to Pages → Create a project
+
+4. Connect your repository
+
+5. Configure build settings
+
+6. Deploy
+</Steps>
+
+## CLI Deployment
+
+```bash
+# Install Wrangler CLI
+pnpm add -g wrangler
+
+# Login
+wrangler login
+
+# Build
+pnpm build
+
+# Deploy
+wrangler pages deploy dist
+```
+
+## Build Settings
+
+Configure in Cloudflare Dashboard:
+
+| Setting | Value |
+|---------|-------|
+| Framework Preset | Astro |
+| Build Command | `pnpm build` |
+| Build Output | `dist` |
+| Node Version | 22 |
+
+## Server-Side Features
+
+For SSR and API routes, add the Cloudflare adapter:
+
+```bash
+pnpm add @astrojs/cloudflare
+```
+
+```javascript
+// astro.config.mjs
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  output: 'server',
+  adapter: cloudflare(),
+});
+```
+
+## Environment Variables
+
+Set in Pages → Project → Settings → Environment Variables:
+
+```bash
+SITE_URL=https://your-project.pages.dev
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+## Custom Domain
+
+1. Go to Pages → Your Project → Custom Domains
+2. Add your domain
+3. Configure DNS (Cloudflare handles this automatically if domain is on CF)
+
+## Workers
+
+For advanced serverless:
+
+```typescript
+// functions/api/hello.ts
+export async function onRequest(context) {
+  return new Response(JSON.stringify({ message: 'Hello!' }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+```
+
+## KV Storage
+
+Use Cloudflare KV for data:
+
+```typescript
+// astro.config.mjs
+export default defineConfig({
+  adapter: cloudflare({
+    mode: 'directory',
+    functionPerRoute: true,
+  }),
+});
+```
+
+```typescript
+// In your API route
+export async function GET({ locals }) {
+  const value = await locals.runtime.env.MY_KV.get('key');
+  return new Response(value);
+}
+```
+
+## Preview Deployments
+
+Branch deploys create preview URLs:
+
+- `branch-name.your-project.pages.dev`
+
+## Troubleshooting
+
+### Node Version
+
+Set in dashboard or `wrangler.toml`:
+
+```toml
+node_compat = true
+```
+
+### Build Failures
+
+Check build logs in Pages dashboard.
+
+### API Routes Not Working
+
+Ensure `output: 'server'` is set and adapter is configured.

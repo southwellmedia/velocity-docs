@@ -1,0 +1,58 @@
+---
+title: SEO Overview
+description: Search engine optimization features in Velocity
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity includes a complete SEO toolkit for optimal search visibility.
+
+## Features
+
+<CardGrid>
+  <Card title="Meta Tags" icon="document">
+    Automatic title, description, and social meta tags.
+  </Card>
+  <Card title="Dynamic OG Images" icon="seti:image">
+    Auto-generated Open Graph images for every page.
+  </Card>
+  <Card title="JSON-LD Schemas" icon="setting">
+    Structured data for rich search results.
+  </Card>
+  <Card title="Sitemap & Robots" icon="list-format">
+    Automatic sitemap and robots.txt generation.
+  </Card>
+</CardGrid>
+
+## Quick Setup
+
+SEO is automatically handled by layouts. Just provide title and description:
+
+```astro
+<PageLayout
+  title="About Us"
+  description="Learn about our team and mission"
+>
+  <!-- Content -->
+</PageLayout>
+```
+
+## What Gets Generated
+
+For every page, Velocity automatically creates:
+
+- `<title>` tag with site name
+- `<meta name="description">`
+- Canonical URL
+- Open Graph tags (og:title, og:description, og:image)
+- Twitter Card tags
+- JSON-LD structured data
+
+## Next Steps
+
+- [Meta Tags](/seo/meta-tags) — Customizing meta information
+- [OG Images](/seo/og-images) — Dynamic image generation
+- [Structured Data](/seo/structured-data) — JSON-LD schemas
+- [Sitemap & Robots](/seo/sitemap-robots) — Site crawling configuration

@@ -1,0 +1,222 @@
+---
+title: Other UI Components
+description: Additional UI components reference
+sidebar:
+  order: 8
+---
+
+Quick reference for additional UI components.
+
+## Form Components
+
+### Textarea
+
+Multi-line text input:
+
+```astro
+<Textarea
+  label="Message"
+  name="message"
+  hint="Enter your message"
+  rows={5}
+/>
+```
+
+### Select
+
+Dropdown select menu:
+
+```astro
+<Select
+  label="Country"
+  name="country"
+  options={[
+    { value: 'us', label: 'United States' },
+    { value: 'uk', label: 'United Kingdom' },
+    { value: 'ca', label: 'Canada' },
+  ]}
+/>
+```
+
+### Checkbox
+
+```astro
+<Checkbox
+  label="I agree to the terms"
+  name="terms"
+  required
+/>
+```
+
+### Radio
+
+```astro
+<Radio
+  label="Option A"
+  name="choice"
+  value="a"
+/>
+<Radio
+  label="Option B"
+  name="choice"
+  value="b"
+/>
+```
+
+## Display Components
+
+### Avatar
+
+User profile image:
+
+```astro
+<Avatar
+  src="/avatars/user.jpg"
+  alt="John Doe"
+  size="lg"
+  fallback="JD"
+/>
+```
+
+### Skeleton
+
+Loading placeholder:
+
+```astro
+<Skeleton variant="text" width="100%" />
+<Skeleton variant="circular" width={40} height={40} />
+<Skeleton variant="rectangular" height={200} />
+```
+
+### Icon
+
+SVG icon component:
+
+```astro
+<Icon name="search" size={24} />
+<Icon name="heart" size={16} strokeWidth={2} />
+```
+
+## Interactive Components
+
+### Dialog
+
+Modal dialog:
+
+```astro
+<Button data-dialog="confirm-modal">Open Dialog</Button>
+
+<Dialog id="confirm-modal" title="Confirm Action">
+  <p>Are you sure you want to continue?</p>
+  <div class="flex gap-2 mt-4">
+    <Button variant="outline" data-dialog-close>Cancel</Button>
+    <Button variant="destructive">Delete</Button>
+  </div>
+</Dialog>
+```
+
+### Dropdown
+
+Dropdown menu:
+
+```astro
+<Dropdown
+  trigger="Options"
+  items={[
+    { label: 'Edit', href: '/edit' },
+    { label: 'Duplicate', onClick: 'duplicate()' },
+    { label: 'Delete', variant: 'destructive' },
+  ]}
+/>
+```
+
+### Tooltip
+
+Hover tooltip:
+
+```astro
+<Tooltip content="This is helpful information">
+  <Button>Hover me</Button>
+</Tooltip>
+```
+
+### Tabs
+
+Horizontal tabs:
+
+```astro
+<Tabs
+  tabs={[
+    { id: 'overview', label: 'Overview' },
+    { id: 'features', label: 'Features' },
+    { id: 'pricing', label: 'Pricing' },
+  ]}
+  defaultTab="overview"
+>
+  <div data-tab="overview">Overview content</div>
+  <div data-tab="features">Features content</div>
+  <div data-tab="pricing">Pricing content</div>
+</Tabs>
+```
+
+### VerticalTabs
+
+Vertical tab navigation (mobile dropdown):
+
+```astro
+<VerticalTabs
+  tabs={[
+    { id: 'account', label: 'Account' },
+    { id: 'security', label: 'Security' },
+    { id: 'billing', label: 'Billing' },
+  ]}
+  defaultTab="account"
+/>
+```
+
+## Specialized Components
+
+### CodeBlock
+
+Syntax-highlighted code:
+
+```astro
+<CodeBlock
+  code={`const greeting = 'Hello, World!';`}
+  language="javascript"
+  filename="example.js"
+/>
+```
+
+### SocialProof
+
+Testimonial card:
+
+```astro
+<SocialProof
+  quote="This product changed our workflow completely."
+  author="Jane Doe"
+  role="CTO, TechCorp"
+  avatar="/avatars/jane.jpg"
+/>
+```
+
+### NpmCopyButton
+
+NPM install command copier:
+
+```astro
+<NpmCopyButton package="velocity" />
+```
+
+### TerminalDemo
+
+Animated terminal demo (React component):
+
+```astro
+<TerminalDemo
+  client:visible
+  commands={['npm install velocity', 'npm run dev']}
+  output={['Installing...', 'Server running at localhost:4321']}
+/>
+```

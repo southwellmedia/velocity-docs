@@ -1,0 +1,83 @@
+---
+title: Prerequisites
+description: System requirements and recommended tools for Velocity development
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Before starting with Velocity, ensure you have the following installed.
+
+## Required
+
+### Node.js 22 or higher
+
+Velocity is built on Astro 6, which requires Node.js 22+. Support for Node 18 and 20 has been dropped.
+
+```bash
+# Check your Node version
+node --version
+```
+
+<Aside type="caution">
+  Astro 6 requires Node.js 22 or later. Node 18 and 20 are no longer supported.
+</Aside>
+
+### Package Manager
+
+We recommend **pnpm 9.x** for the best experience:
+
+```bash
+# Install pnpm globally
+npm install -g pnpm
+
+# Verify installation
+pnpm --version
+```
+
+Alternatively, npm or yarn will work fine.
+
+### Git
+
+Required for cloning the repository and version control.
+
+```bash
+git --version
+```
+
+## Recommended
+
+### VS Code Extensions
+
+For the best development experience:
+
+- **Astro** — Syntax highlighting and IntelliSense
+- **Tailwind CSS IntelliSense** — Autocomplete for Tailwind classes
+- **ESLint** — Code linting
+- **Prettier** — Code formatting
+
+### Browser DevTools
+
+Modern browser with developer tools for debugging:
+
+- Chrome DevTools
+- Firefox Developer Tools
+- Safari Web Inspector
+
+## Verify Setup
+
+Run these commands to verify your environment:
+
+```bash
+# Node.js (should be 22.x or higher)
+node --version
+
+# Package manager
+pnpm --version  # or npm --version
+
+# Git
+git --version
+```
+
+If all commands return version numbers, you're ready to [get started](/getting-started/).

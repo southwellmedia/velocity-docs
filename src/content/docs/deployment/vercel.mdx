@@ -1,0 +1,123 @@
+---
+title: Vercel
+description: Deploy Velocity to Vercel
+sidebar:
+  order: 2
+  badge:
+    text: Recommended
+    variant: tip
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Vercel is the recommended platform for Velocity.
+
+## Quick Deploy
+
+<Steps>
+1. Push your code to GitHub, GitLab, or Bitbucket
+
+2. Import project in [Vercel Dashboard](https://vercel.com/new)
+
+3. Set environment variables:
+   - `SITE_URL` = Your production domain
+
+4. Click Deploy
+</Steps>
+
+## CLI Deployment
+
+```bash
+# Install Vercel CLI
+pnpm add -g vercel
+
+# Deploy
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+## Server-Side Features
+
+For API routes and server-side rendering, add the Vercel adapter:
+
+```bash
+pnpm add @astrojs/vercel
+```
+
+```javascript
+// astro.config.mjs
+import vercel from '@astrojs/vercel';
+
+export default defineConfig({
+  output: 'server',
+  adapter: vercel(),
+});
+```
+
+## Environment Variables
+
+Set in Vercel Dashboard → Project → Settings → Environment Variables:
+
+```bash
+SITE_URL=https://your-project.vercel.app
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+<Aside type="tip">
+  Environment variables are encrypted and only exposed during build/runtime.
+</Aside>
+
+## Custom Domain
+
+1. Go to Project → Settings → Domains
+2. Add your domain
+3. Update DNS records as instructed
+4. Update `SITE_URL` environment variable
+
+## Build Settings
+
+Vercel auto-detects Astro. Manual configuration if needed:
+
+| Setting | Value |
+|---------|-------|
+| Framework Preset | Astro |
+| Build Command | `pnpm build` |
+| Output Directory | `dist` |
+| Install Command | `pnpm install` |
+
+## Preview Deployments
+
+Every push creates a preview deployment:
+
+- `https://your-project-git-branch-name.vercel.app`
+
+Perfect for testing before merging to main.
+
+## Edge Functions
+
+With the Vercel adapter, API routes run on the edge:
+
+```typescript
+// src/pages/api/hello.ts
+export const config = {
+  runtime: 'edge',
+};
+
+export async function GET() {
+  return new Response('Hello from the edge!');
+}
+```
+
+## Troubleshooting
+
+### Build Fails
+
+Check build logs in Vercel Dashboard for errors.
+
+### Environment Variables Not Working
+
+- Ensure no typos in variable names
+- Redeploy after adding/changing variables
+- Check if variable should be `PUBLIC_` prefixed

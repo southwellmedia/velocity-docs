@@ -1,0 +1,108 @@
+---
+title: Brand Colors
+description: Customize the color palette
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Change Velocity's colors to match your brand.
+
+## Quick Change
+
+The brand color is defined in `src/styles/tokens/colors.css`:
+
+```css
+:root {
+  /* Default: International Orange (hue: 38) */
+  --brand-500: oklch(62.5% 0.22 38);
+}
+```
+
+## Full Color Scale
+
+For a complete rebrand, update the entire scale:
+
+```css
+:root {
+  /* Blue brand (hue: 260) */
+  --brand-50: oklch(97.5% 0.02 260);
+  --brand-100: oklch(94% 0.05 260);
+  --brand-200: oklch(88% 0.10 260);
+  --brand-300: oklch(80% 0.15 260);
+  --brand-400: oklch(72% 0.19 260);
+  --brand-500: oklch(62.5% 0.22 260);  /* Primary */
+  --brand-600: oklch(54% 0.20 260);
+  --brand-700: oklch(45% 0.17 260);
+  --brand-800: oklch(36% 0.13 260);
+  --brand-900: oklch(26.5% 0.09 260);
+}
+```
+
+## OKLCH Hue Reference
+
+| Color | Hue |
+|-------|-----|
+| Red | 25-30 |
+| Orange | 35-50 |
+| Yellow | 85-95 |
+| Green | 140-150 |
+| Teal | 175-185 |
+| Blue | 250-270 |
+| Purple | 290-310 |
+| Pink | 340-350 |
+
+<Aside type="tip">
+  Use [oklch.com](https://oklch.com) to generate palettes with proper chroma values.
+</Aside>
+
+## Update Site Config
+
+Also update the theme color in `src/config/site.config.ts`:
+
+```typescript
+branding: {
+  colors: {
+    themeColor: '#3B82F6',  // Your new brand color (hex)
+    backgroundColor: '#ffffff',
+  },
+},
+```
+
+## Example: Purple Theme
+
+```css
+:root {
+  /* Purple (hue: 300) */
+  --brand-50: oklch(97.5% 0.02 300);
+  --brand-100: oklch(94% 0.05 300);
+  --brand-200: oklch(88% 0.10 300);
+  --brand-300: oklch(80% 0.15 300);
+  --brand-400: oklch(72% 0.19 300);
+  --brand-500: oklch(62.5% 0.22 300);
+  --brand-600: oklch(54% 0.20 300);
+  --brand-700: oklch(45% 0.17 300);
+  --brand-800: oklch(36% 0.13 300);
+  --brand-900: oklch(26.5% 0.09 300);
+}
+```
+
+```typescript
+// site.config.ts
+themeColor: '#9333EA',
+```
+
+## Dark Mode Considerations
+
+The brand colors work in both light and dark modes. The semantic tokens handle the adaptation:
+
+```css
+/* Light mode uses darker brand shades for text */
+--text-brand: var(--brand-600);
+
+/* Dark mode uses lighter brand shades */
+.dark {
+  --text-brand: var(--brand-400);
+}
+```

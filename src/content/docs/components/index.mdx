@@ -1,0 +1,121 @@
+---
+title: Components Overview
+description: 56 production-ready components for building modern websites
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity includes 56 components organized by purpose.
+
+## Component Philosophy
+
+1. **Astro-first** — Components work without client JavaScript
+2. **Composable** — Small, single-purpose primitives
+3. **Accessible** — WCAG 2.2 AA compliant
+4. **Token-based** — No hardcoded colors/sizes
+5. **Variant-rich** — Multiple visual options per component
+
+## Component Categories
+
+<CardGrid>
+  <Card title="UI Components" icon="puzzle">
+    33 primitive components: Button, Input, Card, Badge, Alert, and more.
+  </Card>
+  <Card title="Layout Components" icon="setting">
+    4 components: Header, Footer, ThemeToggle, Analytics.
+  </Card>
+  <Card title="Pattern Components" icon="document">
+    3 composed components: ContactForm, NewsletterForm, FormField.
+  </Card>
+  <Card title="Blog Components" icon="pencil">
+    4 components: ArticleHero, BlogCard, ShareButtons, RelatedPosts.
+  </Card>
+  <Card title="Landing Components" icon="rocket">
+    7 components: Hero, CTA, FeatureTabs, Credibility, and more.
+  </Card>
+  <Card title="SEO Components" icon="magnifier">
+    3 components: SEO, JsonLd, Breadcrumbs.
+  </Card>
+</CardGrid>
+
+## Component Count Summary
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. |
+| Layout Components | 4 | Header, Footer, ThemeToggle, Analytics |
+| Pattern Components | 3 | ContactForm, NewsletterForm, FormField |
+| Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
+| Landing Components | 7 | Hero, CTA, FeatureTabs, etc. |
+| SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
+| Hero Components | 2 | Hero variants |
+| **Total** | **56** | |
+
+## Import Patterns
+
+### Direct Import
+
+```astro
+---
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+---
+
+<Button>Click me</Button>
+<Card>Content</Card>
+```
+
+### Path Alias
+
+All components use the `@/` alias pointing to `src/`:
+
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+## Common Patterns
+
+### Variants and Sizes
+
+Most components accept `variant` and `size` props:
+
+```astro
+<Button variant="primary" size="lg">Large Primary</Button>
+<Button variant="outline" size="sm">Small Outline</Button>
+```
+
+### Color Schemes
+
+For components on dark backgrounds:
+
+```astro
+<Button colorScheme="invert">On Dark Background</Button>
+```
+
+### Responsive Props
+
+Some components support responsive variants:
+
+```astro
+<Card padding={{ base: 'md', lg: 'lg' }}>
+  Responsive padding
+</Card>
+```
+
+## Next Steps
+
+- [UI Components](/components/ui/) — Primitives like Button, Input, Card
+- [Layout Components](/components/layout/) — Header, Footer
+- [Pattern Components](/components/patterns) — Forms and patterns
+- [Blog Components](/components/blog) — Blog-specific components
+- [Landing Components](/components/landing) — Marketing components
+- [SEO Components](/components/seo-components) — SEO utilities

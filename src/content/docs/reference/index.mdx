@@ -1,0 +1,100 @@
+---
+title: Reference
+description: Quick reference materials
+sidebar:
+  order: 1
+---
+
+Quick reference materials for Velocity development.
+
+## Component Summary
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. |
+| Layout Components | 4 | Header, Footer, ThemeToggle, Analytics |
+| Pattern Components | 3 | ContactForm, NewsletterForm, FormField |
+| Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
+| Landing Components | 7 | Hero, CTA, FeatureTabs, etc. |
+| SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
+| Hero Components | 2 | Hero variants |
+| **Total** | **56** | |
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `astro.config.mjs` | Astro configuration |
+| `src/content.config.ts` | Content collection schemas |
+| `src/config/site.config.ts` | Site metadata, branding, contact |
+| `src/config/routes.ts` | Type-safe routing |
+| `src/styles/global.css` | Tailwind + design tokens |
+| `src/styles/tokens/colors.css` | Color tokens |
+| `src/lib/og.ts` | OG image configuration |
+| `src/lib/schema.ts` | JSON-LD schema helpers |
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Format with Prettier |
+| `pnpm check` | Run type checker |
+| `pnpm test` | Run tests |
+
+## Content Collections
+
+| Collection | Location | Format |
+|------------|----------|--------|
+| Blog | `src/content/blog/` | MDX |
+| Pages | `src/content/pages/` | MDX |
+| Authors | `src/content/authors/` | JSON |
+| FAQs | `src/content/faqs/` | JSON |
+
+## Design Tokens
+
+### Colors
+
+| Token | Purpose |
+|-------|---------|
+| `--background` | Primary background |
+| `--foreground` | Primary text |
+| `--primary` | Primary action color |
+| `--border` | Standard border |
+| `--surface-invert` | Inverted background |
+
+### Semantic Classes
+
+| Class | Purpose |
+|-------|---------|
+| `bg-background` | Background color |
+| `text-foreground` | Text color |
+| `bg-primary` | Primary button |
+| `bg-surface-invert` | Dark section |
+
+## Layouts
+
+| Layout | Use Case |
+|--------|----------|
+| `BaseLayout` | Core HTML wrapper |
+| `PageLayout` | Standard pages |
+| `BlogLayout` | Blog articles |
+| `LandingLayout` | Marketing pages |
+
+## API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/contact` | POST | Contact form |
+| `/api/newsletter` | POST | Newsletter signup |
+
+## Technology Stack
+
+- **Astro 6** — Web framework
+- **Tailwind CSS v4** — Styling
+- **TypeScript** — Type safety
+- **OKLCH** — Color format
+- **Satori** — OG image generation

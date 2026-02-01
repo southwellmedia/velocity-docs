@@ -1,0 +1,145 @@
+---
+title: LandingLayout
+description: Layout for marketing and landing pages
+sidebar:
+  order: 5
+---
+
+`LandingLayout` provides a minimal chrome layout for marketing pages with full-width sections.
+
+## Usage
+
+```astro
+---
+import LandingLayout from '@/layouts/LandingLayout.astro';
+import Hero from '@/components/landing/Hero.astro';
+import Features from '@/components/landing/Features.astro';
+import CTA from '@/components/landing/CTA.astro';
+---
+
+<LandingLayout
+  title="Welcome to Our Product"
+  description="The best solution for your needs"
+>
+  <Hero />
+  <Features />
+  <CTA />
+</LandingLayout>
+```
+
+## Props
+
+Inherits all props from `BaseLayout`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `showNavbar` | `boolean` | `true` | Show landing navbar |
+| `showFooter` | `boolean` | `true` | Show landing footer |
+
+## Features
+
+### Landing Navbar
+
+A specialized navbar for landing pages:
+
+- Transparent background
+- Compact design
+- CTA button
+- Scrolls to sections
+
+### Full-Width Sections
+
+No container constraints - sections can span full width:
+
+```astro
+<LandingLayout title="Landing">
+  <!-- Full-width hero with gradient -->
+  <section class="bg-gradient-to-b from-gray-50 to-white py-24">
+    <div class="container">
+      <!-- Contained content -->
+    </div>
+  </section>
+
+  <!-- Full-width dark section -->
+  <section class="bg-surface-invert py-24">
+    <div class="container">
+      <!-- Content on dark background -->
+    </div>
+  </section>
+</LandingLayout>
+```
+
+### Landing Footer
+
+Simplified footer for conversions:
+
+- CTA section
+- Minimal links
+- Social proof
+
+## Section Patterns
+
+### Hero Section
+
+```astro
+<section class="py-24 lg:py-32">
+  <div class="container text-center">
+    <h1 class="text-5xl font-bold mb-6">
+      Build Faster with Velocity
+    </h1>
+    <p class="text-xl text-foreground-muted mb-8 max-w-2xl mx-auto">
+      A production-ready Astro starterkit
+    </p>
+    <div class="flex gap-4 justify-center">
+      <Button size="lg">Get Started</Button>
+      <Button size="lg" variant="outline">Learn More</Button>
+    </div>
+  </div>
+</section>
+```
+
+### Features Grid
+
+```astro
+<section class="py-24 bg-background-secondary">
+  <div class="container">
+    <h2 class="text-3xl font-bold text-center mb-12">Features</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <Card structured title="Feature 1" description="Description" />
+      <Card structured title="Feature 2" description="Description" />
+      <Card structured title="Feature 3" description="Description" />
+    </div>
+  </div>
+</section>
+```
+
+### CTA Section
+
+```astro
+<section class="py-24 bg-surface-invert">
+  <div class="container text-center">
+    <h2 class="text-3xl font-bold text-on-invert mb-4">
+      Ready to Get Started?
+    </h2>
+    <p class="text-on-invert-muted mb-8">
+      Join thousands of developers building with Velocity
+    </p>
+    <Button colorScheme="invert" size="lg">
+      Start Free Trial
+    </Button>
+  </div>
+</section>
+```
+
+## Available Landing Components
+
+| Component | Purpose |
+|-----------|---------|
+| `Hero.astro` | Main hero section |
+| `Credibility.astro` | Social proof and trust |
+| `LighthouseScores.astro` | Performance metrics |
+| `TechStack.astro` | Technology showcase |
+| `FeatureTabs.tsx` | Interactive features |
+| `Navbar.astro` | Landing navigation |
+| `LandingFooter.astro` | Landing footer |
+| `CTA.astro` | Call-to-action section |

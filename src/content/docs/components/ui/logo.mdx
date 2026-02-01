@@ -1,0 +1,99 @@
+---
+title: Logo
+description: Brand logo component with size variants and dark mode support
+sidebar:
+  order: 7
+---
+
+The Logo component displays your brand logo with automatic dark mode switching.
+
+## Basic Usage
+
+```astro
+---
+import Logo from '@/components/ui/Logo.astro';
+---
+
+<Logo />
+```
+
+## Sizes
+
+```astro
+<Logo size="sm" />  <!-- 20x20 -->
+<Logo size="md" />  <!-- 24x24 -->
+<Logo size="lg" />  <!-- 32x32 -->
+<Logo size="xl" />  <!-- 48x48 -->
+<Logo size="2xl" /> <!-- 96x96 -->
+```
+
+## Variants
+
+```astro
+<!-- Icon only -->
+<Logo variant="logomark" />
+
+<!-- Full logo with text -->
+<Logo variant="full" />
+```
+
+## Force Dark Version
+
+For dark backgrounds where you need the light version:
+
+```astro
+<section class="bg-surface-invert">
+  <Logo forceDark />
+</section>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl'` | `'md'` | Logo size |
+| `variant` | `'logomark' \| 'full'` | `'logomark'` | Logo type |
+| `forceDark` | `boolean` | `false` | Force dark version |
+
+## Logo Files
+
+Replace the SVG files in `src/assets/branding/`:
+
+| File | Purpose |
+|------|---------|
+| `logomark.svg` | Icon for light backgrounds |
+| `logomark-dark.svg` | Icon for dark backgrounds |
+| `logo-full.svg` | Full logo for light backgrounds |
+| `logo-full-dark.svg` | Full logo for dark backgrounds |
+
+## Automatic Switching
+
+The Logo component automatically switches between light and dark versions based on:
+
+1. The current theme (`.dark` class on `<html>`)
+2. The `forceDark` prop for manual override
+
+## Examples
+
+### Header Logo
+
+```astro
+<header class="flex items-center justify-between">
+  <a href="/">
+    <Logo variant="full" size="lg" />
+  </a>
+  <nav>...</nav>
+</header>
+```
+
+### Footer Logo
+
+```astro
+<footer class="bg-surface-invert">
+  <Logo variant="full" size="xl" forceDark />
+</footer>
+```
+
+### Favicon
+
+The logomark is also used as the favicon. Update `public/favicon.svg` with your icon.

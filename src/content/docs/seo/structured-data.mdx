@@ -1,0 +1,159 @@
+---
+title: Structured Data
+description: JSON-LD schemas for rich search results
+sidebar:
+  order: 4
+---
+
+Velocity includes helpers for common JSON-LD schemas.
+
+## Using JsonLd Component
+
+```astro
+---
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createBlogPostSchema } from '@/lib/schema';
+---
+
+<JsonLd schema={createBlogPostSchema(post)} />
+```
+
+## Available Schema Helpers
+
+### Website Schema
+
+For your homepage:
+
+```astro
+---
+import { createWebsiteSchema } from '@/lib/schema';
+---
+
+<JsonLd schema={createWebsiteSchema()} />
+```
+
+Output:
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Site Name",
+  "url": "https://yoursite.com",
+  "description": "Site description"
+}
+```
+
+### Organization Schema
+
+For about page and homepage:
+
+```astro
+---
+import { createOrganizationSchema } from '@/lib/schema';
+---
+
+<JsonLd schema={createOrganizationSchema()} />
+```
+
+### Blog Post Schema
+
+For articles:
+
+```astro
+---
+import { createBlogPostSchema } from '@/lib/schema';
+
+const schema = createBlogPostSchema({
+  title: post.data.title,
+  description: post.data.description,
+  url: Astro.url.href,
+  image: ogImageUrl,
+  datePublished: post.data.publishedAt,
+  dateModified: post.data.updatedAt,
+  author: { name: post.data.author },
+});
+---
+
+<JsonLd schema={schema} />
+```
+
+### Breadcrumb Schema
+
+For page navigation:
+
+```astro
+---
+import { createBreadcrumbSchema } from '@/lib/schema';
+
+const breadcrumbs = createBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Blog', url: '/blog' },
+  { name: post.data.title, url: Astro.url.href },
+]);
+---
+
+<JsonLd schema={breadcrumbs} />
+```
+
+### FAQ Schema
+
+For FAQ pages:
+
+```astro
+---
+import { createFAQSchema } from '@/lib/schema';
+import { getCollection } from 'astro:content';
+
+const faqs = await getCollection('faqs');
+---
+
+<JsonLd schema={createFAQSchema(faqs)} />
+```
+
+## Multiple Schemas
+
+Combine multiple schemas:
+
+```astro
+<JsonLd schema={[
+  createWebsiteSchema(),
+  createOrganizationSchema(),
+  createBreadcrumbSchema(items),
+]} />
+```
+
+## Custom Schemas
+
+Create custom schema objects:
+
+```astro
+---
+const eventSchema = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "Web Development Workshop",
+  "startDate": "2026-03-15T09:00:00",
+  "location": {
+    "@type": "Place",
+    "name": "Conference Center"
+  }
+};
+---
+
+<JsonLd schema={eventSchema} />
+```
+
+## Testing
+
+Use Google's Rich Results Test to validate:
+
+1. Visit [Rich Results Test](https://search.google.com/test/rich-results)
+2. Enter your URL or paste HTML
+3. Check for errors and warnings
+
+## Best Practices
+
+- Include schema on relevant pages only
+- Keep data accurate and up-to-date
+- Use the most specific schema type
+- Test with Google's tools before deploying

@@ -1,0 +1,194 @@
+---
+title: Internationalization (i18n)
+description: Add multi-language support to your Velocity project
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The CLI wizard offers to add complete internationalization support to your project.
+
+## Wizard Prompt
+
+During setup, you'll be asked about i18n:
+
+```
+◇  Add internationalization (i18n) support?
+│  ● No
+│  ○ Yes
+```
+
+Choose **Yes** to add multi-language support with locale routing, translations, and a language switcher.
+
+<Aside type="tip">
+  Skip the prompt with `--i18n` flag for automation: `pnpm create velocity-astro my-site --i18n`
+</Aside>
+
+## What's Included
+
+When you enable i18n, you get:
+
+### Locale-Prefixed Routes
+
+```
+/en/           → English homepage
+/en/about      → English about page
+/es/           → Spanish homepage
+/es/about      → Spanish about page
+/fr/           → French homepage
+/fr/about      → French about page
+```
+
+### Language Switcher Component
+
+```astro
+<Header
+  showLanguageSwitcher={true}  <!-- Enabled automatically with i18n -->
+/>
+```
+
+The language switcher:
+- Shows current language
+- Dropdown with available languages
+- Preserves current page when switching
+- Accessible keyboard navigation
+
+### Translated Navigation
+
+Navigation items are translated based on the current locale:
+
+```typescript
+// src/config/i18n.ts
+export const translations = {
+  en: {
+    nav: {
+      home: 'Home',
+      about: 'About',
+      blog: 'Blog',
+      contact: 'Contact',
+    },
+  },
+  es: {
+    nav: {
+      home: 'Inicio',
+      about: 'Nosotros',
+      blog: 'Blog',
+      contact: 'Contacto',
+    },
+  },
+  fr: {
+    nav: {
+      home: 'Accueil',
+      about: 'À propos',
+      blog: 'Blog',
+      contact: 'Contact',
+    },
+  },
+};
+```
+
+### SEO Hreflang Tags
+
+Automatic `hreflang` tags for proper search engine indexing:
+
+```html
+<link rel="alternate" hreflang="en" href="https://site.com/en/about" />
+<link rel="alternate" hreflang="es" href="https://site.com/es/about" />
+<link rel="alternate" hreflang="fr" href="https://site.com/fr/about" />
+<link rel="alternate" hreflang="x-default" href="https://site.com/en/about" />
+```
+
+## Default Languages
+
+The CLI sets up three languages by default:
+
+| Locale | Language | Default |
+|--------|----------|---------|
+| `en` | English | Yes |
+| `es` | Spanish | No |
+| `fr` | French | No |
+
+## Adding Languages
+
+After scaffolding, add new languages in `src/config/i18n.ts`:
+
+```typescript
+export const locales = ['en', 'es', 'fr', 'de'] as const;
+export const defaultLocale = 'en';
+
+export const translations = {
+  // ... existing translations
+  de: {
+    nav: {
+      home: 'Startseite',
+      about: 'Über uns',
+      blog: 'Blog',
+      contact: 'Kontakt',
+    },
+    // ... more translations
+  },
+};
+```
+
+## Content Collections
+
+Blog posts and pages support localization:
+
+```
+src/content/
+├── blog/
+│   ├── en/
+│   │   └── hello-world.mdx
+│   ├── es/
+│   │   └── hola-mundo.mdx
+│   └── fr/
+│       └── bonjour-monde.mdx
+```
+
+Each post includes a `locale` field in frontmatter:
+
+```yaml
+---
+title: "Hello World"
+locale: en
+---
+```
+
+<Aside type="note">
+  The `locale` field is required when i18n is enabled. It determines which language version to display.
+</Aside>
+
+## Using Translations
+
+Access translations in your components:
+
+```astro
+---
+import { getTranslation } from '@/lib/i18n';
+
+const locale = Astro.params.locale || 'en';
+const t = getTranslation(locale);
+---
+
+<h1>{t.nav.home}</h1>
+```
+
+## Route Generation
+
+Dynamic routes handle locale prefixes:
+
+```astro
+---
+// src/pages/[locale]/about.astro
+import { locales } from '@/config/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale } = Astro.params;
+---
+```

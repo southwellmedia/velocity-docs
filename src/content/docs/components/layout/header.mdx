@@ -1,0 +1,118 @@
+---
+title: Header
+description: Site header with navigation, actions, and mobile menu
+sidebar:
+  order: 2
+---
+
+The Header component provides full navigation with responsive mobile menu support.
+
+## Basic Usage
+
+```astro
+---
+import Header from '@/components/layout/Header.astro';
+---
+
+<Header />
+```
+
+## Full Configuration
+
+```astro
+<Header
+  layout="default"
+  position="sticky"
+  size="md"
+  variant="default"
+  colorScheme="default"
+  showCta
+  cta={{ label: 'Get Started', href: '/signup' }}
+  showThemeToggle
+  showMobileMenu
+  showActiveState
+  actions={[
+    {
+      icon: 'github',
+      href: 'https://github.com/...',
+      label: 'GitHub',
+      iconOnly: true,
+      target: '_blank'
+    }
+  ]}
+/>
+```
+
+## Inverted Header
+
+For headers on dark backgrounds:
+
+```astro
+<Header colorScheme="invert" variant="transparent" />
+```
+
+## Custom Navigation
+
+Override the default navigation:
+
+```astro
+<Header nav={[
+  { label: 'Home', href: '/' },
+  { label: 'Features', href: '#features' },
+  { label: 'Pricing', href: '#pricing' },
+]} />
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `layout` | `'default' \| 'centered' \| 'minimal'` | `'default'` | Layout style |
+| `position` | `'fixed' \| 'sticky' \| 'static'` | `'sticky'` | Position behavior |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Header height |
+| `variant` | `'default' \| 'solid' \| 'transparent'` | `'default'` | Background style |
+| `colorScheme` | `'default' \| 'invert'` | `'default'` | Color scheme |
+| `nav` | `NavItem[]` | — | Override navigation |
+| `extraNav` | `NavItem[]` | `[]` | Additional nav items |
+| `showCta` | `boolean` | `false` | Show CTA button |
+| `cta` | `{ label, href }` | `{ label: 'Get Started', href: '#cta' }` | CTA config |
+| `actions` | `HeaderAction[]` | `[]` | Action buttons |
+| `showThemeToggle` | `boolean` | `true` | Show theme toggle |
+| `showMobileMenu` | `boolean` | `true` | Show mobile menu |
+| `showActiveState` | `boolean` | `true` | Highlight current page |
+| `logoText` | `string` | — | Override logo text |
+| `hideLogo` | `boolean` | `false` | Hide logo |
+
+## Slots
+
+| Slot | Purpose |
+|------|---------|
+| `logo` | Custom logo content |
+| `nav` | Custom navigation |
+| `actions` | Custom action buttons |
+| `mobile-menu` | Custom mobile menu content |
+
+## Examples
+
+### Landing Page Header
+
+```astro
+<Header
+  variant="transparent"
+  showCta
+  cta={{ label: 'Start Free Trial', href: '/signup' }}
+  actions={[
+    { icon: 'github', href: 'https://github.com/...', iconOnly: true }
+  ]}
+/>
+```
+
+### Minimal Header
+
+```astro
+<Header
+  layout="minimal"
+  showThemeToggle={false}
+  showMobileMenu={false}
+/>
+```

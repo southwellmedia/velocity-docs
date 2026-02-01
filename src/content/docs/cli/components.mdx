@@ -1,0 +1,178 @@
+---
+title: Component Selection
+description: Choose which components to include in your project
+sidebar:
+  order: 2
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The CLI wizard lets you choose which components to include during project setup.
+
+## Interactive Selection
+
+During setup, the wizard presents component options:
+
+```
+◇  Which components would you like to include?
+│  ● All components (recommended)
+│  ○ UI components only
+│  ○ UI + Patterns
+│  ○ None (minimal)
+```
+
+| Option | What's Included |
+|--------|-----------------|
+| **All components** | Full 27+ component library with UI, patterns, and hero sections |
+| **UI components only** | Core interface components (Button, Input, Card, etc.) |
+| **UI + Patterns** | UI components plus pre-built form patterns |
+| **None (minimal)** | Just layouts, SEO, and navigation — add components later |
+
+<Aside type="tip">
+  Choose **All components** if you're unsure. Unused components don't affect bundle size — Astro only ships what you use.
+</Aside>
+
+## Skip the Prompt (Flags)
+
+For automation or quick setups, use the `--components` flag:
+
+<Tabs>
+  <TabItem label="All (default)">
+    ```bash
+    pnpm create velocity-astro my-site --components
+    # or
+    pnpm create velocity-astro my-site --components=all
+    ```
+  </TabItem>
+  <TabItem label="None">
+    ```bash
+    pnpm create velocity-astro my-site --components=none
+    ```
+  </TabItem>
+  <TabItem label="Specific">
+    ```bash
+    pnpm create velocity-astro my-site --components=ui
+    pnpm create velocity-astro my-site --components=ui,patterns
+    ```
+  </TabItem>
+</Tabs>
+
+## Component Categories
+
+### UI Components (21)
+
+Core interface components for building pages.
+
+| Component | Description |
+|-----------|-------------|
+| `Button` | Actions with variants (primary, secondary, outline, ghost) |
+| `Input` | Text input with label, hint, error states |
+| `Textarea` | Multi-line text input |
+| `Select` | Dropdown selection |
+| `Checkbox` | Checkbox with label |
+| `Radio` | Radio button selection |
+| `Card` | Content container with structured layouts |
+| `Badge` | Status labels and tags |
+| `Alert` | Contextual feedback messages |
+| `Dialog` | Modal dialogs |
+| `Tabs` | Horizontal tab navigation |
+| `VerticalTabs` | Vertical tab navigation |
+| `Tooltip` | Hover tooltips |
+| `Dropdown` | Dropdown menus |
+| `Skeleton` | Loading placeholders |
+| `Logo` | Brand logo with variants |
+| `Avatar` | User profile images |
+| `CodeBlock` | Syntax-highlighted code |
+| `SocialProof` | Testimonial cards |
+| `TerminalDemo` | Animated terminal demo |
+| `CTA` | Call-to-action buttons |
+
+### Pattern Components (3)
+
+Pre-built form patterns for common use cases.
+
+| Component | Description |
+|-----------|-------------|
+| `ContactForm` | Complete contact form with validation |
+| `NewsletterForm` | Email subscription form |
+| `FormField` | Reusable form field wrapper |
+
+### Hero Components (1)
+
+Flexible hero sections for landing pages.
+
+| Component | Description |
+|-----------|-------------|
+| `Hero` | Hero section with multiple layout options |
+
+## Component Features
+
+### Button
+
+```astro
+<Button
+  variant="primary"       <!-- primary | secondary | outline | ghost | destructive -->
+  size="md"               <!-- sm | md | lg -->
+  colorScheme="default"   <!-- default | invert -->
+  fullWidth={false}
+  icon={false}
+  href="/path"            <!-- renders as <a> when provided -->
+/>
+```
+
+### Hero
+
+```astro
+<Hero
+  layout="single"         <!-- single | split -->
+  splitRatio="1:1"        <!-- 1:1 | 1:2 | 2:1 -->
+  align="left"            <!-- left | center | right -->
+  background="default"    <!-- default | secondary | invert | gradient | image -->
+  size="lg"               <!-- sm | md | lg | xl -->
+  showGrid={true}
+  showBlob={true}
+  title="Your Title"
+  titleHighlight="Title"  <!-- text to highlight in brand color -->
+  description="..."
+/>
+```
+
+### CTA
+
+```astro
+<CTA
+  variant="default"       <!-- default | invert -->
+  size="lg"               <!-- sm | md | lg | xl -->
+  align="center"          <!-- center | left -->
+  showLogo={true}
+  heading="Ready to start?"
+  headingHighlight="start"
+  description="Get started in seconds."
+  showCopyCommand={true}
+/>
+```
+
+## Dependency Resolution
+
+<Aside type="tip">
+  The CLI automatically resolves component dependencies. If you select `patterns`, required UI components are included.
+</Aside>
+
+Components are managed via `component-registry.json` in Velocity. The registry defines:
+
+- Component files and locations
+- Dependencies between components
+- Required utilities (like `cn` for class merging)
+- Category groupings
+
+## Always Included
+
+Regardless of component selection, these are always included:
+
+- **Header** — Site navigation
+- **Footer** — Site footer
+- **ThemeToggle** — Dark mode toggle
+- **SEO** — Meta tags component
+- **JsonLd** — Structured data
+- **Breadcrumbs** — Navigation breadcrumbs
+- **Layouts** — All page layouts

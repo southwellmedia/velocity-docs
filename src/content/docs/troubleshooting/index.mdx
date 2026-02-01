@@ -1,0 +1,176 @@
+---
+title: Troubleshooting
+description: Common issues and solutions
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Solutions for common issues in Velocity.
+
+## Installation Issues
+
+### "Cannot find module" errors
+
+Clear and reinstall dependencies:
+
+```bash
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+```
+
+### Node version errors
+
+Astro 6 requires Node.js 22.12.0+:
+
+```bash
+node --version  # Should be 22.12.0 or higher
+
+# Using nvm
+nvm install 22
+nvm use 22
+```
+
+## Build Issues
+
+### Tailwind classes not applying
+
+1. Check that `global.css` is imported in your layout
+2. Ensure the file is in Tailwind's content paths
+3. For scoped styles, use `@reference`:
+
+```astro
+<style>
+  @reference "../../styles/global.css";
+  h1 { @apply text-2xl; }
+</style>
+```
+
+### Content collection type errors
+
+Regenerate types:
+
+```bash
+pnpm astro sync
+```
+
+<Aside type="tip">Run this after adding or modifying collection schemas.</Aside>
+
+### OG images not generating
+
+1. Check that dimensions are valid (1200x630 recommended)
+2. Ensure fonts are available
+3. Check build logs for errors
+
+```bash
+pnpm build 2>&1 | grep -i error
+```
+
+## Development Issues
+
+### Hot reload not working
+
+Try restarting the dev server:
+
+```bash
+# Stop with Ctrl+C
+pnpm dev
+```
+
+### TypeScript errors
+
+Update types:
+
+```bash
+pnpm astro sync
+pnpm check
+```
+
+### Import alias not resolving
+
+Check `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+## Component Issues
+
+### Styles not scoped
+
+Use `<style>` without `is:global`:
+
+```astro
+<style>
+  /* These styles are scoped */
+  .my-class { color: red; }
+</style>
+```
+
+### Client-side interactivity not working
+
+Add a client directive:
+
+```astro
+<Counter client:visible />
+<Modal client:load />
+```
+
+### Images not loading
+
+Use absolute paths from `public/` or import:
+
+```astro
+---
+import myImage from '@/assets/image.png';
+---
+
+<img src={myImage.src} alt="Description" />
+```
+
+## Deployment Issues
+
+### Environment variables not working
+
+1. Ensure variables are set in hosting dashboard
+2. Redeploy after adding variables
+3. Check `PUBLIC_` prefix for client-side variables
+
+### Build fails on hosting
+
+Check that your hosting provider supports Node.js 22+.
+
+Set in your hosting configuration:
+
+```
+NODE_VERSION=22
+```
+
+### 404 on routes
+
+For static hosting, ensure `trailingSlash` is configured:
+
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  trailingSlash: "always", // or 'never'
+});
+```
+
+## Getting Help
+
+- **Astro Discord**: https://astro.build/chat
+- **GitHub Issues**: https://github.com/southwellmedia/velocity/issues
+
+<Aside type="note">
+  When reporting issues, include: - Node.js version - Error message - Steps to
+  reproduce
+</Aside>

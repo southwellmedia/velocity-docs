@@ -1,0 +1,153 @@
+---
+title: Color Tokens
+description: Complete color token reference for Velocity
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Color tokens are defined in `src/styles/tokens/colors.css`.
+
+## Grayscale Foundation
+
+```css
+:root {
+  --gray-0: oklch(100% 0 0);      /* White */
+  --gray-50: oklch(98.3% 0 0);
+  --gray-100: oklch(96.4% 0 0);
+  --gray-200: oklch(92.2% 0 0);
+  --gray-300: oklch(87.1% 0 0);
+  --gray-400: oklch(70.7% 0 0);
+  --gray-500: oklch(55.1% 0 0);
+  --gray-600: oklch(44.6% 0 0);
+  --gray-700: oklch(37.3% 0 0);
+  --gray-800: oklch(26.9% 0 0);
+  --gray-900: oklch(20.5% 0 0);
+  --gray-950: oklch(14.5% 0 0);   /* Near black */
+}
+```
+
+## Brand Colors
+
+The default brand color is International Orange (`#F94C10`):
+
+```css
+:root {
+  --brand-50: oklch(97.5% 0.02 45);
+  --brand-100: oklch(94% 0.05 43);
+  --brand-200: oklch(88% 0.10 42);
+  --brand-300: oklch(80% 0.15 40);
+  --brand-400: oklch(72% 0.19 39);
+  --brand-500: oklch(62.5% 0.22 38);   /* Primary brand */
+  --brand-600: oklch(54% 0.20 36);
+  --brand-700: oklch(45% 0.17 35);
+  --brand-800: oklch(36% 0.13 34);
+  --brand-900: oklch(26.5% 0.09 38);
+}
+```
+
+## Semantic Tokens — Light Mode
+
+```css
+:root {
+  /* Backgrounds */
+  --background: var(--gray-0);
+  --background-secondary: var(--gray-50);
+
+  /* Text */
+  --foreground: var(--gray-900);
+  --foreground-secondary: var(--gray-700);
+  --foreground-muted: var(--gray-600);
+
+  /* Borders */
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+
+  /* Primary actions */
+  --primary: var(--gray-900);
+  --primary-foreground: var(--gray-0);
+}
+```
+
+## Semantic Tokens — Dark Mode
+
+```css
+.dark {
+  --background: var(--gray-950);
+  --background-secondary: var(--gray-900);
+
+  --foreground: var(--gray-50);
+  --foreground-secondary: var(--gray-200);
+  --foreground-muted: var(--gray-300);
+
+  --border: var(--gray-800);
+  --border-strong: var(--gray-700);
+
+  --primary: var(--gray-50);
+  --primary-foreground: var(--gray-900);
+}
+```
+
+## Status Colors
+
+```css
+:root {
+  /* Success */
+  --success: oklch(72.3% 0.19 145);
+  --success-light: oklch(94% 0.05 145);
+  --success-foreground: oklch(35% 0.15 145);
+
+  /* Warning */
+  --warning: oklch(79.5% 0.18 85);
+  --warning-light: oklch(95% 0.05 85);
+  --warning-foreground: oklch(40% 0.15 85);
+
+  /* Error */
+  --error: oklch(62.8% 0.22 25);
+  --error-light: oklch(94% 0.05 25);
+  --error-foreground: oklch(40% 0.18 25);
+
+  /* Info */
+  --info: oklch(59.5% 0.19 260);
+  --info-light: oklch(94% 0.05 260);
+  --info-foreground: oklch(35% 0.15 260);
+}
+```
+
+## Inverted Section Tokens
+
+For dark sections on light pages:
+
+```css
+:root {
+  --surface-invert: var(--gray-950);
+  --surface-invert-secondary: var(--gray-900);
+  --on-invert: var(--gray-50);
+  --on-invert-secondary: var(--gray-200);
+  --on-invert-muted: var(--gray-300);
+  --border-invert: var(--gray-800);
+}
+```
+
+## Customizing Colors
+
+<Aside type="tip">
+  Use [oklch.com](https://oklch.com) to generate new color palettes with proper OKLCH values.
+</Aside>
+
+To change the brand color:
+
+1. Pick your new color's hue (0-360)
+2. Generate a scale with varying lightness
+3. Update the `--brand-*` variables
+4. Update `themeColor` in `site.config.ts`
+
+Example for blue (`hue: 260`):
+
+```css
+:root {
+  --brand-500: oklch(62.5% 0.22 260);
+  /* ... generate full scale */
+}
+```

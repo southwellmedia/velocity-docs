@@ -1,0 +1,177 @@
+---
+title: How It Works
+description: Architecture and scaffolding process
+sidebar:
+  order: 4
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Understanding how the CLI scaffolds your project.
+
+## Architecture Overview
+
+```
+User runs CLI
+    │
+    ▼
+Interactive wizard collects preferences
+    │
+    ▼
+Downloads FULL Velocity repo from GitHub (via giget)
+    │
+    ▼
+Applies local template overlays (i18n, base)
+    │
+    ▼
+Configures based on wizard answers (or flags)
+    │
+    ▼
+Installs dependencies
+```
+
+The CLI guides you through an interactive wizard, then downloads the complete [Velocity repository](https://github.com/southwellmedia/velocity) at runtime and applies configuration overlays based on your selections.
+
+<Aside type="tip">
+  This means you always get the latest Velocity features without needing to update the CLI.
+</Aside>
+
+## 8-Step Scaffolding Process
+
+<Steps>
+1. **Download template**
+
+   Fetches Velocity from GitHub via `giget`, ensuring you get the latest version.
+
+2. **Configure components**
+
+   Filters components based on your `--components` selection. Removes unused component files.
+
+3. **Apply i18n overlay**
+
+   If `--i18n` is enabled, adds locale routing, translations, and language switcher.
+
+4. **Remove demo content**
+
+   If `--demo=false`, strips demo landing page and sample blog posts.
+
+5. **Generate pages**
+
+   If `--pages` is enabled, creates starter pages based on your interactive selections.
+
+6. **Update package.json**
+
+   Sets project name and removes CLI-specific metadata.
+
+7. **Initialize git**
+
+   Creates a new git repository with an initial commit.
+
+8. **Install dependencies**
+
+   Runs your package manager's install command.
+</Steps>
+
+## Template Overlay System
+
+The CLI uses a template overlay approach where files are applied in layers:
+
+### Base Velocity
+
+Downloaded from GitHub. Contains all components, layouts, and features.
+
+### i18n Overlay
+
+When `--i18n` is enabled, overlays:
+
+- Locale-prefixed route structure
+- Translation configuration
+- Language switcher component
+- i18n-aware layouts
+
+### Base Template
+
+For non-demo projects, provides minimal pages:
+
+- Homepage
+- About page
+- Contact page
+- 404 page
+
+Overlays are applied in order, with later files overwriting earlier ones.
+
+## Component Registry
+
+Components are managed via `component-registry.json` in the Velocity repository:
+
+```json
+{
+  "components": {
+    "Button": {
+      "files": ["src/components/ui/Button.astro"],
+      "category": "ui",
+      "dependencies": []
+    },
+    "ContactForm": {
+      "files": ["src/components/patterns/ContactForm.astro"],
+      "category": "patterns",
+      "dependencies": ["Button", "Input", "Textarea"]
+    }
+  }
+}
+```
+
+### Registry Structure
+
+| Field | Description |
+|-------|-------------|
+| `files` | Component file paths |
+| `category` | Category grouping (ui, patterns, hero) |
+| `dependencies` | Required components |
+
+### Dependency Resolution
+
+When you select a category, the CLI:
+
+1. Identifies all components in that category
+2. Resolves dependencies recursively
+3. Includes required utility files (like `cn.ts`)
+4. Removes unused components
+
+## File Operations
+
+### Kept Always
+
+These files are never removed:
+
+- `src/layouts/` — All layouts
+- `src/components/layout/` — Header, Footer, ThemeToggle
+- `src/components/seo/` — SEO, JsonLd, Breadcrumbs
+- `src/lib/` — Utility functions
+- `src/styles/` — Global styles and tokens
+- `src/config/` — Configuration files
+
+### Conditionally Removed
+
+Based on your selections:
+
+- Demo landing page (if `--demo=false`)
+- Sample blog posts (if `--demo=false`)
+- Component categories (based on `--components`)
+- i18n files (if `--i18n=false`)
+
+## Package Manager Detection
+
+The CLI automatically detects your package manager:
+
+```bash
+# Detects based on lock files
+pnpm-lock.yaml  → pnpm
+yarn.lock       → yarn
+package-lock.json → npm
+bun.lockb       → bun
+
+# Or from the command used
+pnpm create velocity-astro  → pnpm
+npm create velocity-astro   → npm
+```

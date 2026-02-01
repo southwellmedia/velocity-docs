@@ -1,0 +1,70 @@
+---
+title: Customization Guide
+description: Customize Velocity to match your brand
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity is designed to be easily customizable.
+
+## Quick Customizations
+
+<CardGrid>
+  <Card title="Brand Colors" icon="seti:css">
+    Change the color palette in CSS tokens.
+  </Card>
+  <Card title="Components" icon="puzzle">
+    Add new components or modify existing ones.
+  </Card>
+  <Card title="Routes" icon="rocket">
+    Add pages and navigation items.
+  </Card>
+  <Card title="Collections" icon="document">
+    Create new content types.
+  </Card>
+</CardGrid>
+
+## Common Changes
+
+### Update Branding
+
+1. Replace logos in `src/assets/branding/`
+2. Update `public/favicon.svg`
+3. Edit `site.config.ts` for site name and info
+
+### Change Colors
+
+Edit `src/styles/tokens/colors.css`:
+
+```css
+:root {
+  --brand-500: oklch(62.5% 0.22 260); /* Blue instead of orange */
+}
+```
+
+### Add Navigation
+
+Update `src/config/routes.ts`:
+
+```typescript
+export const routes = {
+  // ... existing
+  pricing: {
+    path: '/pricing',
+    nav: { show: true, order: 5, label: 'Pricing' },
+  },
+};
+```
+
+### Customize Components
+
+Edit components in `src/components/` or create new ones following existing patterns.
+
+## Next Steps
+
+- [Brand Colors](/customization/brand-colors) — Color customization
+- [Adding Components](/customization/adding-components) — Create new components
+- [Adding Routes](/customization/adding-routes) — Add new pages
+- [Adding Collections](/customization/adding-collections) — New content types

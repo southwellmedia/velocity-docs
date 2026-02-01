@@ -1,0 +1,176 @@
+---
+title: CLI Troubleshooting
+description: Common issues and solutions for the CLI tool
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Solutions for common CLI issues.
+
+## Network Errors
+
+### Template Download Fails
+
+If the template download fails:
+
+1. Check your internet connection
+2. Verify GitHub is accessible
+3. Try again in a few minutes
+
+```bash
+# Test GitHub access
+curl https://github.com/southwellmedia/velocity
+```
+
+### Timeout Errors
+
+For slow connections, the download may timeout. Try:
+
+```bash
+# Increase timeout
+npm create velocity-astro@latest my-site --timeout=60000
+```
+
+## Directory Issues
+
+### Directory Already Exists
+
+The CLI prompts before overwriting existing directories:
+
+```
+? Directory "my-site" already exists. Overwrite? (y/N)
+```
+
+Options:
+- Press `y` to overwrite
+- Press `n` to cancel
+- Use a different directory name
+
+### Permission Errors
+
+On Unix systems, you may need execute permissions:
+
+```bash
+chmod +x node_modules/.bin/create-velocity-astro
+```
+
+<Aside type="tip">
+  Running with `npx` or `pnpm create` usually avoids permission issues.
+</Aside>
+
+## Dependency Installation
+
+### Installation Fails
+
+If automatic installation fails:
+
+```bash
+cd my-site
+npm install  # or pnpm install / yarn / bun install
+```
+
+### Node Version Errors
+
+Velocity requires Node.js 22 or higher (Astro 6 dropped support for Node 18 and 20):
+
+```bash
+# Check your version
+node --version
+
+# Update with nvm
+nvm install 22
+nvm use 22
+```
+
+### Package Manager Not Found
+
+The CLI auto-detects your package manager. If detection fails:
+
+```bash
+# Specify explicitly
+cd my-site
+pnpm install  # or npm/yarn/bun
+```
+
+## Component Issues
+
+### Missing Components
+
+If components are missing after scaffold:
+
+1. Check your `--components` flag
+2. Verify the category names are correct
+3. Re-run the CLI with correct options
+
+```bash
+# Include all components
+npm create velocity-astro@latest my-site --components=all
+```
+
+### Component Errors
+
+If components have import errors:
+
+```bash
+# Regenerate types
+cd my-site
+npm run astro sync
+```
+
+## i18n Issues
+
+### Routes Not Working
+
+If locale routes aren't working:
+
+1. Verify `--i18n` was included
+2. Check `src/config/i18n.ts` exists
+3. Ensure pages are in `[locale]/` directories
+
+### Missing Translations
+
+Add missing translations in `src/config/i18n.ts`:
+
+```typescript
+export const translations = {
+  en: { /* ... */ },
+  es: { /* ... */ },
+  // Add your new locale
+  de: { /* ... */ },
+};
+```
+
+## Git Issues
+
+### Git Not Initialized
+
+If git initialization fails:
+
+```bash
+cd my-site
+git init
+git add .
+git commit -m "Initial commit"
+```
+
+### Git Not Installed
+
+Install git from [git-scm.com](https://git-scm.com/downloads).
+
+## Getting Help
+
+If you're still stuck:
+
+1. Check the [GitHub Issues](https://github.com/southwellmedia/velocity/issues)
+2. Search for your error message
+3. Open a new issue with:
+   - Node.js version
+   - Package manager used
+   - Full error message
+   - Steps to reproduce
+
+<Aside type="note">
+  Include the output of `npm create velocity-astro --version` in bug reports.
+</Aside>

@@ -1,0 +1,96 @@
+---
+title: Alert
+description: Contextual feedback messages for user notifications
+sidebar:
+  order: 6
+---
+
+Alerts display important messages to users with contextual styling.
+
+## Basic Usage
+
+```astro
+---
+import Alert from '@/components/ui/Alert.astro';
+---
+
+<Alert variant="info" title="Information">
+  This is an informational message.
+</Alert>
+```
+
+## Variants
+
+```astro
+<Alert variant="info" title="Info">
+  This is an informational message.
+</Alert>
+
+<Alert variant="success" title="Success!">
+  Your changes have been saved.
+</Alert>
+
+<Alert variant="warning" title="Warning">
+  Please review before continuing.
+</Alert>
+
+<Alert variant="error" title="Error">
+  Something went wrong.
+</Alert>
+```
+
+## Dismissible
+
+Add a close button:
+
+```astro
+<Alert variant="error" title="Error" dismissible>
+  Something went wrong. Click X to dismiss.
+</Alert>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | Alert type |
+| `title` | `string` | — | Alert title |
+| `dismissible` | `boolean` | `false` | Show dismiss button |
+
+## Examples
+
+### Form Validation Error
+
+```astro
+<Alert variant="error" title="Validation Error">
+  <ul class="list-disc list-inside">
+    <li>Email is required</li>
+    <li>Password must be at least 8 characters</li>
+  </ul>
+</Alert>
+```
+
+### Success Message
+
+```astro
+<Alert variant="success" title="Payment Successful" dismissible>
+  Your order has been placed. Check your email for confirmation.
+</Alert>
+```
+
+### Warning Notice
+
+```astro
+<Alert variant="warning" title="Maintenance Scheduled">
+  The system will be unavailable on Sunday from 2-4 AM EST.
+</Alert>
+```
+
+### Info Banner
+
+```astro
+<Alert variant="info" title="New Feature Available">
+  Check out our new dashboard with improved analytics.
+  <a href="/dashboard" class="underline">Learn more</a>
+</Alert>
+```

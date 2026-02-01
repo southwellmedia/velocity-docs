@@ -1,0 +1,328 @@
+---
+title: Landing Components
+description: Components for marketing and landing pages
+sidebar:
+  order: 3
+---
+
+Landing components are designed for marketing pages and conversion-focused layouts. They follow a **composition-first** pattern: props control structure and layout, while slots handle all content.
+
+## Hero
+
+The Hero component is a flexible section for page headers with support for centered or split layouts.
+
+### Basic Usage
+
+```astro
+---
+import Hero from '@/components/hero/Hero.astro';
+import Badge from '@/components/ui/Badge.astro';
+import Button from '@/components/ui/Button.astro';
+---
+
+<Hero layout="centered" size="lg">
+  <Badge slot="badge" pill pulse>Now in Beta</Badge>
+  <h1 slot="title">
+    Build faster with <span class="text-brand-500">Velocity</span>
+  </h1>
+  <p slot="description">
+    A production-ready Astro starterkit with design tokens and accessible components.
+  </p>
+  <Fragment slot="actions">
+    <Button href="/get-started" size="lg">Get Started</Button>
+    <Button href="/docs" variant="secondary" size="lg">Documentation</Button>
+  </Fragment>
+</Hero>
+```
+
+### Split Layout
+
+For two-column hero sections with media:
+
+```astro
+---
+import Hero from '@/components/hero/Hero.astro';
+import Badge from '@/components/ui/Badge.astro';
+import Button from '@/components/ui/Button.astro';
+import TerminalDemo from '@/components/landing/TerminalDemo';
+---
+
+<Hero layout="split" size="lg" showGrid showBlob blobPosition="right">
+  <Badge slot="badge" pill pulse variant="brand">v1.0 Public Beta</Badge>
+  <h1 slot="title">
+    Your next site <span class="text-brand-500">starts here.</span>
+  </h1>
+  <p slot="description">
+    Design tokens, accessible components, and a developer experience that gets out of your way.
+  </p>
+  <Fragment slot="actions">
+    <Button href="/get-started" size="lg">Get Started</Button>
+    <Button href="/docs" variant="ghost" size="lg">Learn More</Button>
+  </Fragment>
+  <TerminalDemo slot="aside" client:load />
+</Hero>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `layout` | `'centered' \| 'split'` | `'centered'` | Layout mode |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'lg'` | Vertical padding size |
+| `showGrid` | `boolean` | `false` | Show background grid pattern |
+| `showBlob` | `boolean` | `false` | Show decorative gradient blob |
+| `blobPosition` | `'left' \| 'right' \| 'center'` | `'right'` | Blob position |
+
+### Slots
+
+| Slot | Purpose |
+|------|---------|
+| `badge` | Optional badge/tag above the title |
+| `title` | Main heading (provide your own `<h1>` or `<h2>`) |
+| `description` | Subheading text (provide your own `<p>`) |
+| `actions` | CTA buttons |
+| `aside` | Media content for split layout |
+| `default` | Additional content below actions (e.g., social proof) |
+
+### Content Styling
+
+The Hero component applies automatic styling to slotted content:
+
+- **Title slot**: `<h1>` elements get display font, responsive sizing (5xl→7xl), tight tracking
+- **Description slot**: Text gets muted color, relaxed leading, max-width constraint
+- **Actions**: Flexbox layout with responsive stacking
+
+This means you provide semantic HTML and the component handles the styling:
+
+```astro
+<!-- You write: -->
+<h1 slot="title">Your heading</h1>
+
+<!-- Component styles it as: -->
+<!-- font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight -->
+```
+
+---
+
+## CTA
+
+Call-to-action section component with slot-based content composition.
+
+### Basic Usage
+
+```astro
+---
+import CTA from '@/components/ui/CTA.astro';
+import Button from '@/components/ui/Button.astro';
+---
+
+<CTA variant="default" size="lg" maxWidth="lg">
+  <h2 slot="heading">
+    Start Building <span class="text-brand-500">Today</span>
+  </h2>
+  <p slot="description">
+    Join thousands of developers building faster with Velocity.
+  </p>
+  <Fragment slot="actions">
+    <Button href="/signup" size="lg">Get Started Free</Button>
+  </Fragment>
+</CTA>
+```
+
+### With Logo
+
+```astro
+---
+import CTA from '@/components/ui/CTA.astro';
+import Logo from '@/components/ui/Logo.astro';
+import Button from '@/components/ui/Button.astro';
+---
+
+<CTA variant="default" size="xl" maxWidth="lg">
+  <Logo slot="logo" size="2xl" class="mx-auto" />
+  <h2 slot="heading">
+    Stop configuring. <span class="text-brand-500">Start building.</span>
+  </h2>
+  <p slot="description">
+    Join the developers who ship faster with Velocity.
+  </p>
+  <Fragment slot="actions">
+    <Button href="/signup" size="lg">Get Started</Button>
+    <Button href="/docs" variant="secondary" size="lg">Documentation</Button>
+  </Fragment>
+</CTA>
+```
+
+### Inverted Variant
+
+For dark background sections:
+
+```astro
+<CTA variant="invert" size="lg">
+  <h2 slot="heading">Ready to get started?</h2>
+  <p slot="description">Start your free trial today.</p>
+  <Button slot="actions" href="/signup" variant="secondary" size="lg">
+    Start Free Trial
+  </Button>
+</CTA>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'default' \| 'invert'` | `'default'` | Color scheme |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'lg'` | Vertical padding |
+| `maxWidth` | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'lg'` | Max content width |
+
+### Slots
+
+| Slot | Purpose |
+|------|---------|
+| `logo` | Optional logo above heading |
+| `heading` | Main heading (provide your own `<h2>`) |
+| `description` | Supporting text (provide your own `<p>`) |
+| `actions` | CTA buttons |
+| `default` | Additional content |
+
+---
+
+## Credibility
+
+Social proof and trust indicators:
+
+```astro
+---
+import Credibility from '@/components/landing/Credibility.astro';
+---
+
+<Credibility
+  title="Trusted by developers worldwide"
+  logos={[
+    { src: '/logos/company1.svg', alt: 'Company 1' },
+    { src: '/logos/company2.svg', alt: 'Company 2' },
+  ]}
+/>
+```
+
+---
+
+## LighthouseScores
+
+Performance metrics display:
+
+```astro
+---
+import LighthouseScores from '@/components/landing/LighthouseScores.astro';
+---
+
+<LighthouseScores
+  performance={100}
+  accessibility={100}
+  bestPractices={100}
+  seo={100}
+/>
+```
+
+---
+
+## TechStack
+
+Technology showcase:
+
+```astro
+---
+import TechStack from '@/components/landing/TechStack.astro';
+---
+
+<TechStack
+  title="Built with modern technologies"
+  technologies={[
+    { name: 'Astro', icon: 'astro', description: 'Web framework' },
+    { name: 'Tailwind', icon: 'tailwind', description: 'CSS framework' },
+    { name: 'TypeScript', icon: 'typescript', description: 'Type safety' },
+  ]}
+/>
+```
+
+---
+
+## FeatureTabs
+
+Interactive feature showcase (React component):
+
+```astro
+---
+import FeatureTabs from '@/components/landing/FeatureTabs';
+---
+
+<FeatureTabs
+  client:visible
+  features={[
+    {
+      id: 'components',
+      title: '56 Components',
+      description: 'Production-ready UI components',
+      image: '/features/components.png',
+    },
+    {
+      id: 'theming',
+      title: 'Design System',
+      description: 'Complete design token system',
+      image: '/features/theming.png',
+    },
+  ]}
+/>
+```
+
+---
+
+## Example Landing Page
+
+```astro
+---
+import LandingLayout from '@/layouts/LandingLayout.astro';
+import Hero from '@/components/hero/Hero.astro';
+import CTA from '@/components/ui/CTA.astro';
+import Badge from '@/components/ui/Badge.astro';
+import Button from '@/components/ui/Button.astro';
+import Logo from '@/components/ui/Logo.astro';
+import Credibility from '@/components/landing/Credibility.astro';
+import FeatureTabs from '@/components/landing/FeatureTabs';
+import LighthouseScores from '@/components/landing/LighthouseScores.astro';
+import TechStack from '@/components/landing/TechStack.astro';
+---
+
+<LandingLayout title="Velocity">
+  <Hero layout="split" size="lg" showGrid showBlob>
+    <Badge slot="badge" pill pulse variant="brand">Now in Beta</Badge>
+    <h1 slot="title">
+      Build faster with <span class="text-brand-500">Velocity</span>
+    </h1>
+    <p slot="description">
+      Production-ready Astro starterkit with design tokens and accessible components.
+    </p>
+    <Fragment slot="actions">
+      <Button href="/signup" size="lg">Get Started</Button>
+      <Button href="/docs" variant="ghost" size="lg">Documentation</Button>
+    </Fragment>
+  </Hero>
+
+  <Credibility title="Trusted by developers" />
+
+  <FeatureTabs client:visible features={[...]} />
+
+  <LighthouseScores />
+
+  <TechStack technologies={[...]} />
+
+  <CTA variant="default" size="xl" maxWidth="lg">
+    <Logo slot="logo" size="2xl" class="mx-auto" />
+    <h2 slot="heading">
+      Ready to <span class="text-brand-500">Start</span>?
+    </h2>
+    <p slot="description">Get up and running in minutes.</p>
+    <Button slot="actions" href="/signup" size="lg">Start Free</Button>
+  </CTA>
+</LandingLayout>
+```

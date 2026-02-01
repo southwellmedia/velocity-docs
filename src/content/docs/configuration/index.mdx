@@ -1,0 +1,67 @@
+---
+title: Configuration Overview
+description: Understanding Velocity's configuration system
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity uses a centralized configuration approach with TypeScript for type safety.
+
+## Configuration Files
+
+<CardGrid>
+  <Card title="Site Config" icon="setting">
+    `src/config/site.config.ts` — Site metadata, branding, contact info, and social links.
+  </Card>
+  <Card title="Routes" icon="rocket">
+    `src/config/routes.ts` — Type-safe route definitions and navigation structure.
+  </Card>
+  <Card title="Environment" icon="document">
+    `.env` — Environment variables for different deployment contexts.
+  </Card>
+</CardGrid>
+
+## Quick Configuration
+
+The most common configurations you'll change:
+
+### 1. Site Information
+
+```typescript
+// src/config/site.config.ts
+const siteConfig = {
+  name: 'Your Site Name',
+  description: 'Your site description',
+  url: import.meta.env.SITE_URL,
+  author: 'Your Name',
+  email: 'hello@yoursite.com',
+};
+```
+
+### 2. Navigation
+
+```typescript
+// src/config/routes.ts
+export const routes = {
+  home: { path: '/', nav: { show: false, order: 0, label: 'Home' } },
+  about: { path: '/about', nav: { show: true, order: 1, label: 'About' } },
+  blog: { path: '/blog', nav: { show: true, order: 2, label: 'Blog' } },
+  contact: { path: '/contact', nav: { show: true, order: 3, label: 'Contact' } },
+};
+```
+
+### 3. Environment Variables
+
+```bash
+# .env
+SITE_URL=https://yoursite.com
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+## Next Steps
+
+- [Site Configuration](/configuration/site-config) — Detailed site config options
+- [Routes](/configuration/routes) — Route configuration and helpers
+- [Environment Variables](/configuration/environment) — Environment variable reference

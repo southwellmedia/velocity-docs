@@ -1,0 +1,200 @@
+---
+title: Adding Collections
+description: Create new content types
+sidebar:
+  order: 5
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Add custom content collections to your project.
+
+## Creating a Collection
+
+<Steps>
+1. **Define the schema** in `src/content.config.ts`:
+
+   ```typescript
+   import { defineCollection, z } from 'astro:content';
+   import { glob } from 'astro/loaders';
+
+   const projects = defineCollection({
+     loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+     schema: z.object({
+       title: z.string(),
+       client: z.string(),
+       year: z.number(),
+       image: z.string().optional(),
+       url: z.string().url().optional(),
+       featured: z.boolean().default(false),
+     }),
+   });
+
+   export const collections = {
+     blog,
+     pages,
+     authors,
+     faqs,
+     projects, // Add new collection
+   };
+   ```
+
+2. **Create the content folder**:
+
+   ```
+   src/content/projects/
+   ```
+
+3. **Add content files**:
+
+   ```markdown
+   ---
+   title: "E-commerce Platform"
+   client: "Acme Corp"
+   year: 2026
+   image: ./screenshot.png
+   url: https://acme.example.com
+   featured: true
+   ---
+
+   Built a custom e-commerce platform with...
+   ```
+
+4. **Query and display**:
+
+   ```astro
+   ---
+   import { getCollection } from 'astro:content';
+
+   const projects = await getCollection('projects');
+   const featured = projects.filter(p => p.data.featured);
+   ---
+
+   {projects.map((project) => (
+     <article>
+       <h2>{project.data.title}</h2>
+       <p>{project.data.client} • {project.data.year}</p>
+     </article>
+   ))}
+   ```
+</Steps>
+
+## Schema Types
+
+### Basic Types
+
+```typescript
+z.string()
+z.number()
+z.boolean()
+z.date()
+z.array(z.string())
+```
+
+### Optional Fields
+
+```typescript
+z.string().optional()
+z.number().default(0)
+```
+
+### Enums
+
+```typescript
+z.enum(['draft', 'published', 'archived'])
+```
+
+### Objects
+
+```typescript
+z.object({
+  name: z.string(),
+  email: z.string().email(),
+})
+```
+
+### Images
+
+```typescript
+import { image } from 'astro:schema';
+
+schema: z.object({
+  cover: image(),
+})
+```
+
+## JSON Collections
+
+For structured data like authors or FAQs:
+
+```typescript
+const team = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/team' }),
+  schema: z.object({
+    name: z.string(),
+    role: z.string(),
+    bio: z.string(),
+    avatar: z.string(),
+    social: z.object({
+      twitter: z.string().optional(),
+      linkedin: z.string().optional(),
+    }).optional(),
+  }),
+});
+```
+
+```json
+// src/content/team/jane-doe.json
+{
+  "name": "Jane Doe",
+  "role": "Lead Developer",
+  "bio": "Building great software since 2015.",
+  "avatar": "/team/jane.jpg",
+  "social": {
+    "twitter": "@janedoe",
+    "linkedin": "janedoe"
+  }
+}
+```
+
+## Dynamic Pages
+
+Create pages from collection:
+
+```astro
+---
+// src/pages/projects/[slug].astro
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<h1>{project.data.title}</h1>
+<Content />
+```
+
+## Filtering and Sorting
+
+```astro
+---
+const projects = await getCollection('projects');
+
+// Filter featured
+const featured = projects.filter(p => p.data.featured);
+
+// Sort by year (newest first)
+const sorted = projects.sort((a, b) => b.data.year - a.data.year);
+
+// Filter by client
+const acmeProjects = projects.filter(p => p.data.client === 'Acme Corp');
+---
+```

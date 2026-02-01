@@ -1,0 +1,149 @@
+---
+title: Contact Form API
+description: Handle contact form submissions
+sidebar:
+  order: 2
+---
+
+The contact form endpoint handles submissions from the ContactForm component.
+
+## Endpoint
+
+```
+POST /api/contact
+```
+
+## Request
+
+### Content-Type
+
+`multipart/form-data` (FormData)
+
+### Fields
+
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `name` | string | Yes | 2-100 characters |
+| `email` | string | Yes | Valid email format |
+| `message` | string | Yes | 10-5000 characters |
+| `honeypot` | string | No | Must be empty (spam check) |
+
+### Example Request
+
+```javascript
+const form = document.querySelector('form');
+const formData = new FormData(form);
+
+const response = await fetch('/api/contact', {
+  method: 'POST',
+  body: formData,
+});
+
+const result = await response.json();
+```
+
+## Response
+
+### Success (200)
+
+```json
+{
+  "success": true
+}
+```
+
+### Validation Error (400)
+
+```json
+{
+  "success": false,
+  "errors": {
+    "email": ["Please enter a valid email address"],
+    "message": ["Message must be at least 10 characters"]
+  }
+}
+```
+
+### Server Error (500)
+
+```json
+{
+  "success": false,
+  "error": "Internal server error"
+}
+```
+
+## Implementation
+
+The endpoint is defined in `src/pages/api/contact.ts`:
+
+```typescript
+import type { APIRoute } from 'astro';
+import { z } from 'zod';
+
+const contactSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  message: z.string().min(10).max(5000),
+  honeypot: z.string().max(0),
+});
+
+export const POST: APIRoute = async ({ request }) => {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+
+  const result = contactSchema.safeParse(data);
+
+  if (!result.success) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        errors: result.error.flatten().fieldErrors,
+      }),
+      { status: 400 }
+    );
+  }
+
+  // Process the submission (email, database, etc.)
+  await processContactSubmission(result.data);
+
+  return new Response(
+    JSON.stringify({ success: true }),
+    { status: 200 }
+  );
+};
+```
+
+## Customization
+
+### Adding Email Sending
+
+```typescript
+import { sendEmail } from '@/lib/email';
+
+await sendEmail({
+  to: 'hello@yoursite.com',
+  subject: `Contact from ${data.name}`,
+  body: data.message,
+  replyTo: data.email,
+});
+```
+
+### Custom Endpoint
+
+Override the endpoint in environment:
+
+```bash
+CONTACT_FORM_ENDPOINT=https://api.yoursite.com/contact
+```
+
+## Spam Protection
+
+The honeypot field provides basic spam protection:
+
+```html
+<!-- Hidden field - bots fill it, humans don't -->
+<input type="text" name="honeypot" class="hidden" tabindex="-1" />
+```
+
+Any submission with a non-empty honeypot is rejected.

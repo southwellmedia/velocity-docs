@@ -1,0 +1,136 @@
+---
+title: BaseLayout
+description: The core HTML wrapper for all pages
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`BaseLayout` is the foundation that all other layouts extend. It provides the HTML document structure and core functionality.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | — | Page title (required) |
+| `description` | `string` | — | Meta description |
+| `image` | `string` | — | OG image URL |
+| `imageAlt` | `string` | — | OG image alt text |
+| `article` | `object` | — | Article metadata |
+| `noindex` | `boolean` | `false` | Prevent search indexing |
+| `nofollow` | `boolean` | `false` | Prevent link following |
+| `includeOrgSchema` | `boolean` | `false` | Include Organization JSON-LD |
+
+### Article Metadata
+
+```typescript
+interface ArticleMetadata {
+  publishedTime?: string;
+  modifiedTime?: string;
+  authors?: string[];
+  tags?: string[];
+}
+```
+
+## Slots
+
+| Slot | Purpose |
+|------|---------|
+| `header` | Header component placement |
+| `default` | Main page content |
+| `footer` | Footer component placement |
+
+## Usage
+
+```astro
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+---
+
+<BaseLayout
+  title="Page Title"
+  description="Page description"
+>
+  <Header slot="header" />
+
+  <main>
+    <!-- Your content -->
+  </main>
+
+  <Footer slot="footer" />
+</BaseLayout>
+```
+
+## Included Features
+
+### Fonts
+
+Google Fonts are preconnected and loaded:
+
+- **Outfit** — Primary sans-serif
+- **Manrope** — Secondary sans-serif
+- **JetBrains Mono** — Monospace for code
+
+### SEO Component
+
+Automatically includes the `SEO` component with:
+
+- Title and description meta tags
+- Open Graph tags
+- Twitter Card tags
+- Canonical URL
+
+### JSON-LD Schemas
+
+Optional structured data:
+
+```astro
+<BaseLayout
+  title="Home"
+  includeOrgSchema
+>
+  <!-- Includes Organization schema -->
+</BaseLayout>
+```
+
+### Theme Initialization
+
+Prevents flash of incorrect theme:
+
+```html
+<script is:inline>
+  // Runs before paint to set .dark class
+</script>
+```
+
+### Analytics
+
+If configured, includes:
+
+- Google Analytics
+- Google Tag Manager
+
+<Aside type="note">
+  Most pages should use `PageLayout`, `BlogLayout`, or `LandingLayout` instead of `BaseLayout` directly.
+</Aside>
+
+## Customizing
+
+To add global elements, edit `BaseLayout.astro`:
+
+```astro
+<head>
+  <!-- Add custom fonts, scripts, etc. -->
+</head>
+
+<body>
+  <slot name="header" />
+  <slot />
+  <slot name="footer" />
+
+  <!-- Add global modals, toast containers, etc. -->
+</body>
+```

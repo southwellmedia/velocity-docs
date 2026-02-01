@@ -1,0 +1,89 @@
+---
+title: Content Management
+description: Managing content with Astro's Content Layer API
+sidebar:
+  order: 1
+---
+
+Velocity uses Astro's Content Layer API for type-safe content management.
+
+## Content Collections
+
+Collections are defined in `src/content.config.ts`:
+
+- **blog** — Blog posts in MDX format
+- **pages** — Static pages
+- **authors** — Author profiles (JSON)
+- **faqs** — FAQ entries (JSON)
+
+## Directory Structure
+
+```
+src/content/
+├── blog/
+│   ├── en/
+│   │   ├── first-post.mdx
+│   │   └── second-post.md
+│   ├── es/
+│   │   └── primer-post.mdx
+│   └── fr/
+│       └── premier-post.mdx
+├── pages/
+├── authors/
+│   └── authors.json
+└── faqs/
+    └── faqs.json
+```
+
+## Querying Content
+
+```astro
+---
+import { getCollection } from 'astro:content';
+
+// Get all published posts
+const posts = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+// Filter by locale
+const enPosts = posts.filter(post => post.data.locale === 'en');
+
+// Sort by date
+const sortedPosts = posts.sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+
+// Get featured posts
+const featured = posts.filter(post => post.data.featured);
+---
+```
+
+## Rendering Content
+
+```astro
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogLayout {...post.data}>
+  <Content />
+</BlogLayout>
+```
+
+## Next Steps
+
+- [Blog Posts](/content-management/blog-posts) — Creating blog content
+- [Other Collections](/content-management/other-collections) — Authors, FAQs, pages

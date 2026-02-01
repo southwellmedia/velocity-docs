@@ -1,0 +1,128 @@
+---
+title: Meta Tags
+description: Managing meta tags and social sharing
+sidebar:
+  order: 2
+---
+
+Meta tags are handled by the `SEO` component integrated into all layouts.
+
+## Basic Usage
+
+Every page uses the SEO component via layouts:
+
+```astro
+---
+import SEO from '@/components/seo/SEO.astro';
+---
+
+<head>
+  <SEO
+    title="Page Title"
+    description="Page description for search results"
+  />
+</head>
+```
+
+## Generated Tags
+
+### Essential Meta
+
+```html
+<title>Page Title | Site Name</title>
+<meta name="description" content="Page description" />
+<link rel="canonical" href="https://yoursite.com/page" />
+```
+
+### Open Graph
+
+```html
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Page Title" />
+<meta property="og:description" content="Page description" />
+<meta property="og:url" content="https://yoursite.com/page" />
+<meta property="og:image" content="https://yoursite.com/og/page.png" />
+<meta property="og:site_name" content="Site Name" />
+```
+
+### Twitter Cards
+
+```html
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Page Title" />
+<meta name="twitter:description" content="Page description" />
+<meta name="twitter:image" content="https://yoursite.com/og/page.png" />
+<meta name="twitter:site" content="@yoursite" />
+```
+
+## Customization
+
+### Custom OG Image
+
+```astro
+<SEO
+  title="Page Title"
+  description="Description"
+  image="/custom-og-image.png"
+  imageAlt="Description of the image"
+/>
+```
+
+### Article Metadata
+
+For blog posts:
+
+```astro
+<SEO
+  title={post.title}
+  description={post.description}
+  article={{
+    publishedTime: post.publishedAt.toISOString(),
+    modifiedTime: post.updatedAt?.toISOString(),
+    authors: [post.author],
+    tags: post.tags,
+  }}
+/>
+```
+
+### Preventing Indexing
+
+```astro
+<SEO
+  title="Private Page"
+  noindex
+  nofollow
+/>
+```
+
+## Props Reference
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | — | Page title |
+| `description` | `string` | Site description | Meta description |
+| `image` | `string` | Auto OG image | OG image URL |
+| `imageAlt` | `string` | — | OG image alt |
+| `noindex` | `boolean` | `false` | No indexing |
+| `nofollow` | `boolean` | `false` | No link following |
+| `article` | `object` | — | Article metadata |
+
+## Best Practices
+
+### Title Tags
+
+- Keep under 60 characters
+- Include primary keyword
+- Make unique for each page
+
+### Descriptions
+
+- Keep between 150-160 characters
+- Include call-to-action
+- Summarize page content
+
+### Images
+
+- Use 1200x630px for OG images
+- Ensure text is readable
+- Include branding

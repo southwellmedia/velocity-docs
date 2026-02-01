@@ -1,0 +1,143 @@
+---
+title: Site Configuration
+description: Configure site metadata, branding, and contact information
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The site configuration file (`src/config/site.config.ts`) is the central place for all site-wide settings.
+
+## Configuration Interface
+
+```typescript
+interface SiteConfig {
+  name: string;
+  description: string;
+  url: string;
+  ogImage: string;
+  author: string;
+  email: string;
+  phone?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
+  socialLinks: string[];
+  twitter?: {
+    site: string;
+    creator: string;
+  };
+  verification?: {
+    google?: string;
+    bing?: string;
+  };
+  branding: {
+    logo: {
+      alt: string;
+    };
+    favicon: {
+      svg: string;
+    };
+    colors: {
+      themeColor: string;
+      backgroundColor: string;
+    };
+  };
+}
+```
+
+## Example Configuration
+
+```typescript
+const siteConfig: SiteConfig = {
+  name: 'Velocity',
+  description: 'A modern website built with Astro and Tailwind CSS',
+  url: import.meta.env.SITE_URL || 'https://example.com',
+  ogImage: '/og-default.png',
+  author: 'Your Name',
+  email: 'hello@example.com',
+  phone: '+1 (555) 123-4567',
+  address: {
+    street: '123 Main St',
+    city: 'Dallas',
+    state: 'TX',
+    zip: '75001',
+    country: 'US',
+  },
+  socialLinks: [
+    'https://github.com/yourname',
+    'https://twitter.com/yourname',
+  ],
+  twitter: {
+    site: '@yoursite',
+    creator: '@yourcreator',
+  },
+  verification: {
+    google: 'your-google-verification-code',
+    bing: 'your-bing-verification-code',
+  },
+  branding: {
+    logo: { alt: 'Your Site Name' },
+    favicon: { svg: '/favicon.svg' },
+    colors: {
+      themeColor: '#F94C10',
+      backgroundColor: '#ffffff',
+    },
+  },
+};
+
+export default siteConfig;
+```
+
+## Field Reference
+
+### Core Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `string` | Your site/brand name |
+| `description` | `string` | Default meta description |
+| `url` | `string` | Production URL |
+| `ogImage` | `string` | Default OG image path |
+| `author` | `string` | Default author name |
+| `email` | `string` | Contact email |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `phone` | `string` | Contact phone number |
+| `address` | `object` | Physical address for local SEO |
+| `socialLinks` | `string[]` | Social media profile URLs |
+| `twitter` | `object` | Twitter card configuration |
+| `verification` | `object` | Search engine verification codes |
+
+### Branding
+
+| Field | Path | Description |
+|-------|------|-------------|
+| `logo.alt` | `branding.logo.alt` | Logo alt text for accessibility |
+| `favicon.svg` | `branding.favicon.svg` | Path to favicon in public/ |
+| `themeColor` | `branding.colors.themeColor` | Browser toolbar color (hex) |
+| `backgroundColor` | `branding.colors.backgroundColor` | PWA splash background |
+
+<Aside type="tip">
+  The `themeColor` affects the browser's address bar color on mobile devices. Use your primary brand color.
+</Aside>
+
+## Usage in Components
+
+```astro
+---
+import siteConfig from '@/config/site.config';
+---
+
+<title>{siteConfig.name}</title>
+<meta name="description" content={siteConfig.description} />
+<meta name="author" content={siteConfig.author} />
+```

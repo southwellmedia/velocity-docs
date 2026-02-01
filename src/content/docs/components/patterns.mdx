@@ -1,0 +1,161 @@
+---
+title: Pattern Components
+description: Composed patterns for common use cases
+sidebar:
+  order: 1
+---
+
+Pattern components combine multiple UI components into reusable patterns.
+
+## ContactForm
+
+Complete contact form with validation:
+
+```astro
+---
+import ContactForm from '@/components/patterns/ContactForm.astro';
+---
+
+<ContactForm
+  action="/api/contact"
+  successMessage="Thanks! We'll be in touch soon."
+/>
+```
+
+### Features
+
+- Name, email, and message fields
+- Client-side validation
+- Honeypot spam protection
+- Success/error states
+- Accessible form structure
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `action` | `string` | `'/api/contact'` | Form submission endpoint |
+| `successMessage` | `string` | `'Thank you...'` | Success message |
+| `errorMessage` | `string` | `'Something went wrong...'` | Error message |
+
+## NewsletterForm
+
+Email subscription form:
+
+```astro
+---
+import NewsletterForm from '@/components/patterns/NewsletterForm.astro';
+---
+
+<NewsletterForm
+  action="/api/newsletter"
+  placeholder="Enter your email"
+  buttonText="Subscribe"
+/>
+```
+
+### Features
+
+- Single email field
+- Inline button layout
+- Loading state
+- Success/error feedback
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `action` | `string` | `'/api/newsletter'` | Submission endpoint |
+| `placeholder` | `string` | `'Enter your email'` | Input placeholder |
+| `buttonText` | `string` | `'Subscribe'` | Button text |
+
+## FormField
+
+Wrapper for consistent form field layouts:
+
+```astro
+---
+import FormField from '@/components/patterns/FormField.astro';
+---
+
+<FormField
+  label="Email"
+  name="email"
+  type="email"
+  required
+  hint="We'll never share your email"
+/>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | — | Field label |
+| `name` | `string` | — | Input name |
+| `type` | `string` | `'text'` | Input type |
+| `required` | `boolean` | `false` | Required field |
+| `hint` | `string` | — | Helper text |
+| `error` | `string` | — | Error message |
+
+## Examples
+
+### Contact Page
+
+```astro
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ContactForm from '@/components/patterns/ContactForm.astro';
+---
+
+<PageLayout title="Contact">
+  <section class="py-16">
+    <div class="container max-w-xl">
+      <h1 class="text-4xl font-bold mb-8">Contact Us</h1>
+      <ContactForm />
+    </div>
+  </section>
+</PageLayout>
+```
+
+### Newsletter Section
+
+```astro
+<section class="bg-surface-invert py-16">
+  <div class="container max-w-md text-center">
+    <h2 class="text-2xl font-bold text-on-invert mb-4">
+      Stay Updated
+    </h2>
+    <p class="text-on-invert-muted mb-6">
+      Get the latest news delivered to your inbox.
+    </p>
+    <NewsletterForm />
+  </div>
+</section>
+```
+
+### Custom Form
+
+```astro
+<form action="/api/signup" method="post" class="space-y-4">
+  <FormField
+    label="Full Name"
+    name="name"
+    required
+  />
+  <FormField
+    label="Email"
+    name="email"
+    type="email"
+    required
+  />
+  <FormField
+    label="Company"
+    name="company"
+    hint="Optional"
+  />
+  <Button type="submit" fullWidth>
+    Create Account
+  </Button>
+</form>
+```

@@ -1,0 +1,83 @@
+---
+title: Project Structure
+description: Understanding the Velocity codebase organization
+sidebar:
+  order: 3
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+Velocity follows a structured organization designed for scalability and maintainability.
+
+## Directory Overview
+
+<FileTree>
+- src/
+  - assets/
+    - branding/ Logo files (logomark.svg, logo-full.svg, etc.)
+  - components/
+    - ui/ 33 primitive components (Button, Input, Card, etc.)
+    - patterns/ 3 composed components (ContactForm, FormField, etc.)
+    - layout/ 4 layout components (Header, Footer, ThemeToggle, Analytics)
+    - seo/ 3 SEO components (SEO, JsonLd, Breadcrumbs)
+    - blog/ 4 blog components (ArticleHero, BlogCard, etc.)
+    - landing/ 7 landing page components
+    - hero/ 2 hero components
+  - config/
+    - site.config.ts Site metadata, branding, contact info
+    - routes.ts Type-safe route definitions
+  - content/ Content collections (blog, pages, authors, faqs)
+  - layouts/ 4 page layouts
+    - BaseLayout.astro Core HTML wrapper
+    - PageLayout.astro Standard content pages
+    - BlogLayout.astro Blog articles
+    - LandingLayout.astro Marketing/landing pages
+  - lib/ Utility functions (cn, schema, og, utils)
+  - pages/ Routes and API endpoints
+    - api/ Contact, newsletter endpoints
+    - og/ Dynamic OG image generation
+    - blog/ Blog routes
+  - styles/
+    - global.css Tailwind + design tokens
+    - tokens/ colors.css, typography.css, spacing.css
+- public/ Static assets
+- astro.config.mjs Astro configuration
+</FileTree>
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `astro.config.mjs` | Astro configuration |
+| `src/content.config.ts` | Content collection schemas |
+| `src/config/site.config.ts` | Site metadata, branding, contact info |
+| `src/config/routes.ts` | Type-safe routing and navigation |
+| `src/styles/global.css` | Tailwind + design tokens |
+| `src/lib/og.ts` | OG image generation configuration |
+
+## Component Organization
+
+Components are organized by category:
+
+- **ui/** — Primitive components (Button, Input, Card)
+- **patterns/** — Composed patterns (ContactForm, FormField)
+- **layout/** — Page structure (Header, Footer)
+- **seo/** — SEO utilities (meta tags, JSON-LD)
+- **blog/** — Blog-specific components
+- **landing/** — Marketing page components
+- **hero/** — Hero section variants
+
+## Content Collections
+
+Located in `src/content/`:
+
+```
+content/
+├── blog/           # Blog posts (MDX)
+│   ├── en/         # English posts
+│   ├── es/         # Spanish posts
+│   └── fr/         # French posts
+├── pages/          # Static pages
+├── authors/        # Author profiles (JSON)
+└── faqs/           # FAQ entries (JSON)
+```

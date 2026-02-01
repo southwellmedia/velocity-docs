@@ -1,0 +1,55 @@
+---
+title: API Routes
+description: Server-side endpoints for forms and data
+sidebar:
+  order: 1
+---
+
+Velocity includes API routes for form handling.
+
+## Available Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/contact` | POST | Contact form submission |
+| `/api/newsletter` | POST | Newsletter subscription |
+
+## Request Format
+
+All endpoints accept `FormData`:
+
+```javascript
+const formData = new FormData(form);
+const response = await fetch('/api/contact', {
+  method: 'POST',
+  body: formData,
+});
+const result = await response.json();
+```
+
+## Response Format
+
+### Success
+
+```json
+{
+  "success": true
+}
+```
+
+### Validation Error
+
+```json
+{
+  "success": false,
+  "errors": {
+    "email": ["Please enter a valid email address"],
+    "message": ["Message must be at least 10 characters"]
+  }
+}
+```
+
+## Next Steps
+
+- [Contact API](/api/contact) — Contact form endpoint
+- [Newsletter API](/api/newsletter) — Newsletter subscription endpoint

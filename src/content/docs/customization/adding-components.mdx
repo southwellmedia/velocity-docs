@@ -1,0 +1,188 @@
+---
+title: Adding Components
+description: Create new components for your project
+sidebar:
+  order: 3
+---
+
+Create components that follow Velocity's patterns.
+
+## Component Structure
+
+Create in the appropriate directory:
+
+```
+src/components/
+├── ui/           # Primitives (Button, Input)
+├── patterns/     # Composed patterns (ContactForm)
+├── layout/       # Page structure (Header)
+├── blog/         # Blog-specific
+└── landing/      # Marketing pages
+```
+
+## Basic Component
+
+```astro
+---
+// src/components/ui/Tag.astro
+interface Props {
+  variant?: 'default' | 'primary' | 'success';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  size = 'md',
+  class: className = '',
+} = Astro.props;
+
+const variants = {
+  default: 'bg-background-secondary text-foreground',
+  primary: 'bg-primary text-primary-foreground',
+  success: 'bg-success-light text-success-foreground',
+};
+
+const sizes = {
+  sm: 'px-2 py-0.5 text-xs',
+  md: 'px-3 py-1 text-sm',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center rounded-full font-medium',
+    variants[variant],
+    sizes[size],
+    className,
+  ]}
+>
+  <slot />
+</span>
+```
+
+## Best Practices
+
+### Use Design Tokens
+
+```astro
+<!-- Good: Uses tokens -->
+<div class="bg-background text-foreground border-border">
+
+<!-- Bad: Hardcoded values -->
+<div class="bg-white text-gray-900 border-gray-200">
+```
+
+### Support Color Schemes
+
+```astro
+---
+interface Props {
+  colorScheme?: 'default' | 'invert';
+}
+
+const { colorScheme = 'default' } = Astro.props;
+
+const schemes = {
+  default: 'bg-background text-foreground',
+  invert: 'bg-surface-invert text-on-invert',
+};
+---
+
+<div class={schemes[colorScheme]}>
+  <slot />
+</div>
+```
+
+### Use class:list
+
+```astro
+<div
+  class:list={[
+    'base-classes',
+    variant === 'primary' && 'variant-primary',
+    size === 'lg' && 'size-large',
+    className,
+  ]}
+>
+```
+
+## TypeScript Props
+
+Define props with TypeScript:
+
+```astro
+---
+interface Props {
+  title: string;
+  description?: string;
+  variant?: 'default' | 'featured';
+  href?: string;
+}
+
+const { title, description, variant = 'default', href } = Astro.props;
+---
+```
+
+## Slots
+
+Use slots for flexible content:
+
+```astro
+---
+// FeatureCard.astro
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="card">
+  <div class="icon">
+    <slot name="icon" />
+  </div>
+  <h3>{title}</h3>
+  <div class="content">
+    <slot />
+  </div>
+  <slot name="footer" />
+</div>
+```
+
+Usage:
+
+```astro
+<FeatureCard title="Fast">
+  <Icon name="zap" slot="icon" />
+  Lightning quick builds and deployments.
+  <Button slot="footer">Learn More</Button>
+</FeatureCard>
+```
+
+## Client-Side Interactivity
+
+For interactive components, use React:
+
+```tsx
+// src/components/ui/Counter.tsx
+import { useState } from 'react';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(c => c + 1)}>
+      Count: {count}
+    </button>
+  );
+}
+```
+
+```astro
+---
+import Counter from '@/components/ui/Counter';
+---
+
+<Counter client:visible />
+```

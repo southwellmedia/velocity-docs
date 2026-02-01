@@ -1,0 +1,175 @@
+---
+title: create-velocity-astro
+description: Scaffold production-ready Velocity projects in seconds
+sidebar:
+  order: 1
+  badge:
+    text: CLI
+    variant: note
+---
+
+import { Tabs, TabItem, Aside, Card, CardGrid, Steps } from '@astrojs/starlight/components';
+
+Scaffold production-ready [Velocity](https://github.com/southwellmedia/velocity) projects in seconds with the official CLI tool.
+
+## Quick Start
+
+<Tabs>
+  <TabItem label="pnpm" icon="pnpm">
+    ```bash
+    pnpm create velocity-astro my-site
+    ```
+  </TabItem>
+  <TabItem label="npm" icon="seti:npm">
+    ```bash
+    npm create velocity-astro@latest my-site
+    ```
+  </TabItem>
+  <TabItem label="yarn" icon="seti:yarn">
+    ```bash
+    yarn create velocity-astro my-site
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```bash
+    bun create velocity-astro my-site
+    ```
+  </TabItem>
+</Tabs>
+
+## Interactive Wizard
+
+The CLI guides you through setup with an interactive wizard. Just run the command and answer the prompts:
+
+```
+┌  create-velocity-astro
+│
+◇  Where should we create your project?
+│  my-awesome-site
+│
+◇  Include demo landing page and sample content?
+│  Yes
+│
+◇  Which components would you like to include?
+│  ● All components (recommended)
+│  ○ UI components only
+│  ○ UI + Patterns
+│  ○ None (minimal)
+│
+◇  Add internationalization (i18n) support?
+│  No
+│
+◇  Generate additional starter pages?
+│  No
+│
+◆  Creating your project...
+```
+
+<Aside type="tip">
+  The wizard remembers sensible defaults. Press Enter to accept them, or customize each option.
+</Aside>
+
+## Wizard Steps
+
+<Steps>
+1. **Project Location**
+
+   Choose where to create your project. Enter a folder name or path.
+
+2. **Demo Content**
+
+   Include the demo landing page, sample blog posts, and example pages? Great for learning and customizing.
+
+3. **Component Selection**
+
+   Choose which UI components to include:
+   - **All components** — Full 27+ component library
+   - **UI only** — Core interface components
+   - **UI + Patterns** — Add form patterns
+   - **None** — Minimal, just layouts and SEO
+
+4. **Internationalization**
+
+   Add multi-language support with locale routing, translations, and language switcher.
+
+5. **Starter Pages**
+
+   Optionally generate additional pages like Services, Pricing, Team, etc.
+</Steps>
+
+## What You Get
+
+Every Velocity project includes:
+
+<CardGrid>
+  <Card title="Astro 6" icon="rocket">
+    Latest Astro with View Transitions and Content Layer API.
+  </Card>
+  <Card title="Tailwind CSS v4" icon="seti:css">
+    Modern utility-first CSS with native cascade layers.
+  </Card>
+  <Card title="TypeScript" icon="seti:typescript">
+    Full type safety throughout your project.
+  </Card>
+  <Card title="27+ Components" icon="puzzle">
+    Production-ready UI components with variants.
+  </Card>
+  <Card title="SEO Ready" icon="magnifier">
+    Meta tags, Open Graph, JSON-LD schemas, sitemap.
+  </Card>
+  <Card title="Dark Mode" icon="moon">
+    System-aware theme switching built in.
+  </Card>
+</CardGrid>
+
+## Skip the Wizard (Flags)
+
+For automation or quick setups, use flags to skip prompts:
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--demo` | boolean | prompt | Include demo landing page and sample content |
+| `--components` | string | prompt | Component selection (see below) |
+| `--i18n` | boolean | prompt | Add internationalization support |
+| `--pages` | boolean | false | Generate starter pages interactively |
+| `-y, --yes` | boolean | false | Skip all prompts, use defaults |
+| `-h, --help` | - | - | Show help message |
+| `-v, --version` | - | - | Show version number |
+
+### Quick Examples
+
+```bash
+# Accept all defaults (full-featured)
+pnpm create velocity-astro my-site -y
+
+# Minimal project, no demo
+pnpm create velocity-astro my-site -y --demo=false --components=none
+
+# Full project with i18n
+pnpm create velocity-astro my-site --demo --components --i18n
+```
+
+<Aside type="note">
+  Flags are optional. Without them, the wizard will prompt for each choice.
+</Aside>
+
+## After Scaffolding
+
+Once complete, the CLI shows next steps:
+
+```
+◆  Done! Your project is ready.
+
+   Next steps:
+   1. cd my-site
+   2. npm run dev
+
+   Your site will be at http://localhost:4321
+```
+
+## Next Steps
+
+- [Component Selection](/cli/components) — Details on component options
+- [i18n Support](/cli/i18n) — Internationalization features
+- [How It Works](/cli/how-it-works) — Under the hood
+- [Configuration](/cli/configuration) — Post-scaffold setup

@@ -1,0 +1,158 @@
+---
+title: BlogLayout
+description: Layout for blog articles with full article features
+sidebar:
+  order: 4
+---
+
+`BlogLayout` is designed for blog posts with article-specific features like hero images, breadcrumbs, and related posts.
+
+## Usage
+
+```astro
+---
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishedAt={post.data.publishedAt}
+  author={post.data.author}
+  tags={post.data.tags}
+  image={post.data.image}
+>
+  <Content />
+</BlogLayout>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | — | Article title (required) |
+| `description` | `string` | — | Article description |
+| `publishedAt` | `Date` | — | Publication date |
+| `updatedAt` | `Date` | — | Last updated date |
+| `author` | `string` | `"Team"` | Author name |
+| `image` | `string` | — | Cover image URL |
+| `imageAlt` | `string` | — | Cover image alt text |
+| `tags` | `string[]` | `[]` | Article tags |
+| `slug` | `string` | — | Article slug for OG image |
+
+## Features
+
+### ArticleHero
+
+Displays article title, metadata, and optional cover image:
+
+```astro
+<ArticleHero
+  title={title}
+  publishedAt={publishedAt}
+  author={author}
+  image={image}
+  imageAlt={imageAlt}
+/>
+```
+
+### Breadcrumbs
+
+Automatic breadcrumb navigation:
+
+```
+Home > Blog > Article Title
+```
+
+Also generates BreadcrumbList JSON-LD schema.
+
+### Prose Styling
+
+Content is wrapped in prose classes for optimal reading:
+
+```html
+<article class="prose prose-lg max-w-none">
+  <!-- MDX content -->
+</article>
+```
+
+### Share Buttons
+
+Social sharing buttons for the article:
+
+- Twitter
+- Facebook
+- LinkedIn
+- Copy link
+
+### Related Posts
+
+Automatically shows related posts based on shared tags:
+
+```astro
+<RelatedPosts currentSlug={slug} tags={tags} />
+```
+
+## Article Schema
+
+BlogLayout automatically generates Article JSON-LD:
+
+```json
+{
+  "@type": "Article",
+  "headline": "Article Title",
+  "datePublished": "2026-01-28",
+  "author": {
+    "@type": "Person",
+    "name": "Author Name"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Site Name"
+  }
+}
+```
+
+## Content Styling
+
+The default prose styling includes:
+
+- Responsive typography
+- Proper heading hierarchy
+- Code block styling
+- Table formatting
+- Image handling
+- Blockquote styling
+
+### Code Blocks
+
+```javascript
+// Syntax highlighted code
+const greeting = 'Hello, World!';
+```
+
+### Tables
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Data     | Data     |
+
+### Images
+
+Images are responsive with lazy loading:
+
+```markdown
+![Alt text](./image.jpg)
+```

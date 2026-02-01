@@ -1,0 +1,77 @@
+---
+title: Design System Overview
+description: Understanding Velocity's three-tier design token architecture
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Velocity uses a three-tier token system built on OKLCH colors for perceptually uniform color transitions.
+
+## Token Architecture
+
+<CardGrid>
+  <Card title="Reference Tokens" icon="list-format">
+    Raw values like grayscale and brand color scales. These are the foundation.
+  </Card>
+  <Card title="Semantic Tokens" icon="document">
+    Intent-based tokens like `background`, `foreground`, `border`. Used in components.
+  </Card>
+  <Card title="Inverted Tokens" icon="moon">
+    For dark sections on light pages, maintaining proper contrast.
+  </Card>
+</CardGrid>
+
+## Quick Reference
+
+### Background & Text
+
+| Class | Purpose |
+|-------|---------|
+| `bg-background` | Primary background |
+| `bg-background-secondary` | Secondary background |
+| `text-foreground` | Primary text |
+| `text-foreground-muted` | Muted/subtle text |
+
+### Buttons
+
+| Class | Purpose |
+|-------|---------|
+| `bg-primary` | Primary button background |
+| `text-primary-foreground` | Primary button text |
+| `bg-secondary` | Secondary button background |
+
+### Borders
+
+| Class | Purpose |
+|-------|---------|
+| `border-border` | Standard border |
+| `border-border-strong` | Emphasized border |
+
+### Inverted Sections
+
+| Class | Purpose |
+|-------|---------|
+| `bg-surface-invert` | Dark section background |
+| `text-on-invert` | Text on dark sections |
+
+## OKLCH Color Format
+
+Velocity uses OKLCH for perceptually uniform colors:
+
+```css
+oklch(62.5% 0.22 38)
+       ↑     ↑   ↑
+       L     C   H
+```
+
+- **L** — Lightness (0-100%)
+- **C** — Chroma (0-0.4, higher = more saturated)
+- **H** — Hue (0-360, color wheel degrees)
+
+## Next Steps
+
+- [Colors](/design-system/colors) — Color token reference
+- [Tailwind Utilities](/design-system/tailwind-utilities) — Available utility classes
+- [Dark Mode](/design-system/dark-mode) — Dark mode implementation

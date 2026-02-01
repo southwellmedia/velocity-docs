@@ -1,0 +1,88 @@
+---
+title: Available Scripts
+description: npm/pnpm scripts available in Velocity
+sidebar:
+  order: 4
+---
+
+Velocity includes several scripts for development, building, and maintenance.
+
+## Development
+
+### `pnpm dev`
+
+Start the development server with hot reload.
+
+```bash
+pnpm dev
+```
+
+Opens at `http://localhost:4321` by default.
+
+### `pnpm preview`
+
+Preview your production build locally.
+
+```bash
+pnpm build && pnpm preview
+```
+
+## Building
+
+### `pnpm build`
+
+Build your site for production.
+
+```bash
+pnpm build
+```
+
+Output is generated in the `dist/` directory.
+
+## Code Quality
+
+### `pnpm lint`
+
+Run ESLint to check for code issues.
+
+```bash
+pnpm lint
+```
+
+### `pnpm format`
+
+Format code with Prettier.
+
+```bash
+pnpm format
+```
+
+### `pnpm check`
+
+Run Astro's type checker.
+
+```bash
+pnpm check
+```
+
+## Testing
+
+### `pnpm test`
+
+Run the test suite.
+
+```bash
+pnpm test
+```
+
+## Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server with hot reload |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build locally |
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Format code with Prettier |
+| `pnpm check` | Run Astro's type checker |
+| `pnpm test` | Run test suite |

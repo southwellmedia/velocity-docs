@@ -1,0 +1,118 @@
+---
+title: Environment Variables
+description: Configure environment variables for different deployment contexts
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity uses environment variables for configuration that varies between environments.
+
+## Setup
+
+Create your environment file from the example:
+
+```bash
+cp .env.example .env
+```
+
+## Variable Reference
+
+### Required
+
+```bash
+# Your production domain (no trailing slash)
+SITE_URL=https://yoursite.com
+```
+
+<Aside type="caution">
+  The `SITE_URL` is required for proper sitemap generation and canonical URLs.
+</Aside>
+
+### Analytics (Optional)
+
+```bash
+# Google Analytics
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Google Tag Manager
+PUBLIC_GTM_ID=GTM-XXXXXXX
+```
+
+### Form Handling (Optional)
+
+```bash
+# Custom form endpoint
+CONTACT_FORM_ENDPOINT=https://api.yoursite.com/contact
+```
+
+### Search Verification (Optional)
+
+```bash
+# Search engine verification codes
+GOOGLE_SITE_VERIFICATION=your-google-code
+BING_SITE_VERIFICATION=your-bing-code
+```
+
+## Public vs Private Variables
+
+<Aside type="tip">
+  Variables prefixed with `PUBLIC_` are exposed to the browser. **Never** prefix sensitive values like API keys with `PUBLIC_`.
+</Aside>
+
+### Public Variables (Browser-Accessible)
+
+```bash
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX  # ✅ Safe - just a tracking ID
+PUBLIC_API_URL=https://api.example.com  # ✅ Safe - public endpoint
+```
+
+### Private Variables (Server-Only)
+
+```bash
+API_SECRET_KEY=sk_live_xxxxx  # ✅ Safe - server only
+DATABASE_URL=postgres://...    # ✅ Safe - server only
+PUBLIC_API_KEY=sk_xxxxx        # ❌ DANGER - exposed to browser!
+```
+
+## Accessing Variables
+
+### In Astro Components
+
+```astro
+---
+// Server-side (both public and private)
+const siteUrl = import.meta.env.SITE_URL;
+const apiKey = import.meta.env.API_SECRET_KEY;
+---
+```
+
+### In Client-Side JavaScript
+
+```typescript
+// Only PUBLIC_ prefixed variables work here
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+```
+
+## Environment-Specific Files
+
+For different environments, create:
+
+- `.env` — Local development (not committed)
+- `.env.production` — Production overrides
+- `.env.example` — Template for team members (committed)
+
+## Deployment Platforms
+
+### Vercel
+
+Set variables in Project Settings → Environment Variables.
+
+### Netlify
+
+Set variables in Site Settings → Build & Deploy → Environment.
+
+### Cloudflare Pages
+
+Set variables in Settings → Environment Variables.

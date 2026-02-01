@@ -1,0 +1,89 @@
+/* Velocity Documentation Theme
+   Brand Color: #F94C10 (International Orange)
+   HSL: 14, 97%, 52%
+*/
+
+:root {
+  /* Accent color scale - International Orange */
+  --sl-color-accent-low: hsl(14, 95%, 15%);
+  --sl-color-accent: hsl(14, 97%, 52%);
+  --sl-color-accent-high: hsl(14, 95%, 85%);
+  --sl-color-text-accent: hsl(14, 90%, 45%);
+
+  /* Typography */
+  --sl-font: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+}
+
+:root[data-theme='dark'] {
+  /* Dark mode accent adjustments */
+  --sl-color-accent-low: hsl(14, 90%, 20%);
+  --sl-color-accent: hsl(14, 97%, 55%);
+  --sl-color-accent-high: hsl(14, 95%, 75%);
+  --sl-color-text-accent: hsl(14, 95%, 65%);
+}
+
+/* Active sidebar link styling */
+nav.sidebar a[aria-current='page'],
+.sidebar a[aria-current='page'] {
+  background: linear-gradient(90deg, hsla(14, 97%, 52%, 0.12) 0%, transparent 100%);
+  border-left: 3px solid var(--sl-color-accent);
+  margin-left: -3px;
+  padding-left: calc(0.5rem + 3px);
+  color: var(--sl-color-accent) !important;
+  font-weight: 600;
+}
+
+/* Ensure sidebar links have proper contrast */
+.sidebar-content a[aria-current='page'],
+[data-current-parent] > a {
+  color: var(--sl-color-accent) !important;
+}
+
+:root[data-theme='dark'] nav.sidebar a[aria-current='page'],
+:root[data-theme='dark'] .sidebar a[aria-current='page'] {
+  background: linear-gradient(90deg, hsla(14, 97%, 55%, 0.15) 0%, transparent 100%);
+  color: hsl(14, 95%, 65%) !important;
+}
+
+/* Logo sizing adjustments */
+.site-title img {
+  height: 2rem;
+  width: auto;
+}
+
+/* Code block enhancements */
+pre {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+}
+
+/* Badge styling */
+.sl-badge {
+  font-weight: 500;
+}
+
+/* Callout/Aside styling enhancements */
+.starlight-aside {
+  border-radius: 0.5rem;
+}
+
+/* Hero section on homepage */
+.hero {
+  padding-block: 3rem;
+}
+
+/* Card hover effects */
+.card:hover {
+  border-color: var(--sl-color-accent);
+}
+
+/* Link styling */
+a:not([class]) {
+  text-decoration-color: var(--sl-color-accent);
+  text-underline-offset: 0.15em;
+}
+
+a:not([class]):hover {
+  color: var(--sl-color-accent);
+}

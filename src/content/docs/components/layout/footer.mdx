@@ -1,0 +1,134 @@
+---
+title: Footer
+description: Site footer with multiple layout options
+sidebar:
+  order: 3
+---
+
+The Footer component supports multiple layouts for different needs.
+
+## Layouts
+
+### Simple
+
+```astro
+<Footer layout="simple" />
+```
+
+### Columns
+
+```astro
+<Footer
+  layout="columns"
+  columns={3}
+  linkGroups={[
+    {
+      title: 'Product',
+      links: [
+        { label: 'Features', href: '/features' },
+        { label: 'Pricing', href: '/pricing' },
+      ]
+    },
+    {
+      title: 'Company',
+      links: [
+        { label: 'About', href: '/about' },
+        { label: 'Contact', href: '/contact' },
+      ]
+    }
+  ]}
+/>
+```
+
+### Minimal
+
+```astro
+<Footer layout="minimal" />
+```
+
+### Stacked
+
+```astro
+<Footer
+  layout="stacked"
+  tagline="Building the future of web development."
+/>
+```
+
+## Social Links
+
+```astro
+<Footer
+  socialLinks={[
+    { platform: 'github', href: 'https://github.com/...' },
+    { platform: 'twitter', href: 'https://twitter.com/...' },
+    { platform: 'linkedin', href: 'https://linkedin.com/...' },
+  ]}
+/>
+```
+
+## Legal Links
+
+```astro
+<Footer
+  legalLinks={[
+    { label: 'Privacy', href: '/privacy' },
+    { label: 'Terms', href: '/terms' },
+  ]}
+/>
+```
+
+## Inverted Background
+
+```astro
+<Footer background="invert" />
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `layout` | `'simple' \| 'columns' \| 'minimal' \| 'stacked'` | `'simple'` | Layout style |
+| `columns` | `2 \| 3 \| 4` | `3` | Column count |
+| `background` | `'default' \| 'secondary' \| 'invert'` | `'default'` | Background color |
+| `nav` | `NavItem[]` | — | Override navigation |
+| `linkGroups` | `FooterLinkGroup[]` | `[]` | Link groups |
+| `socialLinks` | `SocialLink[]` | `[]` | Social links |
+| `showSocial` | `boolean` | `true` | Show social links |
+| `showCopyright` | `boolean` | `true` | Show copyright |
+| `copyright` | `string` | Auto-generated | Copyright text |
+| `legalLinks` | `LegalLink[]` | `[]` | Legal links |
+| `hideLogo` | `boolean` | `false` | Hide logo |
+| `tagline` | `string` | — | Tagline under logo |
+
+## Examples
+
+### Marketing Site Footer
+
+```astro
+<Footer
+  layout="columns"
+  columns={4}
+  background="invert"
+  linkGroups={[
+    { title: 'Product', links: [...] },
+    { title: 'Company', links: [...] },
+    { title: 'Resources', links: [...] },
+    { title: 'Legal', links: [...] },
+  ]}
+  socialLinks={[...]}
+  tagline="Making web development faster."
+/>
+```
+
+### Blog Footer
+
+```astro
+<Footer
+  layout="simple"
+  socialLinks={[
+    { platform: 'twitter', href: '...' },
+    { platform: 'rss', href: '/feed.xml' },
+  ]}
+/>
+```

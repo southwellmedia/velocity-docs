@@ -1,0 +1,136 @@
+---
+title: Button
+description: Clickable button component with multiple variants and states
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The Button component supports multiple variants, sizes, and states.
+
+## Basic Usage
+
+```astro
+---
+import Button from '@/components/ui/Button.astro';
+---
+
+<Button>Click me</Button>
+```
+
+## Variants
+
+```astro
+<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link Style</Button>
+<Button variant="destructive">Delete</Button>
+```
+
+## Sizes
+
+```astro
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+```
+
+## Color Schemes
+
+For buttons on dark backgrounds:
+
+```astro
+<Button colorScheme="invert">On Dark Background</Button>
+```
+
+## Icon Buttons
+
+Square button for icons only:
+
+```astro
+---
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<Button icon size="sm">
+  <Icon name="search" />
+</Button>
+```
+
+## States
+
+```astro
+<!-- Loading state -->
+<Button loading>Submitting...</Button>
+
+<!-- Disabled state -->
+<Button disabled>Disabled</Button>
+
+<!-- Full width -->
+<Button fullWidth>Full Width Button</Button>
+```
+
+## As Link
+
+Renders as an anchor tag when `href` is provided:
+
+```astro
+<Button href="/about">Go to About</Button>
+<Button href="/signup" variant="primary" size="lg">Sign Up</Button>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'destructive'` | `'primary'` | Visual style |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Button size |
+| `colorScheme` | `'default' \| 'invert'` | `'default'` | Color scheme |
+| `icon` | `boolean` | `false` | Icon-only mode (square) |
+| `loading` | `boolean` | `false` | Show loading spinner |
+| `fullWidth` | `boolean` | `false` | Full container width |
+| `href` | `string` | — | Renders as `<a>` |
+| `disabled` | `boolean` | `false` | Disable interaction |
+| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | Button type |
+
+## Accessibility
+
+- Uses native `<button>` or `<a>` elements
+- Proper focus states
+- Disabled state prevents interaction
+- Loading state announces to screen readers
+
+<Aside type="tip">
+  Always provide meaningful text content for accessibility. For icon-only buttons, use `aria-label`.
+</Aside>
+
+## Examples
+
+### Form Submit Button
+
+```astro
+<form>
+  <Input label="Email" name="email" type="email" />
+  <Button type="submit" fullWidth>Subscribe</Button>
+</form>
+```
+
+### Button Group
+
+```astro
+<div class="flex gap-2">
+  <Button variant="outline">Cancel</Button>
+  <Button variant="primary">Save Changes</Button>
+</div>
+```
+
+### CTA on Dark Background
+
+```astro
+<section class="bg-surface-invert py-16">
+  <Button colorScheme="invert" size="lg">Get Started</Button>
+</section>
+```

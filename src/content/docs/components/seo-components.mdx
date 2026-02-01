@@ -1,0 +1,178 @@
+---
+title: SEO Components
+description: Components for search engine optimization
+sidebar:
+  order: 4
+---
+
+SEO components handle meta tags, structured data, and navigation aids.
+
+## SEO
+
+Main SEO component for meta tags:
+
+```astro
+---
+import SEO from '@/components/seo/SEO.astro';
+---
+
+<head>
+  <SEO
+    title="Page Title"
+    description="Page description for search results"
+    image="/og-image.png"
+    imageAlt="Description of the image"
+  />
+</head>
+```
+
+### Generated Tags
+
+- `<title>` with site name suffix
+- `meta description`
+- Canonical URL
+- Open Graph tags (og:title, og:description, og:image, etc.)
+- Twitter Card tags
+- `robots` meta (if noindex/nofollow)
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | — | Page title |
+| `description` | `string` | Site description | Meta description |
+| `image` | `string` | Default OG image | OG image URL |
+| `imageAlt` | `string` | — | OG image alt text |
+| `noindex` | `boolean` | `false` | Prevent indexing |
+| `nofollow` | `boolean` | `false` | Prevent following |
+| `article` | `object` | — | Article metadata |
+
+## JsonLd
+
+Structured data component:
+
+```astro
+---
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createBlogPostSchema, createBreadcrumbSchema } from '@/lib/schema';
+
+const blogSchema = createBlogPostSchema({
+  title: post.data.title,
+  description: post.data.description,
+  url: Astro.url.href,
+  image: ogImageUrl,
+  datePublished: post.data.publishedAt,
+  author: { name: post.data.author },
+});
+
+const breadcrumbs = createBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Blog', url: '/blog' },
+  { name: post.data.title, url: Astro.url.href },
+]);
+---
+
+<JsonLd schema={[blogSchema, breadcrumbs]} />
+```
+
+### Schema Helpers
+
+| Helper | Use Case |
+|--------|----------|
+| `createWebsiteSchema()` | Homepage |
+| `createOrganizationSchema()` | About page, homepage |
+| `createBlogPostSchema(post)` | Blog posts |
+| `createBreadcrumbSchema(items)` | Any page with breadcrumbs |
+| `createFAQSchema(faqs)` | FAQ pages |
+
+## Breadcrumbs
+
+Breadcrumb navigation component:
+
+```astro
+---
+import Breadcrumbs from '@/components/seo/Breadcrumbs.astro';
+---
+
+<Breadcrumbs
+  items={[
+    { label: 'Home', href: '/' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Current Article' },
+  ]}
+/>
+```
+
+### Features
+
+- Proper semantic markup (`<nav>` with `aria-label`)
+- JSON-LD breadcrumb schema
+- Current page indication
+- Customizable separator
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `BreadcrumbItem[]` | — | Breadcrumb items |
+| `separator` | `string` | `'/'` | Separator character |
+
+## Examples
+
+### Homepage SEO
+
+```astro
+---
+import SEO from '@/components/seo/SEO.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createWebsiteSchema, createOrganizationSchema } from '@/lib/schema';
+---
+
+<head>
+  <SEO
+    title="Home"
+    description="Welcome to our website"
+  />
+  <JsonLd schema={[
+    createWebsiteSchema(),
+    createOrganizationSchema(),
+  ]} />
+</head>
+```
+
+### Blog Post SEO
+
+```astro
+---
+import SEO from '@/components/seo/SEO.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createBlogPostSchema } from '@/lib/schema';
+---
+
+<head>
+  <SEO
+    title={post.title}
+    description={post.description}
+    image={`/og/blog/${post.slug}.png`}
+    article={{
+      publishedTime: post.publishedAt.toISOString(),
+      authors: [post.author],
+      tags: post.tags,
+    }}
+  />
+  <JsonLd schema={createBlogPostSchema(post)} />
+</head>
+```
+
+### FAQ Page SEO
+
+```astro
+---
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { createFAQSchema } from '@/lib/schema';
+
+const faqs = await getCollection('faqs');
+---
+
+<JsonLd schema={createFAQSchema(faqs)} />
+```

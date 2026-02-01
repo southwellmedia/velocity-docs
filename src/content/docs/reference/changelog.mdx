@@ -1,0 +1,88 @@
+---
+title: Changelog
+description: Version history and release notes
+sidebar:
+  order: 2
+---
+
+## v1.0.0-beta.1 (2026-01-30)
+
+**Initial beta release**
+
+### Features
+
+- **Astro 6.0.0-beta.5** with Tailwind CSS v4.0
+- **56 components** across 7 categories
+- **Three-tier design token system** with OKLCH colors
+- **Inverted color scheme** for dark sections on light pages
+- **Type-safe routing** with `routes.ts` configuration
+- **Full SEO toolkit**:
+  - Dynamic OG image generation with Satori
+  - JSON-LD structured data schemas
+  - Automatic sitemap and robots.txt
+- **Content collections**:
+  - Blog posts with i18n support
+  - Pages collection
+  - Authors (JSON)
+  - FAQs (JSON)
+- **4 layout variants**:
+  - BaseLayout
+  - PageLayout
+  - BlogLayout
+  - LandingLayout
+- **Dark mode** with system preference detection
+- **API routes** for contact and newsletter forms
+- **Deploy configurations** for:
+  - Vercel
+  - Netlify
+  - Cloudflare Pages
+
+### Components
+
+#### UI (33)
+Button, Input, Textarea, Select, Checkbox, Radio, Card, Badge, Alert, Avatar, Skeleton, Icon, Logo, Dialog, Dropdown, Tooltip, Tabs, VerticalTabs, CodeBlock, CTA, SocialProof, NpmCopyButton, TerminalDemo, and more.
+
+#### Layout (4)
+Header, Footer, ThemeToggle, Analytics
+
+#### Pattern (3)
+ContactForm, NewsletterForm, FormField
+
+#### Blog (4)
+ArticleHero, BlogCard, ShareButtons, RelatedPosts
+
+#### Landing (7)
+Hero, Credibility, LighthouseScores, TechStack, FeatureTabs, Navbar, LandingFooter, CTA
+
+#### SEO (3)
+SEO, JsonLd, Breadcrumbs
+
+#### Hero (2)
+Hero variants
+
+### Breaking Changes
+
+None (initial release)
+
+### Known Issues
+
+- OG image generation may be slow for large sites
+- Some Tailwind v4 features are in beta
+
+---
+
+## Roadmap
+
+### Planned for v1.0.0
+
+- Stable Astro 6 release support
+- Additional component variants
+- Improved documentation
+- Performance optimizations
+
+### Future Considerations
+
+- Multi-language documentation
+- Component playground
+- CLI scaffolding tool
+- Premium themes

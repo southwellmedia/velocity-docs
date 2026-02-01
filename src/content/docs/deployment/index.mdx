@@ -1,0 +1,61 @@
+---
+title: Deployment
+description: Deploy your Velocity site to production
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+Velocity works out of the box with major hosting platforms.
+
+## Supported Platforms
+
+<CardGrid>
+  <Card title="Vercel" icon="rocket">
+    Recommended. Zero-config deployment with edge functions.
+  </Card>
+  <Card title="Netlify" icon="laptop">
+    Great for static sites with serverless functions.
+  </Card>
+  <Card title="Cloudflare Pages" icon="setting">
+    Global edge network with Workers support.
+  </Card>
+</CardGrid>
+
+## Before Deploying
+
+1. Set `SITE_URL` in your environment
+2. Run `pnpm build` locally to catch errors
+3. Test with `pnpm preview`
+
+<Aside type="tip">
+  Most platforms detect Astro automatically and configure the build for you.
+</Aside>
+
+## Build Output
+
+Velocity builds to static files by default:
+
+```bash
+pnpm build
+# Output in dist/
+```
+
+For server-side features, configure an adapter in `astro.config.mjs`.
+
+## Environment Variables
+
+Set these on your hosting platform:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SITE_URL` | Yes | Your production domain |
+| `PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics ID |
+| `PUBLIC_GTM_ID` | No | Google Tag Manager ID |
+
+## Next Steps
+
+- [Vercel](/deployment/vercel) — Deploy to Vercel
+- [Netlify](/deployment/netlify) — Deploy to Netlify
+- [Cloudflare](/deployment/cloudflare) — Deploy to Cloudflare Pages

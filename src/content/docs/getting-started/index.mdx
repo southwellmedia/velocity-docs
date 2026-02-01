@@ -1,0 +1,133 @@
+---
+title: Quick Start
+description: Get Velocity up and running in your first 10 minutes
+sidebar:
+  order: 1
+  badge:
+    text: Start Here
+    variant: tip
+---
+
+import {
+  Tabs,
+  TabItem,
+  Aside,
+  Steps,
+  Card,
+  CardGrid,
+} from "@astrojs/starlight/components";
+
+Get your Velocity project running in just a few commands.
+
+## Using the CLI (Recommended)
+
+The fastest way to start is with the official CLI:
+
+<Tabs>
+  <TabItem label="pnpm" icon="pnpm">
+```bash
+pnpm create velocity-astro my-project
+cd my-project
+pnpm dev
+```
+  </TabItem>
+  <TabItem label="npm" icon="seti:npm">
+```bash
+npm create velocity-astro@latest my-project
+cd my-project
+npm run dev
+```
+  </TabItem>
+  <TabItem label="yarn" icon="seti:yarn">
+```bash
+yarn create velocity-astro my-project
+cd my-project
+yarn dev
+```
+  </TabItem>
+  <TabItem label="bun">
+```bash
+bun create velocity-astro my-project
+cd my-project
+bun run dev
+```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip" title="CLI Features">
+  The CLI lets you choose components, enable i18n, and customize your setup.
+  [Learn more →](/cli/)
+</Aside>
+
+## Manual Installation
+
+Alternatively, clone the repository directly:
+
+<Tabs>
+  <TabItem label="pnpm" icon="pnpm">
+```bash
+git clone https://github.com/southwellmedia/velocity.git my-project
+cd my-project
+pnpm install
+```
+  </TabItem>
+  <TabItem label="npm" icon="seti:npm">
+```bash
+git clone https://github.com/southwellmedia/velocity.git my-project
+cd my-project
+npm install
+```
+  </TabItem>
+  <TabItem label="yarn" icon="seti:yarn">
+```bash
+git clone https://github.com/southwellmedia/velocity.git my-project
+cd my-project
+yarn install
+```
+  </TabItem>
+</Tabs>
+
+## Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set your production domain:
+
+```bash
+SITE_URL=https://yoursite.com
+```
+
+## Start Development
+
+```bash
+pnpm dev
+```
+
+Your site is now available at `http://localhost:4321`.
+
+## Configuration Checklist
+
+<Steps>
+1. **Set your domain** in `.env` → `SITE_URL=https://yoursite.com`
+
+2. **Update site info** in `src/config/site.config.ts` → name, description, author, contact
+
+3. **Configure navigation** in `src/config/routes.ts` → add/remove pages from nav
+
+4. **Replace branding** in `src/assets/branding/` → your logo SVGs
+
+5. **Update favicon** in `public/favicon.svg` → your icon
+</Steps>
+
+<Aside type="tip" title="First time with Astro?">
+  Check out the [Astro documentation](https://docs.astro.build) for a
+  comprehensive introduction to the framework.
+</Aside>
+
+## Next Steps
+
+- [Prerequisites](/getting-started/prerequisites) — System requirements
+- [Project Structure](/getting-started/project-structure) — Understanding the codebase
+- [Configuration](/configuration/) — Detailed configuration options

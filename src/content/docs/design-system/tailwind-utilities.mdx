@@ -1,0 +1,119 @@
+---
+title: Tailwind Utilities
+description: Custom Tailwind utility classes in Velocity
+sidebar:
+  order: 3
+---
+
+Velocity extends Tailwind CSS with semantic utility classes mapped to design tokens.
+
+## Background Utilities
+
+| Class | Token | Purpose |
+|-------|-------|---------|
+| `bg-background` | `--background` | Primary page background |
+| `bg-background-secondary` | `--background-secondary` | Secondary/card backgrounds |
+| `bg-primary` | `--primary` | Primary action backgrounds |
+| `bg-secondary` | `--secondary` | Secondary action backgrounds |
+| `bg-surface-invert` | `--surface-invert` | Inverted dark sections |
+
+## Text Utilities
+
+| Class | Token | Purpose |
+|-------|-------|---------|
+| `text-foreground` | `--foreground` | Primary text |
+| `text-foreground-secondary` | `--foreground-secondary` | Secondary text |
+| `text-foreground-muted` | `--foreground-muted` | Subtle/hint text |
+| `text-primary-foreground` | `--primary-foreground` | Text on primary backgrounds |
+| `text-on-invert` | `--on-invert` | Text on inverted backgrounds |
+
+## Border Utilities
+
+| Class | Token | Purpose |
+|-------|-------|---------|
+| `border-border` | `--border` | Standard borders |
+| `border-border-strong` | `--border-strong` | Emphasized borders |
+| `border-invert` | `--border-invert` | Borders on dark sections |
+
+## Status Utilities
+
+### Success
+
+| Class | Usage |
+|-------|-------|
+| `bg-success` | Success state background |
+| `bg-success-light` | Light success background |
+| `text-success-foreground` | Success text |
+
+### Warning
+
+| Class | Usage |
+|-------|-------|
+| `bg-warning` | Warning state background |
+| `bg-warning-light` | Light warning background |
+| `text-warning-foreground` | Warning text |
+
+### Error
+
+| Class | Usage |
+|-------|-------|
+| `bg-error` | Error state background |
+| `bg-error-light` | Light error background |
+| `text-error-foreground` | Error text |
+
+### Info
+
+| Class | Usage |
+|-------|-------|
+| `bg-info` | Info state background |
+| `bg-info-light` | Light info background |
+| `text-info-foreground` | Info text |
+
+## Usage Examples
+
+### Standard Card
+
+```html
+<div class="bg-background-secondary border border-border rounded-lg p-4">
+  <h3 class="text-foreground">Card Title</h3>
+  <p class="text-foreground-muted">Card description text</p>
+</div>
+```
+
+### Inverted Section
+
+```html
+<section class="bg-surface-invert py-16">
+  <div class="container">
+    <h2 class="text-on-invert">Section Title</h2>
+    <p class="text-on-invert-secondary">Section content</p>
+  </div>
+</section>
+```
+
+### Status Message
+
+```html
+<div class="bg-success-light text-success-foreground p-4 rounded-lg">
+  <p>Your changes have been saved successfully.</p>
+</div>
+```
+
+### Primary Button
+
+```html
+<button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg">
+  Submit
+</button>
+```
+
+## Dark Mode Behavior
+
+All semantic utilities automatically adapt to dark mode when the `.dark` class is present on `<html>`:
+
+```html
+<!-- These classes work in both light and dark mode -->
+<div class="bg-background text-foreground">
+  Content adapts automatically
+</div>
+```

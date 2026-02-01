@@ -1,0 +1,101 @@
+---
+title: UI Components Overview
+description: 33 primitive UI components for building interfaces
+sidebar:
+  order: 1
+---
+
+UI components are the building blocks of your interface. They're designed to be composable, accessible, and customizable through props.
+
+## Available Components
+
+### Form Elements
+
+| Component | Purpose |
+|-----------|---------|
+| `Button.astro` | Clickable actions with multiple variants |
+| `Input.astro` | Text input with label, hint, and error states |
+| `Textarea.astro` | Multi-line text input |
+| `Select.astro` | Dropdown select menu |
+| `Checkbox.astro` | Checkbox input with label |
+| `Radio.astro` | Radio button for single selection |
+
+### Display
+
+| Component | Purpose |
+|-----------|---------|
+| `Card.astro` | Container with structured content |
+| `Badge.astro` | Status labels and tags |
+| `Alert.astro` | Contextual feedback messages |
+| `Avatar.astro` | User profile images |
+| `Skeleton.astro` | Loading placeholders |
+| `Icon.astro` | SVG icon component |
+| `Logo.astro` | Brand logo with variants |
+
+### Interactive
+
+| Component | Purpose |
+|-----------|---------|
+| `Dialog.astro` | Modal dialogs |
+| `Dropdown.astro` | Dropdown menus |
+| `Tooltip.astro` | Hover tooltips |
+| `Tabs.astro` | Horizontal tab navigation |
+| `VerticalTabs.astro` | Vertical tab navigation |
+
+### Specialized
+
+| Component | Purpose |
+|-----------|---------|
+| `CodeBlock.astro` | Syntax-highlighted code |
+| `CTA.astro` | Call-to-action buttons |
+| `SocialProof.astro` | Testimonial cards |
+| `NpmCopyButton.astro` | NPM install command copier |
+| `TerminalDemo.tsx` | Animated terminal demo |
+
+## Common Props
+
+Most UI components share these patterns:
+
+### Variant
+
+Visual style options:
+
+```astro
+<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+```
+
+### Size
+
+Size options (usually `sm`, `md`, `lg`):
+
+```astro
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+```
+
+### Color Scheme
+
+For dark backgrounds:
+
+```astro
+<Button colorScheme="invert">On Dark</Button>
+```
+
+## Import Example
+
+```astro
+---
+import Button from '@/components/ui/Button.astro';
+import Input from '@/components/ui/Input.astro';
+import Card from '@/components/ui/Card.astro';
+---
+
+<Card>
+  <Input label="Email" name="email" type="email" />
+  <Button>Submit</Button>
+</Card>
+```
