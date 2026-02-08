@@ -1,0 +1,254 @@
+---
+title: "Upgrade: v0.1.0-beta to v0.2.0-beta"
+description: Step-by-step guide for upgrading Velocity from v0.1.0-beta to v0.2.0-beta
+sidebar:
+  order: 2
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through every change between Velocity **v0.1.0-beta** and **v0.2.0-beta**.
+
+## Overview
+
+| | v0.1.0-beta | v0.2.0-beta |
+|---|---|---|
+| **Astro** | 6.0.0-beta.5 | 6.0.0-beta.9 |
+| **Package manager** | npm | pnpm |
+| **Zod** | Standalone `zod` package | `astro/zod` (Zod 4) |
+| **SEO** | `astro-seo` package | Native `<meta>` tags |
+| **CSP** | Not configured | Enabled with allowlists |
+| **Env vars** | `import.meta.env` | `astro:env` (type-safe) |
+| **@astrojs/mdx** | v4 | v5 beta |
+| **@astrojs/react** | v4 | v5 beta |
+
+## Prerequisites
+
+- **Node.js** >= 22.12.0
+- **pnpm** installed globally (`npm install -g pnpm`)
+
+## Migration Steps
+
+<Steps>
+1. **Switch to pnpm**
+
+   Remove `package-lock.json` and install with pnpm:
+
+   ```bash
+   rm package-lock.json
+   pnpm install
+   ```
+
+   <Aside type="caution">
+     If pnpm prompts to approve build scripts for packages like `sharp` or `esbuild`, add them to `pnpm.onlyBuiltDependencies` in `package.json`:
+
+     ```json
+     "pnpm": {
+       "onlyBuiltDependencies": ["sharp", "esbuild"]
+     }
+     ```
+   </Aside>
+
+2. **Update dependencies**
+
+   Bump Astro and integration packages, and remove packages that are no longer needed:
+
+   ```bash
+   pnpm add astro@6.0.0-beta.9 @astrojs/mdx@5.0.0-beta.1 @astrojs/react@5.0.0-beta.1
+   pnpm remove zod astro-seo
+   ```
+
+3. **Remove legacy ESLint `--ext` flags**
+
+   The `--ext` flag was removed in ESLint v9. Update your `package.json` scripts:
+
+   ```diff
+   - "lint": "eslint . --ext .js,.ts,.astro"
+   + "lint": "eslint ."
+   ```
+
+4. **Migrate zod imports**
+
+   Astro 6 bundles Zod 4 internally. Replace all standalone `zod` imports:
+
+   ```diff
+   - import { z } from 'zod';
+   + import { z } from 'astro/zod';
+   ```
+
+   This applies to API routes (`src/pages/api/*.ts`) and anywhere else you import `z`.
+
+5. **Update Zod 4 API calls**
+
+   Zod 4 changed several method signatures:
+
+   ```diff
+   // Email validation is now a top-level type
+   - z.string().email()
+   + z.email()
+
+   // ZodError property renamed
+   - error.errors
+   + error.issues
+   ```
+
+   <Aside type="note">
+     `z.string()` still works for general string validation. Only `.email()`, which became a top-level validator, needs updating.
+   </Aside>
+
+6. **Remove `experimental.contentIntellisense` flag**
+
+   This flag was stabilized in Astro 6 beta.9. Remove it from `astro.config.mjs`:
+
+   ```diff
+   - experimental: {
+   -   contentIntellisense: true,
+   - },
+   ```
+
+7. **Fix duplicate canonical URL**
+
+   Remove the manual canonical link from `BaseLayout.astro` — the SEO component now handles it:
+
+   ```diff
+   - <link rel="canonical" href={canonicalURL} />
+   ```
+
+8. **Replace `astro-seo` with native meta tags**
+
+   The `astro-seo` package is replaced with a native `SEO.astro` component. Update `src/components/SEO.astro`:
+
+   **Before (v0.1.0-beta):**
+   ```astro
+   ---
+   import { SEO } from 'astro-seo';
+   // ... props
+   ---
+   <SEO
+     title={title}
+     description={description}
+     openGraph={{ basic: { title, type: "website", image: ogImage } }}
+     twitter={{ card: "summary_large_image" }}
+   />
+   ```
+
+   **After (v0.2.0-beta):**
+   ```astro
+   ---
+   // No external dependency needed
+   const { title, description, ogImage, canonicalURL } = Astro.props;
+   ---
+   <title>{title}</title>
+   <meta name="description" content={description} />
+   <link rel="canonical" href={canonicalURL} />
+
+   <!-- Open Graph -->
+   <meta property="og:title" content={title} />
+   <meta property="og:description" content={description} />
+   <meta property="og:type" content="website" />
+   <meta property="og:image" content={ogImage} />
+   <meta property="og:url" content={canonicalURL} />
+
+   <!-- Twitter Card -->
+   <meta name="twitter:card" content="summary_large_image" />
+   <meta name="twitter:title" content={title} />
+   <meta name="twitter:description" content={description} />
+   <meta name="twitter:image" content={ogImage} />
+   ```
+
+9. **Add `astro:env` configuration**
+
+   Replace raw `import.meta.env` usage with type-safe `astro:env`. Add the env schema to `astro.config.mjs`:
+
+   ```javascript
+   import { defineConfig, envField } from 'astro/config';
+
+   export default defineConfig({
+     env: {
+       schema: {
+         SITE_URL: envField.string({ context: 'server', access: 'public', optional: true }),
+         PUBLIC_GA_MEASUREMENT_ID: envField.string({ context: 'client', access: 'public', optional: true }),
+         PUBLIC_GTM_ID: envField.string({ context: 'client', access: 'public', optional: true }),
+       },
+     },
+     // ...
+   });
+   ```
+
+   Then update your imports:
+
+   ```diff
+   - const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+   + import { PUBLIC_GA_MEASUREMENT_ID } from 'astro:env/client';
+   ```
+
+   <Aside type="tip">
+     `astro:env` gives you build-time validation and TypeScript autocomplete for all environment variables. See the [Environment Variables](/configuration/environment/) docs.
+   </Aside>
+
+10. **Enable CSP with explicit allowlists**
+
+    Add Content Security Policy to `astro.config.mjs`:
+
+    ```javascript
+    export default defineConfig({
+      security: {
+        csp: true,
+      },
+    });
+    ```
+
+    Astro auto-hashes inline scripts and styles. If you use external resources (Google Fonts, analytics scripts, etc.), add explicit directives:
+
+    ```javascript
+    security: {
+      csp: {
+        "script-src": ["https://www.googletagmanager.com"],
+        "style-src": ["https://fonts.googleapis.com"],
+        "font-src": ["https://fonts.gstatic.com"],
+        "connect-src": ["https://www.google-analytics.com"],
+      },
+    },
+    ```
+
+    <Aside type="caution">
+      Test your site thoroughly after enabling CSP. Blocked resources will appear as errors in the browser console.
+    </Aside>
+</Steps>
+
+## Verify the Upgrade
+
+Run the full verification suite:
+
+```bash
+pnpm build && pnpm lint && pnpm check
+```
+
+Also manually verify:
+- Pages render without console errors
+- Contact and newsletter forms still validate correctly
+- Analytics scripts load (if configured)
+- Fonts and external resources load under CSP
+
+## Removed Dependencies
+
+| Package | Reason |
+|---------|--------|
+| `zod` | Replaced by `astro/zod` (bundled with Astro 6) |
+| `astro-seo` | Replaced by native `<meta>` tags in `SEO.astro` |
+
+## Removed Files
+
+| File | Reason |
+|------|--------|
+| `package-lock.json` | Switched to pnpm (`pnpm-lock.yaml`) |
+| `env.d.ts` | No longer needed with `astro:env` |
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v0.2.0-beta
+- [Environment Variables](/configuration/environment/) — `astro:env` configuration reference
+- [SEO Components](/components/seo-components/) — Native SEO component docs

@@ -1,0 +1,32 @@
+---
+title: Upgrade Guides
+description: Step-by-step guides for upgrading between Velocity releases
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+Step-by-step guides for migrating between Velocity releases. Each guide covers dependency changes, breaking API updates, and verification steps.
+
+## Available Guides
+
+<CardGrid>
+  <Card title="v0.1.0-beta to v0.2.0-beta" icon="up-caret">
+    Astro 6 beta.9, pnpm, Zod 4 via `astro/zod`, native SEO, `astro:env`, and CSP.
+    [Read the guide &rarr;](/upgrade-guides/beta-1-to-beta-2/)
+  </Card>
+</CardGrid>
+
+<Aside type="tip">
+  For a quick summary of what changed in each release, see the [Changelog](/reference/changelog/).
+</Aside>
+
+## Naming Convention
+
+Upgrade guides are named after **Velocity versions**, not the underlying Astro versions. For example, the guide for moving from `v0.1.0-beta` to `v0.2.0-beta` is `beta-1-to-beta-2.mdx`.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full version history
+- [Quick Start](/getting-started/) — Setting up a new project

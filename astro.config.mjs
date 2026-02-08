@@ -110,6 +110,12 @@ export default defineConfig({
         },
         { label: "Troubleshooting", slug: "troubleshooting" },
         {
+          label: "Upgrade Guides",
+          badge: { text: "New", variant: "success" },
+          collapsed: false,
+          autogenerate: { directory: "upgrade-guides" },
+        },
+        {
           label: "Reference",
           collapsed: true,
           autogenerate: { directory: "reference" },

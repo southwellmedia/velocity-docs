@@ -5,7 +5,37 @@ sidebar:
   order: 2
 ---
 
-## v1.0.0-beta.1 (2026-01-30)
+## v0.2.0-beta (2026-02-08)
+
+### Breaking Changes
+
+- **pnpm only** — Removed `package-lock.json`, pnpm is now the sole package manager
+- **Zod migration** — Replaced standalone `zod` with `astro/zod` (Zod 4); `z.string().email()` is now `z.email()`
+- **Removed `astro-seo`** — Replaced with native `<meta>` tags in `SEO.astro`
+- **Removed `env.d.ts`** — Replaced by `astro:env` type-safe environment variables
+- **ESLint `--ext` removed** — Legacy flag dropped (not supported in ESLint v9)
+- **`experimental.contentIntellisense` removed** — Flag was stabilized in Astro beta.9
+
+### Features
+
+- **Astro 6.0.0-beta.9** with `@astrojs/mdx` v5 and `@astrojs/react` v5 betas
+- **Content Security Policy (CSP)** with auto-hashed inline scripts and explicit external allowlists
+- **`astro:env`** for build-time validated, type-safe environment variables
+- **Native SEO component** with full Open Graph and Twitter Card meta tags
+- **Twitter Card meta tags** added to SEO component
+
+### Bug Fixes
+
+- Fixed duplicate canonical URL in `BaseLayout.astro`
+- Fixed `ZodError.errors` → `.issues` for Zod 4 compatibility
+- Removed legacy `--ext` flag from ESLint scripts
+- Removed stabilized `experimental.contentIntellisense` flag
+
+> **Upgrade guide:** [v0.1.0-beta to v0.2.0-beta](/upgrade-guides/beta-1-to-beta-2/)
+
+---
+
+## v0.1.0-beta (2026-01-30)
 
 **Initial beta release**
 
@@ -73,7 +103,7 @@ None (initial release)
 
 ## Roadmap
 
-### Planned for v1.0.0
+### Planned for v1.0.0 Stable
 
 - Stable Astro 6 release support
 - Additional component variants
