@@ -1,49 +1,83 @@
-# Starlight Starter Kit: Basics
+<p align="center">
+  <img src="src/assets/logomark.svg" alt="Velocity" width="60" />
+</p>
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+<p align="center">
+  <strong>Velocity Documentation</strong> — Official docs for the Velocity Astro 6 starterkit.
+</p>
+
+<p align="center">
+  <a href="https://velocity-docs-two.vercel.app">Live Site</a> &middot;
+  <a href="https://github.com/southwellmedia/velocity">Velocity Repo</a> &middot;
+  <a href="https://github.com/southwellmedia/create-velocity-astro">CLI Tool</a>
+</p>
+
+---
+
+## About
+
+Documentation site for [Velocity](https://github.com/southwellmedia/velocity), built with [Starlight](https://starlight.astro.build) (Astro's documentation framework).
+
+### Sections
+
+| Section | Description |
+|---------|-------------|
+| **Getting Started** | Installation, prerequisites, project structure |
+| **Components** | 55 components across UI, layout, patterns, blog, landing, and SEO |
+| **Design System** | Three-tier token architecture, colors, dark mode, Tailwind utilities |
+| **Customization** | Brand colors, themes, adding components/routes/collections |
+| **Configuration** | Site config, environment variables, routing |
+| **Content Management** | Blog posts, authors, FAQs, pages |
+| **Layouts** | Base, Page, Blog, and Landing layouts |
+| **SEO** | Meta tags, OG images, structured data, sitemap |
+| **CLI** | create-velocity-astro usage, flags, i18n |
+| **API** | Contact and newsletter endpoints |
+| **Deployment** | Vercel, Netlify, Cloudflare Pages |
+| **Reference** | Changelog, quick reference |
+| **Upgrade Guides** | Step-by-step migration between releases |
+
+## Development
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Visit `http://localhost:4321` to preview the docs locally.
+
+## Commands
+
+| Command | Action |
+|---------|--------|
+| `pnpm dev` | Start dev server at `localhost:4321` |
+| `pnpm build` | Build production site to `dist/` |
+| `pnpm preview` | Preview production build locally |
+
+## Adding Documentation
+
+Docs are `.mdx` files in `src/content/docs/`. Each file becomes a route based on its path. Starlight handles navigation, search (Pagefind), and theming automatically.
 
 ```
-npm create astro@latest -- --template starlight
+src/content/docs/
+├── getting-started/
+├── components/
+├── design-system/
+├── customization/
+├── ...
+└── index.mdx
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Tech Stack
 
-## 🚀 Project Structure
+- [Astro](https://astro.build) + [Starlight](https://starlight.astro.build) — Documentation framework
+- [Vercel](https://vercel.com) — Hosting and deployment
+- [Pagefind](https://pagefind.app) — Client-side search
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
+## Related Repositories
 
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
-```
+- [velocity](https://github.com/southwellmedia/velocity) — The starterkit itself
+- [create-velocity-astro](https://github.com/southwellmedia/create-velocity-astro) — CLI scaffolding tool
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+---
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
-
-Static assets, like favicons, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+**Built & maintained by [Southwell Media](https://southwellmedia.com)**
