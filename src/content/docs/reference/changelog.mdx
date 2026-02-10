@@ -5,6 +5,31 @@ sidebar:
   order: 2
 ---
 
+## v0.3.0-beta (2026-02-10)
+
+### Breaking Changes
+
+- **UI component directory restructure** — Components moved from flat `src/components/ui/` into 8 subcategory folders: `form/`, `data-display/`, `feedback/`, `overlay/`, `layout/`, `primitives/`, `content/`, `marketing/`
+- **Import paths changed** — Direct imports like `import Button from '@/components/ui/Button.astro'` no longer work. Use barrel imports: `import { Button } from '@/components/ui'`
+
+### Features
+
+- **CVA variant system** — All UI components now use `class-variance-authority` for type-safe variant management
+- **New UI components** — Switch, Table, Pagination, Progress, Toast, Accordion, Separator, NpmCopyButton, AvatarGroup, Icon
+- **New pattern components** — SearchInput, PasswordInput, StatCard, EmptyState
+- **Barrel exports** — All UI components re-exported from `@/components/ui` index
+
+### Component Counts
+
+- UI: 31 (was 33, reorganized with subcategories)
+- Patterns: 7 (was 3, added SearchInput, PasswordInput, StatCard, EmptyState)
+- Hero: 1 (unchanged)
+- Total: 57 components across all categories
+
+> **Upgrade guide:** Update all direct imports to barrel imports. See [upgrade guide](/upgrade-guides/beta-2-to-beta-2-1/) for CVA migration details.
+
+---
+
 ## v0.2.0-beta (2026-02-08)
 
 ### Breaking Changes

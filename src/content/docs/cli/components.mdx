@@ -23,7 +23,7 @@ During setup, the wizard presents component options:
 
 | Option | What's Included |
 |--------|-----------------|
-| **All components** | Full 27+ component library with UI, patterns, and hero sections |
+| **All components** | Full 40+ component library with UI, patterns, and hero sections |
 | **UI components only** | Core interface components (Button, Input, Card, etc.) |
 | **UI + Patterns** | UI components plus pre-built form patterns |
 | **None (minimal)** | Just layouts, SEO, and navigation — add components later |
@@ -59,43 +59,57 @@ For automation or quick setups, use the `--components` flag:
 
 ## Component Categories
 
-### UI Components (21)
+### UI Components (31)
 
-Core interface components for building pages.
+Core interface components organized into subcategories.
 
-| Component | Description |
-|-----------|-------------|
-| `Button` | Actions with variants (primary, secondary, outline, ghost) |
-| `Input` | Text input with label, hint, error states |
-| `Textarea` | Multi-line text input |
-| `Select` | Dropdown selection |
-| `Checkbox` | Checkbox with label |
-| `Radio` | Radio button selection |
-| `Card` | Content container with structured layouts |
-| `Badge` | Status labels and tags |
-| `Alert` | Contextual feedback messages |
-| `Dialog` | Modal dialogs |
-| `Tabs` | Horizontal tab navigation |
-| `VerticalTabs` | Vertical tab navigation |
-| `Tooltip` | Hover tooltips |
-| `Dropdown` | Dropdown menus |
-| `Skeleton` | Loading placeholders |
-| `Logo` | Brand logo with variants |
-| `Avatar` | User profile images |
-| `CodeBlock` | Syntax-highlighted code |
-| `SocialProof` | Testimonial cards |
-| `TerminalDemo` | Animated terminal demo |
-| `CTA` | Call-to-action buttons |
+| Component | Subcategory | Description |
+|-----------|-------------|-------------|
+| `Button` | form | Actions with variants (primary, secondary, outline, ghost) |
+| `Input` | form | Text input with label, hint, error states |
+| `Textarea` | form | Multi-line text input |
+| `Select` | form | Dropdown selection |
+| `Checkbox` | form | Checkbox with label |
+| `Radio` | form | Radio button selection |
+| `Switch` | form | Toggle switch input |
+| `Card` | data-display | Content container with structured layouts |
+| `Badge` | data-display | Status labels and tags |
+| `Avatar` | data-display | User profile images |
+| `AvatarGroup` | data-display | Grouped avatar display |
+| `Table` | data-display | Data table with styling |
+| `Pagination` | data-display | Page navigation controls |
+| `Progress` | data-display | Progress bar indicator |
+| `Skeleton` | data-display | Loading placeholders |
+| `Alert` | feedback | Contextual feedback messages |
+| `Toast` | feedback | Temporary notification messages |
+| `Tooltip` | feedback | Hover tooltips |
+| `Dialog` | overlay | Modal dialogs |
+| `Dropdown` | overlay | Dropdown menus |
+| `Tabs` | overlay | Horizontal tab navigation |
+| `VerticalTabs` | overlay | Vertical tab navigation |
+| `Accordion` | overlay | Collapsible content sections |
+| `Separator` | layout | Visual divider between sections |
+| `Icon` | primitives | SVG icon component |
+| `CodeBlock` | content | Syntax-highlighted code |
+| `Logo` | marketing | Brand logo with variants |
+| `CTA` | marketing | Call-to-action sections |
+| `NpmCopyButton` | marketing | NPM install command copier |
+| `SocialProof` | marketing | Testimonial cards |
+| `TerminalDemo` | marketing | Animated terminal demo |
 
-### Pattern Components (3)
+### Pattern Components (7)
 
-Pre-built form patterns for common use cases.
+Pre-built form and UI patterns for common use cases.
 
 | Component | Description |
 |-----------|-------------|
 | `ContactForm` | Complete contact form with validation |
 | `NewsletterForm` | Email subscription form |
 | `FormField` | Reusable form field wrapper |
+| `SearchInput` | Search input with icon |
+| `PasswordInput` | Password input with visibility toggle |
+| `StatCard` | Statistics display card |
+| `EmptyState` | Empty state placeholder |
 
 ### Hero Components (1)
 

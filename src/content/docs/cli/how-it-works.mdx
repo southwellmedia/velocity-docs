@@ -107,15 +107,23 @@ Components are managed via `component-registry.json` in the Velocity repository:
 ```json
 {
   "components": {
-    "Button": {
-      "files": ["src/components/ui/Button.astro"],
+    "button": {
+      "name": "Button",
       "category": "ui",
-      "dependencies": []
+      "subcategory": "form",
+      "files": [
+        "src/components/ui/form/Button/Button.astro",
+        "src/components/ui/form/Button/Button.tsx",
+        "src/components/ui/form/Button/button.variants.ts",
+        "src/components/ui/form/Button/index.ts"
+      ],
+      "dependencies": { "utilities": ["cn"], "components": [] }
     },
-    "ContactForm": {
-      "files": ["src/components/patterns/ContactForm.astro"],
+    "contact-form": {
+      "name": "ContactForm",
       "category": "patterns",
-      "dependencies": ["Button", "Input", "Textarea"]
+      "files": ["src/components/patterns/ContactForm.astro"],
+      "dependencies": { "utilities": ["cn"], "components": ["input", "textarea", "button"] }
     }
   }
 }
@@ -125,9 +133,11 @@ Components are managed via `component-registry.json` in the Velocity repository:
 
 | Field | Description |
 |-------|-------------|
-| `files` | Component file paths |
+| `name` | Display name of the component |
 | `category` | Category grouping (ui, patterns, hero) |
-| `dependencies` | Required components |
+| `subcategory` | Subcategory within UI (form, data-display, feedback, overlay, etc.) |
+| `files` | Component file paths |
+| `dependencies` | Required utilities and components |
 
 ### Dependency Resolution
 

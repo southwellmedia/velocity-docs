@@ -1,13 +1,13 @@
 ---
 title: Components Overview
-description: 56 production-ready components for building modern websites
+description: 57 production-ready components for building modern websites
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Velocity includes 56 components organized by purpose.
+Velocity includes 57 components organized by purpose.
 
 ## Component Philosophy
 
@@ -21,13 +21,13 @@ Velocity includes 56 components organized by purpose.
 
 <CardGrid>
   <Card title="UI Components" icon="puzzle">
-    33 primitive components: Button, Input, Card, Badge, Alert, and more.
+    31 components organized by subcategory: form, data-display, feedback, overlay, and more.
   </Card>
   <Card title="Layout Components" icon="setting">
     4 components: Header, Footer, ThemeToggle, Analytics.
   </Card>
   <Card title="Pattern Components" icon="document">
-    3 composed components: ContactForm, NewsletterForm, FormField.
+    7 composed components: ContactForm, NewsletterForm, FormField, SearchInput, and more.
   </Card>
   <Card title="Blog Components" icon="pencil">
     4 components: ArticleHero, BlogCard, ShareButtons, RelatedPosts.
@@ -44,14 +44,14 @@ Velocity includes 56 components organized by purpose.
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. |
+| UI Components | 31 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
 | Layout Components | 4 | Header, Footer, ThemeToggle, Analytics |
-| Pattern Components | 3 | ContactForm, NewsletterForm, FormField |
+| Pattern Components | 7 | ContactForm, NewsletterForm, FormField, SearchInput, etc. |
 | Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
 | Landing Components | 7 | Hero, CTA, FeatureTabs, etc. |
 | SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
-| Hero Components | 2 | Hero variants |
-| **Total** | **56** | |
+| Hero Components | 1 | Hero section |
+| **Total** | **57** | All components across categories |
 
 ## Import Patterns
 
@@ -59,8 +59,7 @@ Velocity includes 56 components organized by purpose.
 
 ```astro
 ---
-import Button from '@/components/ui/Button.astro';
-import Card from '@/components/ui/Card.astro';
+import { Button, Card } from '@/components/ui';
 ---
 
 <Button>Click me</Button>

@@ -13,11 +13,19 @@ Create in the appropriate directory:
 
 ```
 src/components/
-├── ui/           # Primitives (Button, Input)
-├── patterns/     # Composed patterns (ContactForm)
-├── layout/       # Page structure (Header)
-├── blog/         # Blog-specific
-└── landing/      # Marketing pages
+├── ui/                # UI components organized by subcategory
+│   ├── form/          # Button, Input, Select, Checkbox, Radio, Switch, Textarea
+│   ├── data-display/  # Card, Badge, Avatar, Table, Pagination, Progress, Skeleton
+│   ├── feedback/      # Alert, Toast, Tooltip
+│   ├── overlay/       # Dialog, Dropdown, Tabs, VerticalTabs, Accordion
+│   ├── layout/        # Separator
+│   ├── primitives/    # Icon
+│   ├── content/       # CodeBlock
+│   └── marketing/     # Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo
+├── patterns/          # Composed patterns (ContactForm, SearchInput, etc.)
+├── layout/            # Page structure (Header, Footer)
+├── blog/              # Blog-specific
+└── landing/           # Marketing pages
 ```
 
 ## Basic Component
@@ -181,7 +189,7 @@ export default function Counter() {
 
 ```astro
 ---
-import Counter from '@/components/ui/Counter';
+import { Counter } from '@/components/ui';
 ---
 
 <Counter client:visible />

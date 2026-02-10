@@ -11,7 +11,7 @@ The Card component is a versatile container following the **composition-first** 
 
 ```astro
 ---
-import Card from '@/components/ui/Card.astro';
+import { Card } from '@/components/ui';
 ---
 
 <Card>
@@ -81,8 +81,8 @@ Since Card follows composition-first design, you build your own layouts:
 
 ```astro
 ---
-import Card from '@/components/ui/Card.astro';
-import Icon from '@/components/ui/Icon.astro';
+import { Card } from '@/components/ui';
+import { Icon } from '@/components/ui';
 ---
 
 <Card padding="lg">
@@ -137,9 +137,9 @@ import Icon from '@/components/ui/Icon.astro';
 
 ```astro
 ---
-import Card from '@/components/ui/Card.astro';
-import Button from '@/components/ui/Button.astro';
-import Badge from '@/components/ui/Badge.astro';
+import { Card } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { Badge } from '@/components/ui';
 ---
 
 <Card variant="elevated" padding="lg" class="text-center">

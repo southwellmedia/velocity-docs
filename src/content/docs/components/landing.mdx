@@ -16,8 +16,8 @@ The Hero component is a flexible section for page headers with support for cente
 ```astro
 ---
 import Hero from '@/components/hero/Hero.astro';
-import Badge from '@/components/ui/Badge.astro';
-import Button from '@/components/ui/Button.astro';
+import { Badge } from '@/components/ui';
+import { Button } from '@/components/ui';
 ---
 
 <Hero layout="centered" size="lg">
@@ -42,8 +42,8 @@ For two-column hero sections with media:
 ```astro
 ---
 import Hero from '@/components/hero/Hero.astro';
-import Badge from '@/components/ui/Badge.astro';
-import Button from '@/components/ui/Button.astro';
+import { Badge } from '@/components/ui';
+import { Button } from '@/components/ui';
 import TerminalDemo from '@/components/landing/TerminalDemo';
 ---
 
@@ -112,8 +112,8 @@ Call-to-action section component with slot-based content composition.
 
 ```astro
 ---
-import CTA from '@/components/ui/CTA.astro';
-import Button from '@/components/ui/Button.astro';
+import { CTA } from '@/components/ui';
+import { Button } from '@/components/ui';
 ---
 
 <CTA variant="default" size="lg" maxWidth="lg">
@@ -133,9 +133,9 @@ import Button from '@/components/ui/Button.astro';
 
 ```astro
 ---
-import CTA from '@/components/ui/CTA.astro';
-import Logo from '@/components/ui/Logo.astro';
-import Button from '@/components/ui/Button.astro';
+import { CTA } from '@/components/ui';
+import { Logo } from '@/components/ui';
+import { Button } from '@/components/ui';
 ---
 
 <CTA variant="default" size="xl" maxWidth="lg">
@@ -261,7 +261,7 @@ import FeatureTabs from '@/components/landing/FeatureTabs';
   features={[
     {
       id: 'components',
-      title: '56 Components',
+      title: '57 Components',
       description: 'Production-ready UI components',
       image: '/features/components.png',
     },
@@ -283,10 +283,7 @@ import FeatureTabs from '@/components/landing/FeatureTabs';
 ---
 import LandingLayout from '@/layouts/LandingLayout.astro';
 import Hero from '@/components/hero/Hero.astro';
-import CTA from '@/components/ui/CTA.astro';
-import Badge from '@/components/ui/Badge.astro';
-import Button from '@/components/ui/Button.astro';
-import Logo from '@/components/ui/Logo.astro';
+import { CTA, Badge, Button, Logo } from '@/components/ui';
 import Credibility from '@/components/landing/Credibility.astro';
 import FeatureTabs from '@/components/landing/FeatureTabs';
 import LighthouseScores from '@/components/landing/LighthouseScores.astro';

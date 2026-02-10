@@ -16,8 +16,16 @@ Velocity follows a structured organization designed for scalability and maintain
   - assets/
     - branding/ Logo files (logomark.svg, logo-full.svg, etc.)
   - components/
-    - ui/ 33 primitive components (Button, Input, Card, etc.)
-    - patterns/ 3 composed components (ContactForm, FormField, etc.)
+    - ui/ 31 components organized by subcategory
+      - form/ Button, Input, Textarea, Select, Checkbox, Radio, Switch
+      - data-display/ Card, Badge, Avatar, AvatarGroup, Table, Pagination, Progress, Skeleton
+      - feedback/ Alert, Toast, Tooltip
+      - overlay/ Dialog, Dropdown, Tabs, VerticalTabs, Accordion
+      - layout/ Separator
+      - primitives/ Icon
+      - content/ CodeBlock
+      - marketing/ Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo
+    - patterns/ 7 composed components (ContactForm, FormField, etc.)
     - layout/ 4 layout components (Header, Footer, ThemeToggle, Analytics)
     - seo/ 3 SEO components (SEO, JsonLd, Breadcrumbs)
     - blog/ 4 blog components (ArticleHero, BlogCard, etc.)
@@ -59,8 +67,8 @@ Velocity follows a structured organization designed for scalability and maintain
 
 Components are organized by category:
 
-- **ui/** — Primitive components (Button, Input, Card)
-- **patterns/** — Composed patterns (ContactForm, FormField)
+- **ui/** — 31 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
+- **patterns/** — Composed patterns (ContactForm, FormField, SearchInput, etc.)
 - **layout/** — Page structure (Header, Footer)
 - **seo/** — SEO utilities (meta tags, JSON-LD)
 - **blog/** — Blog-specific components

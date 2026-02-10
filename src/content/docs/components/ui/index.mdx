@@ -1,6 +1,6 @@
 ---
 title: UI Components Overview
-description: 33 primitive UI components for building interfaces
+description: 31 UI components organized by subcategory for building interfaces
 sidebar:
   order: 1
 ---
@@ -9,48 +9,78 @@ UI components are the building blocks of your interface. They're designed to be 
 
 ## Available Components
 
-### Form Elements
+Components are organized into subcategories under `src/components/ui/`.
+
+### Form (`ui/form/`)
 
 | Component | Purpose |
 |-----------|---------|
-| `Button.astro` | Clickable actions with multiple variants |
-| `Input.astro` | Text input with label, hint, and error states |
-| `Textarea.astro` | Multi-line text input |
-| `Select.astro` | Dropdown select menu |
-| `Checkbox.astro` | Checkbox input with label |
-| `Radio.astro` | Radio button for single selection |
+| `Button` | Clickable actions with multiple variants |
+| `Input` | Text input with label, hint, and error states |
+| `Textarea` | Multi-line text input |
+| `Select` | Dropdown select menu |
+| `Checkbox` | Checkbox input with label |
+| `Radio` | Radio button for single selection |
+| `Switch` | Toggle switch input |
 
-### Display
-
-| Component | Purpose |
-|-----------|---------|
-| `Card.astro` | Container with structured content |
-| `Badge.astro` | Status labels and tags |
-| `Alert.astro` | Contextual feedback messages |
-| `Avatar.astro` | User profile images |
-| `Skeleton.astro` | Loading placeholders |
-| `Icon.astro` | SVG icon component |
-| `Logo.astro` | Brand logo with variants |
-
-### Interactive
+### Data Display (`ui/data-display/`)
 
 | Component | Purpose |
 |-----------|---------|
-| `Dialog.astro` | Modal dialogs |
-| `Dropdown.astro` | Dropdown menus |
-| `Tooltip.astro` | Hover tooltips |
-| `Tabs.astro` | Horizontal tab navigation |
-| `VerticalTabs.astro` | Vertical tab navigation |
+| `Card` | Container with structured content |
+| `Badge` | Status labels and tags |
+| `Avatar` | User profile images |
+| `AvatarGroup` | Grouped avatar display |
+| `Table` | Data table with styling |
+| `Pagination` | Page navigation controls |
+| `Progress` | Progress bar indicator |
+| `Skeleton` | Loading placeholders |
 
-### Specialized
+### Feedback (`ui/feedback/`)
 
 | Component | Purpose |
 |-----------|---------|
-| `CodeBlock.astro` | Syntax-highlighted code |
-| `CTA.astro` | Call-to-action buttons |
-| `SocialProof.astro` | Testimonial cards |
-| `NpmCopyButton.astro` | NPM install command copier |
-| `TerminalDemo.tsx` | Animated terminal demo |
+| `Alert` | Contextual feedback messages |
+| `Toast` | Temporary notification messages |
+| `Tooltip` | Hover tooltips |
+
+### Overlay (`ui/overlay/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `Dialog` | Modal dialogs |
+| `Dropdown` | Dropdown menus |
+| `Tabs` | Horizontal tab navigation |
+| `VerticalTabs` | Vertical tab navigation |
+| `Accordion` | Collapsible content sections |
+
+### Layout (`ui/layout/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `Separator` | Visual divider between sections |
+
+### Primitives (`ui/primitives/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `Icon` | SVG icon component |
+
+### Content (`ui/content/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `CodeBlock` | Syntax-highlighted code |
+
+### Marketing (`ui/marketing/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `Logo` | Brand logo with variants |
+| `CTA` | Call-to-action sections |
+| `NpmCopyButton` | NPM install command copier |
+| `SocialProof` | Testimonial cards |
+| `TerminalDemo` | Animated terminal demo |
 
 ## Common Props
 
@@ -89,9 +119,7 @@ For dark backgrounds:
 
 ```astro
 ---
-import Button from '@/components/ui/Button.astro';
-import Input from '@/components/ui/Input.astro';
-import Card from '@/components/ui/Card.astro';
+import { Button, Input, Card } from '@/components/ui';
 ---
 
 <Card>

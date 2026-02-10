@@ -11,7 +11,7 @@ Badges are used for status indicators, labels, and tags.
 
 ```astro
 ---
-import Badge from '@/components/ui/Badge.astro';
+import { Badge } from '@/components/ui';
 ---
 
 <Badge>Default</Badge>
@@ -99,7 +99,7 @@ Combine `pill` and `pulse` for hero-style announcement badges:
 ```astro
 ---
 import Hero from '@/components/hero/Hero.astro';
-import Badge from '@/components/ui/Badge.astro';
+import { Badge } from '@/components/ui';
 ---
 
 <Hero layout="centered" size="lg">
