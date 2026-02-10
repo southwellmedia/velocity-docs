@@ -12,8 +12,8 @@ Velocity is designed to be easily customizable.
 ## Quick Customizations
 
 <CardGrid>
-  <Card title="Brand Colors" icon="seti:css">
-    Change the color palette in CSS tokens.
+  <Card title="Brand Colors & Themes" icon="seti:css">
+    Change colors, switch themes, or create your own.
   </Card>
   <Card title="Components" icon="puzzle">
     Add new components or modify existing ones.
@@ -36,12 +36,24 @@ Velocity is designed to be easily customizable.
 
 ### Change Colors
 
-Edit `src/styles/tokens/colors.css`:
+Edit `src/styles/tokens/primitives.css`:
 
 ```css
 :root {
   --brand-500: oklch(62.5% 0.22 260); /* Blue instead of orange */
 }
+```
+
+### Switch Theme
+
+Edit `src/styles/tokens/colors.css` line 9:
+
+```css
+/* Default theme */
+@import '../themes/default.css';
+
+/* Or use midnight theme */
+@import '../themes/midnight.css';
 ```
 
 ### Add Navigation
@@ -64,7 +76,7 @@ Edit components in `src/components/` or create new ones following existing patte
 
 ## Next Steps
 
-- [Brand Colors](/customization/brand-colors) — Color customization
+- [Brand Colors & Themes](/customization/brand-colors) — Colors, theme switching, and custom themes
 - [Adding Components](/customization/adding-components) — Create new components
 - [Adding Routes](/customization/adding-routes) — Add new pages
 - [Adding Collections](/customization/adding-collections) — New content types

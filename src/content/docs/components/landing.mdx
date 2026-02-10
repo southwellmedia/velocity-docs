@@ -189,39 +189,28 @@ For dark background sections:
 
 ## Credibility
 
-Social proof and trust indicators:
+CLI feature showcase with terminal-style card and project stats. Self-contained with no props — edit the component directly to customize content.
 
 ```astro
 ---
 import Credibility from '@/components/landing/Credibility.astro';
 ---
 
-<Credibility
-  title="Trusted by developers worldwide"
-  logos={[
-    { src: '/logos/company1.svg', alt: 'Company 1' },
-    { src: '/logos/company2.svg', alt: 'Company 2' },
-  ]}
-/>
+<Credibility />
 ```
 
 ---
 
 ## LighthouseScores
 
-Performance metrics display:
+Displays perfect Lighthouse scores with animated circular gauges. Self-contained with no props — scores are defined internally.
 
 ```astro
 ---
 import LighthouseScores from '@/components/landing/LighthouseScores.astro';
 ---
 
-<LighthouseScores
-  performance={100}
-  accessibility={100}
-  bestPractices={100}
-  seo={100}
-/>
+<LighthouseScores />
 ```
 
 ---
@@ -305,7 +294,7 @@ import TechStack from '@/components/landing/TechStack.astro';
     </Fragment>
   </Hero>
 
-  <Credibility title="Trusted by developers" />
+  <Credibility />
 
   <FeatureTabs client:visible features={[...]} />
 

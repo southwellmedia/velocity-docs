@@ -11,7 +11,7 @@ Change Velocity's colors to match your brand.
 
 ## Quick Change
 
-The brand color is defined in `src/styles/tokens/colors.css`:
+The brand color scale is defined in `src/styles/tokens/primitives.css`:
 
 ```css
 :root {
@@ -20,9 +20,11 @@ The brand color is defined in `src/styles/tokens/colors.css`:
 }
 ```
 
+To shift your brand to a different color, change the hue value. For example, `38` (orange) → `260` (blue).
+
 ## Full Color Scale
 
-For a complete rebrand, update the entire scale:
+For a complete rebrand, update the entire scale in `src/styles/tokens/primitives.css`:
 
 ```css
 :root {
@@ -93,6 +95,40 @@ branding: {
 themeColor: '#9333EA',
 ```
 
+## Switching Themes
+
+Velocity ships with two themes: `default` and `midnight`. To switch, edit `src/styles/tokens/colors.css`:
+
+```css
+@import './primitives.css';
+@import '../themes/default.css';
+/* To use the midnight theme, replace the line above with:
+   @import '../themes/midnight.css';
+*/
+```
+
+## Creating a New Theme
+
+1. Duplicate `src/styles/themes/default.css`
+2. Implement all ~35 semantic tokens for both `:root` (light) and `.dark` (dark):
+
+| Category | Tokens |
+|----------|--------|
+| Backgrounds | `--background`, `--background-secondary`, `--background-tertiary`, `--background-elevated` |
+| Foregrounds | `--foreground`, `--foreground-secondary`, `--foreground-muted`, `--foreground-subtle` |
+| Borders | `--border`, `--border-strong`, `--border-subtle` |
+| Interactive | `--primary`, `--primary-hover`, `--primary-foreground`, `--secondary`, `--secondary-hover`, `--secondary-foreground`, `--accent`, `--accent-hover`, `--accent-light` |
+| Surfaces | `--muted`, `--muted-foreground`, `--card`, `--card-border`, `--input-bg`, `--input-border`, `--input-focus`, `--ring` |
+| Destructive | `--destructive`, `--destructive-foreground` |
+| Gradients | `--gradient-start`, `--gradient-end` |
+| Invert sections | `--surface-invert`, `--surface-invert-secondary`, `--surface-invert-tertiary`, `--on-invert`, `--on-invert-secondary`, `--on-invert-muted`, `--border-invert`, `--border-invert-strong` |
+
+3. Update the import in `src/styles/tokens/colors.css` to point to your new theme file
+
+<Aside type="caution">
+  When creating custom themes, maintain WCAG AA contrast ratios: 7:1 for `--foreground`, 4.5:1 for `--foreground-muted` and `--foreground-subtle`. Each theme file documents its contrast ratios inline.
+</Aside>
+
 ## Dark Mode Considerations
 
 The brand colors work in both light and dark modes. The semantic tokens handle the adaptation:
@@ -106,3 +142,5 @@ The brand colors work in both light and dark modes. The semantic tokens handle t
   --text-brand: var(--brand-400);
 }
 ```
+
+To opt out of dark mode entirely, remove the `.dark { ... }` block from your theme file.

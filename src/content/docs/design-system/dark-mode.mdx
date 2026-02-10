@@ -142,3 +142,7 @@ For dark sections on light pages, use inverted tokens:
 ```
 
 This works in both light and dark mode, maintaining proper contrast.
+
+## Opting Out of Dark Mode
+
+To disable dark mode entirely, remove the `.dark { ... }` block from your active theme file in `src/styles/themes/`. Without the `.dark` rule, the semantic tokens remain fixed at their light-mode values regardless of the toggle state.

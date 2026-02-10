@@ -67,7 +67,7 @@ Dropdown select menu:
 
 ### Avatar
 
-User profile image:
+User profile image. Extends `HTMLAttributes<'div'>`.
 
 ```astro
 <Avatar
@@ -80,12 +80,12 @@ User profile image:
 
 ### Skeleton
 
-Loading placeholder:
+Loading placeholder. Extends `HTMLAttributes<'div'>`.
 
 ```astro
 <Skeleton variant="text" width="100%" />
-<Skeleton variant="circular" width={40} height={40} />
-<Skeleton variant="rectangular" height={200} />
+<Skeleton variant="circular" width="40px" height="40px" />
+<Skeleton variant="default" height="200px" />
 ```
 
 ### Icon
@@ -132,7 +132,7 @@ Dropdown menu:
 
 ### Tooltip
 
-Hover tooltip:
+Hover tooltip. Extends `HTMLAttributes<'span'>`.
 
 ```astro
 <Tooltip content="This is helpful information">

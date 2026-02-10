@@ -5,6 +5,21 @@ sidebar:
   order: 2
 ---
 
+## v0.3.1-beta (2026-02-10)
+
+### Improvements
+
+- **Standardized component extensibility** — Badge, Avatar, AvatarGroup, Skeleton, Table, Pagination, Progress, Alert, Tooltip, and Separator now extend `HTMLAttributes` and forward `data-*`, `aria-*`, and all other HTML attributes via `...attrs` spread — matching the pattern already used by Button, Input, and Card
+- **Landing page cleanup** — Removed deprecated `Navbar.astro` and `LandingFooter.astro` (dead code replaced by Header/Footer in LandingLayout)
+- **Design token consistency** — Replaced hardcoded hex colors in Credibility (`#FF5F56`, `#FFBD2E`, `#27C93F`) and LighthouseScores (`#0cce6b`) with CSS custom properties (`var(--error)`, `var(--warning)`, `var(--success)`)
+
+### Component Counts
+
+- Landing: 5 (was 7, removed deprecated Navbar and LandingFooter)
+- Total: 55 components across all categories
+
+---
+
 ## v0.3.0-beta (2026-02-10)
 
 ### Breaking Changes
@@ -106,8 +121,8 @@ ContactForm, NewsletterForm, FormField
 #### Blog (4)
 ArticleHero, BlogCard, ShareButtons, RelatedPosts
 
-#### Landing (7)
-Hero, Credibility, LighthouseScores, TechStack, FeatureTabs, Navbar, LandingFooter, CTA
+#### Landing (7, now 5)
+Hero, Credibility, LighthouseScores, TechStack, FeatureTabs, ~~Navbar~~, ~~LandingFooter~~, CTA
 
 #### SEO (3)
 SEO, JsonLd, Breadcrumbs

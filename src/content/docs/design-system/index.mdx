@@ -12,14 +12,14 @@ Velocity uses a three-tier token system built on OKLCH colors for perceptually u
 ## Token Architecture
 
 <CardGrid>
-  <Card title="Reference Tokens" icon="list-format">
-    Raw values like grayscale and brand color scales. These are the foundation.
+  <Card title="Primitives" icon="list-format">
+    Raw values (grayscale, brand, status color scales) in `src/styles/tokens/primitives.css`.
   </Card>
   <Card title="Semantic Tokens" icon="document">
-    Intent-based tokens like `background`, `foreground`, `border`. Used in components.
+    Intent-based tokens (`background`, `foreground`, `border`) defined per-theme in `src/styles/themes/`.
   </Card>
-  <Card title="Inverted Tokens" icon="moon">
-    For dark sections on light pages, maintaining proper contrast.
+  <Card title="Themes" icon="moon">
+    Swap themes by changing one import in `colors.css`. Ships with `default` and `midnight`.
   </Card>
 </CardGrid>
 
