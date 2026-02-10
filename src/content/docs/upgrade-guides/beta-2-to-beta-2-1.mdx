@@ -1,0 +1,163 @@
+---
+title: "Upgrade: v0.2.0-beta to v0.2.1-beta"
+description: Step-by-step guide for upgrading Velocity from v0.2.0-beta to v0.2.1-beta
+sidebar:
+  order: 3
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through every change between Velocity **v0.2.0-beta** and **v0.2.1-beta**.
+
+## Overview
+
+| | v0.2.0-beta | v0.2.1-beta |
+|---|---|---|
+| **Component variants** | Inline Tailwind classes | CVA `.variants.ts` files |
+| **Color tokens** | Dual namespace (`--background` + `--color-background`) | Single `--color-*` namespace |
+| **Invert theming** | Per-component `colorScheme`/`variant` props | `.invert-section` wrapper class |
+| **New dependency** | — | `class-variance-authority` |
+| **CSS structure** | Monolithic `colors.css` | `primitives.css` + `themes/` directory |
+| **UI components** | 17 | 29 |
+| **Pattern components** | 3 | 7 |
+
+## Breaking Changes
+
+This release includes the following breaking prop changes:
+
+| Component | Removed Prop | Migration |
+|---|---|---|
+| `Button` | `colorScheme` | Wrap in `<div class="invert-section">` |
+| `Input` | `variant="invert"` | Wrap in `<div class="invert-section">` |
+| `Select` | `selectSize` | Rename to `size` |
+| `Textarea` | `textareaSize` | Rename to `size` |
+
+## Migration Steps
+
+<Steps>
+1. **Install new dependency**
+
+   The component system now uses [class-variance-authority](https://cva.style) for type-safe variant definitions:
+
+   ```bash
+   pnpm add class-variance-authority
+   ```
+
+2. **Replace `colorScheme` on Button**
+
+   The `colorScheme="invert"` prop has been removed. Instead, wrap the Button in an `.invert-section` container:
+
+   ```diff
+   - <Button colorScheme="invert">Click me</Button>
+   + <div class="invert-section">
+   +   <Button>Click me</Button>
+   + </div>
+   ```
+
+   <Aside type="tip">
+     `.invert-section` automatically swaps foreground and background tokens, so all child components invert without per-component props.
+   </Aside>
+
+3. **Replace `variant="invert"` on Input**
+
+   Same approach — use the `.invert-section` wrapper:
+
+   ```diff
+   - <Input variant="invert" placeholder="Email" />
+   + <div class="invert-section">
+   +   <Input placeholder="Email" />
+   + </div>
+   ```
+
+4. **Rename `selectSize` to `size` on Select**
+
+   ```diff
+   - <Select selectSize="sm" />
+   + <Select size="sm" />
+   ```
+
+5. **Rename `textareaSize` to `size` on Textarea**
+
+   ```diff
+   - <Textarea textareaSize="lg" />
+   + <Textarea size="lg" />
+   ```
+
+6. **Update custom CSS token references (optional)**
+
+   If you have custom CSS that imports `src/styles/tokens/colors.css` by path, it still works — the file now imports from `primitives.css` and `themes/`. No action required unless you were importing internal token files directly.
+
+   The token architecture now uses a single `--color-*` namespace. Raw primitives (`--background`, `--foreground`, etc.) still exist on `:root` for backwards compatibility, but component CSS now references `--color-background`, `--color-foreground`, etc. exclusively.
+
+   <Aside type="note">
+     If you have custom components using `var(--background)` directly, they will still work. However, they won't respond to `.invert-section` overrides. Migrate to `var(--color-background)` for full theme support.
+   </Aside>
+</Steps>
+
+## Verify the Upgrade
+
+Run the full verification suite:
+
+```bash
+pnpm build && pnpm lint && pnpm check
+```
+
+Also manually verify:
+- Components render correctly in both default and `.invert-section` contexts
+- Any custom components using old props have been updated
+- Accordion `size` prop works if you use it (`sm`, `md`, `lg`)
+
+## New Dependency
+
+| Package | Reason |
+|---------|--------|
+| `class-variance-authority` | Type-safe component variant system used by all UI components |
+
+## What's New
+
+### New UI Components
+
+| Component | Description |
+|-----------|-------------|
+| `Accordion` | Collapsible content sections using native `<details>`/`<summary>` |
+| `AvatarGroup` | Stacked avatar display with overflow count |
+| `Pagination` | Page navigation with previous/next and page numbers |
+| `Progress` | Determinate progress bar with size and color variants |
+| `Separator` | Horizontal or vertical divider line |
+| `Switch` | Toggle switch with label support |
+| `Table` | Responsive data table with striped and hoverable variants |
+| `Toast` | Notification toasts with success, error, warning, and info types |
+| `CodeBlock` | Syntax-highlighted code display |
+| `Dialog` | Modal dialog with backdrop |
+| `Dropdown` | Dropdown menu trigger |
+| `SocialProof` | Logo/brand display strip |
+
+### New Pattern Components
+
+| Pattern | Description |
+|---------|-------------|
+| `SearchInput` | Input with search icon and clear button |
+| `PasswordInput` | Input with show/hide password toggle |
+| `StatCard` | Metric display card with label, value, and trend |
+| `EmptyState` | Placeholder for empty content areas with icon and action |
+
+### CVA Variant System
+
+Every component now has a co-located `.variants.ts` file (e.g., `button.variants.ts`) that defines its visual variants using CVA. This enables:
+
+- **Type-safe props** — variant options are derived from the CVA definition
+- **Extensibility** — import and extend variants in your own components
+- **Consistency** — all variant logic is co-located, not scattered across templates
+
+```typescript
+// Example: importing and extending button variants
+import { buttonVariants, type ButtonVariants } from '@/components/ui';
+```
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v0.2.1-beta
+- [Design System](/design-system/color-tokens/) — Updated color token documentation
