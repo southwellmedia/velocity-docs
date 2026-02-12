@@ -5,6 +5,24 @@ sidebar:
   order: 2
 ---
 
+## v0.4.0-beta (2026-02-12)
+
+### Dependency Changes
+
+- **Astro** upgraded from 6.0.0-beta.9 to **6.0.0-beta.11**
+- **@astrojs/mdx** upgraded from beta.5 to **beta.7**
+- **@astrojs/check** upgraded from 0.9.6 to **0.9.7-beta.1**
+- **Replaced `@resvg/resvg-js` with `sharp`** for OG image generation — Sharp is already bundled by Astro, removing the need for a platform-specific native binding and its Vite workarounds
+- Removed stale `image.png` from project root
+
+### Simplifications
+
+- Removed `ssr.external` and `optimizeDeps.exclude` entries for `@resvg/resvg-js` from `astro.config.mjs`
+
+> **Upgrade guide:** [v0.3.x-beta to v0.4.0-beta](/upgrade-guides/beta-3-to-beta-4/)
+
+---
+
 ## v0.3.1-beta (2026-02-10)
 
 ### Improvements

@@ -86,11 +86,18 @@ export async function GET({ params }) {
     }
   );
 
-  return new Response(svgToPng(svg), {
+  // Convert SVG to PNG using Sharp (bundled by Astro)
+  const png = await sharp(Buffer.from(svg)).resize(1200).png().toBuffer();
+
+  return new Response(png, {
     headers: { 'Content-Type': 'image/png' },
   });
 }
 ```
+
+<Aside type="note">
+  Since **v0.4.0-beta**, Velocity uses [Sharp](https://sharp.pixelplumbing.com/) for the SVG→PNG conversion step. Sharp is already bundled by Astro, so no extra native bindings are needed. Previous versions used `@resvg/resvg-js`, which required Vite `ssr.external` workarounds.
+</Aside>
 
 <Aside type="caution">
   OG images are generated at build time. Changes require a rebuild.

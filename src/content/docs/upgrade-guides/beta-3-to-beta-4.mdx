@@ -1,0 +1,121 @@
+---
+title: "Upgrade: v0.3.x-beta to v0.4.0-beta"
+description: Step-by-step guide for upgrading Velocity from v0.3.x-beta to v0.4.0-beta
+sidebar:
+  order: 4
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through every change between Velocity **v0.3.x-beta** and **v0.4.0-beta**.
+
+## Overview
+
+| | v0.3.x-beta | v0.4.0-beta |
+|---|---|---|
+| **Astro** | 6.0.0-beta.9 | 6.0.0-beta.11 |
+| **@astrojs/mdx** | beta.5 | beta.7 |
+| **@astrojs/check** | 0.9.6 | 0.9.7-beta.1 |
+| **OG image renderer** | `@resvg/resvg-js` | `sharp` |
+| **Vite workarounds** | `ssr.external` + `optimizeDeps.exclude` for resvg | Removed |
+
+## Migration Steps
+
+<Steps>
+1. **Update `package.json` dependencies**
+
+   Bump the core Astro packages:
+
+   ```diff
+   - "astro": "6.0.0-beta.9",
+   + "astro": "6.0.0-beta.11",
+   - "@astrojs/mdx": "5.0.0-beta.5",
+   + "@astrojs/mdx": "5.0.0-beta.7",
+   - "@astrojs/check": "0.9.6",
+   + "@astrojs/check": "0.9.7-beta.1",
+   ```
+
+2. **Swap `@resvg/resvg-js` for `sharp`**
+
+   Remove the old renderer and add Sharp:
+
+   ```bash
+   pnpm remove @resvg/resvg-js
+   pnpm add sharp
+   ```
+
+   <Aside type="tip">
+     Sharp is already used internally by Astro for image optimization, so this actually *reduces* the number of native bindings in your dependency tree.
+   </Aside>
+
+3. **Update `src/lib/og.ts`**
+
+   Replace the Resvg import and rendering call with Sharp:
+
+   ```diff
+   - import { Resvg } from '@resvg/resvg-js';
+   + import sharp from 'sharp';
+   ```
+
+   Then update the SVG→PNG conversion at the bottom of the file:
+
+   ```diff
+   - const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
+   - return resvg.render().asPng();
+   + return Buffer.from(
+   +   await sharp(Buffer.from(svg)).resize(1200).png().toBuffer()
+   + );
+   ```
+
+4. **Clean up `astro.config.mjs`**
+
+   Remove the Vite workarounds that were only needed for `@resvg/resvg-js`:
+
+   ```diff
+     vite: {
+   -   ssr: {
+   -     external: ['@resvg/resvg-js'],
+   -   },
+   -   optimizeDeps: {
+   -     exclude: ['@resvg/resvg-js'],
+   -   },
+     },
+   ```
+
+   If the `vite` key is now empty, you can remove it entirely.
+
+5. **Install and verify**
+
+   ```bash
+   pnpm install && pnpm build
+   ```
+
+   Check that OG images are still generated under `/og/[...slug].png` and that the build completes without errors.
+</Steps>
+
+## Verify the Upgrade
+
+Run the full verification suite:
+
+```bash
+pnpm build && pnpm lint && pnpm check
+```
+
+Also manually verify:
+- OG images generate correctly (check a few `/og/*.png` routes)
+- No Vite warnings about `@resvg/resvg-js` in the build output
+- Build time is the same or faster (Sharp is typically quicker than Resvg)
+
+## What Changed
+
+This is a **dependency-only** release with no breaking API changes. All component APIs, props, and import paths remain identical to v0.3.x-beta.
+
+The key improvement is replacing `@resvg/resvg-js` — a platform-specific native module that required Vite SSR workarounds — with `sharp`, which Astro already bundles for image optimization. This simplifies the Vite config and removes a class of build-time issues on platforms like Vercel and Cloudflare.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v0.4.0-beta
+- [OG Images](/seo/og-images/) — Updated OG image documentation
