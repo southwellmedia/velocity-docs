@@ -40,6 +40,20 @@ PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 PUBLIC_GTM_ID=GTM-XXXXXXX
 ```
 
+### Cookie Consent (Optional)
+
+```bash
+# Enable the consent banner (default: false)
+PUBLIC_CONSENT_ENABLED=true
+
+# Link shown in the consent banner (optional)
+PUBLIC_PRIVACY_POLICY_URL=https://yoursite.com/privacy
+```
+
+<Aside type="tip">
+  When `PUBLIC_CONSENT_ENABLED` is `false` or omitted, the ConsentBanner component renders nothing. Analytics scripts still load normally without consent gating.
+</Aside>
+
 ### Form Handling (Optional)
 
 ```bash

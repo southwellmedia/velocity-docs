@@ -5,6 +5,32 @@ sidebar:
   order: 2
 ---
 
+## v0.4.5-beta (2026-02-15)
+
+### Features
+
+- **Cookie Consent Manager** — Full consent banner with Accept All / Decline All / Customize, per-category settings panel via Dialog, Google Consent Mode v2 integration, localStorage persistence with versioned re-consent
+- **Two consent modes** — `consent_mode_v2` (cookieless pings with denied defaults) and `strict` (full script blocking until consent)
+- **Consent configuration** — `src/config/consent.config.ts` for categories, UI text, GCM type mapping, and show delay
+- **New env vars** — `PUBLIC_CONSENT_ENABLED` to toggle consent on/off, `PUBLIC_PRIVACY_POLICY_URL` for the privacy link
+
+### Security
+
+- **Removed Astro CSP** — Auto-hashing of `<style>` blocks makes `'unsafe-inline'` ineffective per the CSP spec. Will revisit when the Astro CSP API is stable.
+- **Simplified security headers** — 4 zero-maintenance headers via `vercel.json`: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`
+- **Dropped `X-XSS-Protection`** — Deprecated header that can introduce vulnerabilities in older browsers
+- **Kept `checkOrigin: true`** — CSRF protection via Astro's origin checking
+
+### Bug Fixes
+
+- **Fixed mobile menu backdrop blur** — `.mobile-menu-blur` was in a scoped `<style>` block but applied to elements outside the Header component; changed to `<style is:global>`
+- Fixed Analytics race conditions and duplicate event listeners
+- Fixed dynamic consent mapping bugs in GCM integration
+
+> **Upgrade guide:** [v0.4.x-beta to v0.4.5-beta](/upgrade-guides/beta-4-to-beta-4.5/)
+
+---
+
 ## v0.4.0-beta (2026-02-12)
 
 ### Dependency Changes

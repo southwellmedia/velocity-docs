@@ -1,0 +1,225 @@
+---
+title: "Upgrade: v0.4.x-beta to v0.4.5-beta"
+description: Step-by-step guide for upgrading Velocity from v0.4.x-beta to v0.4.5-beta
+sidebar:
+  order: 5
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through every change between Velocity **v0.4.x-beta** and **v0.4.5-beta**.
+
+## Overview
+
+| Area | What Changed |
+|---|---|
+| **Cookie Consent** | New ConsentBanner component with Google Consent Mode v2 |
+| **Security Headers** | CSP removed; simplified to 4 bulletproof headers via `vercel.json` |
+| **Environment** | 2 new env vars: `PUBLIC_CONSENT_ENABLED`, `PUBLIC_PRIVACY_POLICY_URL` |
+| **Bug Fixes** | Mobile menu backdrop blur, Analytics race conditions |
+
+## Migration Steps
+
+<Steps>
+1. **Update environment variables**
+
+   Add the new consent variables to your `.env` and `.env.example`:
+
+   ```bash
+   # Cookie Consent
+   PUBLIC_CONSENT_ENABLED=true
+   PUBLIC_PRIVACY_POLICY_URL=https://yoursite.com/privacy
+   ```
+
+   Set `PUBLIC_CONSENT_ENABLED=false` (or omit it) to disable the consent banner entirely.
+
+   <Aside type="tip">
+     The consent banner only renders when `PUBLIC_CONSENT_ENABLED` is `true`. If you don't need cookie consent (e.g., no analytics or marketing scripts), you can skip this entirely.
+   </Aside>
+
+2. **Add new files**
+
+   Copy these new files into your project:
+
+   ```
+   src/config/consent.config.ts          # Consent categories, UI text, GCM mapping
+   src/lib/consent.types.ts              # TypeScript types for consent system
+   src/components/ui/overlay/ConsentBanner/ConsentBanner.astro
+   src/components/ui/overlay/ConsentBanner/index.ts
+   ```
+
+   Also update the barrel export:
+
+   ```diff
+   // src/components/ui/overlay/index.ts
+   + export * from './ConsentBanner';
+   ```
+
+3. **Update `BaseLayout.astro`**
+
+   Import and render the ConsentBanner at the end of `<body>`:
+
+   ```diff
+   ---
+   + import ConsentBanner from '@/components/ui/overlay/ConsentBanner';
+   ---
+
+     <slot name="footer" />
+   + <ConsentBanner />
+   </body>
+   ```
+
+4. **Update `astro.config.mjs`**
+
+   Remove the `csp` block from the security config:
+
+   ```diff
+     security: {
+       checkOrigin: true,
+   -   csp: {
+   -     scriptDirective: { ... },
+   -     styleDirective: { ... },
+   -     directives: [ ... ],
+   -   },
+     },
+   ```
+
+   <Aside type="note">
+     Astro 6 beta's CSP auto-hashes `<style>` blocks, which per the CSP spec causes browsers to ignore `'unsafe-inline'` — breaking all inline `style=""` attributes. CSP will be revisited when the Astro CSP API is stable and battle-tested.
+   </Aside>
+
+5. **Update `vercel.json`**
+
+   Remove the deprecated `X-XSS-Protection` header:
+
+   ```diff
+     {
+   -   "key": "X-XSS-Protection",
+   -   "value": "1; mode=block"
+   - },
+   ```
+
+   Your security headers should now be exactly:
+   - `X-Content-Type-Options: nosniff`
+   - `X-Frame-Options: DENY`
+   - `Referrer-Policy: strict-origin-when-cross-origin`
+   - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+6. **Update `Analytics.astro`**
+
+   The Analytics component was updated to integrate with the consent system. Replace your existing `src/components/layout/Analytics.astro` with the new version.
+
+7. **Fix mobile menu blur (if applicable)**
+
+   In `src/components/layout/Header.astro`, the `.mobile-menu-blur` style block needs to be global:
+
+   ```diff
+   - <style>
+   + <style is:global>
+       .mobile-menu-blur {
+         opacity: 0.3;
+         filter: blur(4px);
+         transition: opacity 200ms, filter 200ms;
+       }
+     </style>
+   ```
+
+8. **Install and verify**
+
+   ```bash
+   pnpm install && pnpm build
+   ```
+</Steps>
+
+## Configure Consent Categories
+
+Edit `src/config/consent.config.ts` to customize categories, UI text, and Google Consent Mode mappings:
+
+```typescript
+const consentConfig: ConsentConfig = {
+  version: 1,              // Bump to force re-consent
+  mode: 'consent_mode_v2', // or 'strict'
+  storageKey: 'velocity-consent',
+  showDelay: 500,          // ms before banner slides in
+
+  categories: {
+    necessary: {
+      label: 'Necessary',
+      description: 'Essential cookies required for the website to function.',
+      required: true,
+      defaultEnabled: true,
+      gcmTypes: ['security_storage'],
+    },
+    analytics: {
+      label: 'Analytics',
+      description: 'Help us understand how visitors interact with the website.',
+      required: false,
+      defaultEnabled: false,
+      gcmTypes: ['analytics_storage'],
+    },
+    // Add or remove categories as needed
+  },
+
+  ui: {
+    heading: 'Cookie Preferences',
+    description: 'We use cookies to enhance your browsing experience.',
+    acceptAll: 'Accept All',
+    declineAll: 'Decline All',
+    customize: 'Customize',
+    savePreferences: 'Save Preferences',
+    settingsHeading: 'Privacy Settings',
+  },
+};
+```
+
+### Consent Modes
+
+| Mode | Behavior |
+|---|---|
+| `consent_mode_v2` | Scripts load immediately with denied defaults; Google receives cookieless pings. Update consent state on user action. |
+| `strict` | Analytics/marketing scripts are fully blocked until the user grants consent. |
+
+## Verify the Upgrade
+
+Run the full verification suite:
+
+```bash
+pnpm build && pnpm lint && pnpm check
+```
+
+Also manually verify:
+- Consent banner appears on first visit (clear localStorage or use incognito)
+- Accept All / Decline All / Customize all work correctly
+- Settings panel opens via "Customize" button
+- Reopener button appears after consent is saved
+- Mobile menu backdrop blurs page content when opened
+- No CSP errors in the browser console
+
+## What Changed
+
+### New: Cookie Consent Manager
+
+A complete consent system built on the existing Dialog and Button components:
+
+- **ConsentBanner** — Bottom (or top) bar with Accept All, Decline All, and Customize buttons
+- **Settings panel** — Per-category toggles via the Dialog component
+- **Google Consent Mode v2** — Dynamic GCM mapping with `gtag('consent', 'update', ...)` calls
+- **Two blocking modes** — `consent_mode_v2` (cookieless pings) or `strict` (full script blocking)
+- **Reopener button** — Small floating button to re-open settings after consent is saved
+- **localStorage persistence** — Versioned storage with automatic re-consent on version bump
+
+### Changed: Security Headers
+
+CSP was removed from `astro.config.mjs` because Astro 6 beta's auto-hashing of `<style>` blocks makes `'unsafe-inline'` ineffective per the CSP specification. The remaining security headers in `vercel.json` cover the realistic threats for a marketing site. CSP will return as an opt-in feature when the Astro API is stable.
+
+### Fixed: Mobile Menu Blur
+
+The `.mobile-menu-blur` CSS was in a scoped `<style>` block, but JS applies it to `<main>` and `<footer>` elements outside the Header component. Astro's scoping made the selector unreachable. Changed to `<style is:global>`.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v0.4.5-beta
+- [Environment Variables](/configuration/environment/) — Updated env var reference
