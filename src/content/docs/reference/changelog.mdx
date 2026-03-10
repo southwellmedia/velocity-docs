@@ -5,6 +5,61 @@ sidebar:
   order: 2
 ---
 
+## v1.0.0 (2026-03-10)
+
+### Stable Release
+
+Velocity reaches **1.0.0** — all Astro 6 beta dependencies replaced with stable releases. No code changes needed; this is a dependency-only upgrade from v0.5.0-beta.
+
+### Dependency Changes
+
+- **Astro** upgraded from 6.0.0-beta.20 to **6.0.0** (stable)
+- **@astrojs/mdx** upgraded from 5.0.0-beta.12 to **5.0.0** (stable)
+- **@astrojs/react** upgraded from 5.0.0-beta.4 to **5.0.0** (stable)
+- **@astrojs/check** upgraded from 0.9.7-beta.1 to **0.9.7** (stable)
+- **@astrojs/sitemap** bumped to **^3.7.1**
+
+### CLI Improvements
+
+- **Version-gated migration system** — the CLI upgrade flow now uses `fromVersion`/`toVersion` fields to show only migrations relevant to your current version
+- **Protected file notices** — upgrade flow warns about files it won't overwrite (pages, content, config)
+- **Updated fallback safe list** — includes `src/styles/themes/`, `src/config/nav.config.ts`, and deployment configs
+
+> **Upgrade guide:** [Beta to v1.0.0 Stable](/upgrade-guides/beta-to-stable/)
+
+---
+
+## v0.5.0-beta (2026-03-03)
+
+### Dependency Changes
+
+- **Astro** upgraded from 6.0.0-beta.11 to **6.0.0-beta.20**
+- **@astrojs/mdx** upgraded from beta.7 to **beta.12**
+- **@astrojs/react** upgraded from beta.2 to **beta.4**
+- **Vitest** upgraded from v2 to **v3.2+** (required by Vite 7)
+
+### Features
+
+- **15 React island components** — GoogleMap, FloatingHeader, MobileMenu, ThemeToggle, CookieConsent, SearchDialog, Accordion, Tabs, Toast, and more
+- **Floating header** with scroll-aware show/hide behavior
+- **Extended theme system** — `src/styles/themes/` directory for multi-theme support
+- **ClientRouter** integration for view transitions
+- **GoogleMap component** with API key support via `astro:env`
+
+### Improvements
+
+- Simplified README
+- Lint fixes across the codebase
+- Version-gated migrations in `velocity-manifest.json`
+
+### Notes
+
+- Astro 6 beta.20 changed image defaults: cropping enabled by default, no upscaling
+- Heading ID generation algorithm changed — verify anchor links in MDX content
+- Script and style tags now render in definition order
+
+---
+
 ## v0.4.5-beta (2026-02-15)
 
 ### Features
@@ -187,16 +242,16 @@ None (initial release)
 
 ## Roadmap
 
-### Planned for v1.0.0 Stable
+### Shipped in v1.0.0
 
-- Stable Astro 6 release support
-- Additional component variants
-- Improved documentation
-- Performance optimizations
+- ~~Stable Astro 6 release support~~ ✅
+- ~~CLI scaffolding tool~~ ✅ (`create-velocity-astro`)
+- ~~Additional component variants~~ ✅ (60+ components)
 
-### Future Considerations
+### Planned
 
 - Multi-language documentation
-- Component playground
-- CLI scaffolding tool
-- Premium themes
+- Component playground / Storybook integration
+- Premium themes and templates
+- E2E test suite with Playwright
+- Performance benchmarking dashboard

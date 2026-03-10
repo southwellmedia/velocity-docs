@@ -1,0 +1,129 @@
+---
+title: "Upgrade: Beta to v1.0.0 Stable"
+description: Step-by-step guide for upgrading Velocity from any beta release to v1.0.0 stable
+sidebar:
+  order: 5
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through upgrading Velocity from **any beta release** (v0.1.0-beta through v0.5.0-beta) to the **v1.0.0 stable** release.
+
+## Overview
+
+| | Beta (latest) | v1.0.0 Stable |
+|---|---|---|
+| **Astro** | 6.0.0-beta.20 | 6.0.0 |
+| **@astrojs/mdx** | 5.0.0-beta.12 | 5.0.0 |
+| **@astrojs/react** | 5.0.0-beta.4 | 5.0.0 |
+| **@astrojs/check** | 0.9.7-beta.1 | 0.9.7 |
+| **@astrojs/sitemap** | ^3.7.0 | ^3.7.1 |
+
+<Aside type="tip">
+  This is a **dependency-only** upgrade. No code changes are needed — all Velocity APIs, components, and import paths remain identical. The codebase has been fully Astro 6 compliant since v0.5.0-beta.
+</Aside>
+
+## Option A: CLI Upgrade (Recommended)
+
+If you have `create-velocity-astro` installed:
+
+<Steps>
+1. **Update the CLI**
+
+   ```bash
+   npm install -g create-velocity-astro@latest
+   ```
+
+2. **Run the upgrade**
+
+   ```bash
+   pnpm create velocity-astro upgrade
+   ```
+
+   The CLI will:
+   - Download the latest template
+   - Show what files will change
+   - Update safe files (components, layouts, lib, styles)
+   - Bump `package.json` dependencies to stable versions
+   - Update your `.velocity.json` version marker
+   - Show migration notes relevant to your current version
+
+3. **Install and verify**
+
+   ```bash
+   pnpm install && pnpm build
+   ```
+</Steps>
+
+<Aside type="caution">
+  The CLI will **not** modify protected files like `astro.config.mjs`, your pages, content, or environment files. These are yours to manage.
+</Aside>
+
+## Option B: Manual Upgrade
+
+<Steps>
+1. **Update `package.json` dependencies**
+
+   ```diff
+   - "astro": "6.0.0-beta.20",
+   + "astro": "6.0.0",
+   - "@astrojs/mdx": "5.0.0-beta.12",
+   + "@astrojs/mdx": "5.0.0",
+   - "@astrojs/react": "5.0.0-beta.4",
+   + "@astrojs/react": "5.0.0",
+   - "@astrojs/check": "0.9.7-beta.1",
+   + "@astrojs/check": "0.9.7",
+   - "@astrojs/sitemap": "^3.7.0",
+   + "@astrojs/sitemap": "^3.7.1",
+   ```
+
+2. **Install and build**
+
+   ```bash
+   pnpm install && pnpm build
+   ```
+
+3. **Update `.velocity.json`**
+
+   ```diff
+   - "version": "0.5.0-beta"
+   + "version": "1.0.0"
+   ```
+</Steps>
+
+## Notes for Users on Older Betas
+
+If you're upgrading from a version earlier than v0.5.0-beta, review these additional guides first:
+
+### From v0.4.0-beta
+
+- **Vitest 2 → 3 migration**: Astro 6 bundles Vite 7, which requires Vitest 3.2+. If you have a custom `vitest.config.ts`, review the [Vitest 3 migration guide](https://vitest.dev/guide/migration.html).
+- **Image defaults changed**: Cropping is now enabled by default and images are never upscaled. If images appear cropped unexpectedly, add `fit: 'contain'` to your Image components.
+- **Heading ID changes**: The heading ID generation algorithm changed. Verify any internal anchor links (`#my-heading`) still resolve correctly.
+
+### From v0.3.x-beta or earlier
+
+Follow the existing upgrade guides in order:
+1. [v0.1.0-beta to v0.2.0-beta](/upgrade-guides/beta-1-to-beta-2/)
+2. [v0.2.0-beta to v0.3.0-beta](/upgrade-guides/beta-2-to-beta-3/)
+3. [v0.3.x-beta to v0.4.0-beta](/upgrade-guides/beta-3-to-beta-4/)
+
+Then apply the steps in this guide.
+
+## Verify the Upgrade
+
+Run the full verification suite:
+
+```bash
+pnpm lint && pnpm check && pnpm build
+```
+
+All three commands should complete with zero errors. The stable releases are fully compatible with the existing beta.20 codebase.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v1.0.0
+- [Quick Start](/getting-started/) — Setting up a new project
