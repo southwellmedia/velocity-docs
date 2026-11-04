@@ -54,10 +54,12 @@ interface SiteConfig {
 ## Example Configuration
 
 ```typescript
+import { SITE_URL } from 'astro:env/server';
+
 const siteConfig: SiteConfig = {
   name: 'Velocity',
   description: 'A modern website built with Astro and Tailwind CSS',
-  url: import.meta.env.SITE_URL || 'https://example.com',
+  url: SITE_URL || 'https://example.com',
   ogImage: '/og-default.png',
   author: 'Your Name',
   email: 'hello@example.com',

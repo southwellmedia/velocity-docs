@@ -1,0 +1,96 @@
+---
+title: Security & CSP
+description: Velocity's Content Security Policy and how to work with it
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity ships with Astro's hash-based Content Security Policy turned on through `security.csp` in `astro.config.mjs`. Every page gets a `<meta http-equiv="content-security-policy">` tag.
+
+## The Policy
+
+| Directive | Value |
+|-----------|-------|
+| `script-src` | `'self'` plus a SHA-256 hash for each inline script. No `'unsafe-inline'`. |
+| `style-src-elem` | `'self'` plus hashes |
+| `style-src-attr` | `'unsafe-inline'`, so Shiki can color code blocks through `style=""` attributes |
+| `object-src` | `'none'` |
+| `base-uri` | `'self'` |
+| `form-action` | `'self'` |
+
+Inline style attributes can't run script. `<style>` elements stay hash-locked. Astro logs a generic Shiki warning at build time, which you can ignore.
+
+```javascript
+// astro.config.mjs
+security: {
+  checkOrigin: true,
+  csp: {
+    scriptDirective: { resources: ["'self'"] },
+    styleDirective: {
+      resources: [
+        { resource: "'self'", kind: 'element' },
+        { resource: "'unsafe-inline'", kind: 'attribute' },
+      ],
+    },
+    directives: ["object-src 'none'", "base-uri 'self'", "form-action 'self'"],
+  },
+},
+```
+
+## Rules for Your Code
+
+**Never add `'unsafe-inline'` to `script-src`.**
+
+**Keep inline scripts static.** Astro can only hash a script whose content doesn't change. `define:vars` and interpolated values won't work. Pass data through a JSON element instead:
+
+```astro
+---
+const config = JSON.stringify({ id: 'abc' });
+---
+
+<script type="application/json" id="my-config" set:html={config} />
+
+<script>
+  const config = JSON.parse(document.getElementById('my-config').textContent);
+</script>
+```
+
+## Third-Party Scripts
+
+Declare hosts in the component that loads them, so other pages keep the strict policy:
+
+```astro
+---
+Astro.csp?.insertScriptResource('https://cdn.example.com');
+---
+
+<script is:inline src="https://cdn.example.com/widget.js"></script>
+```
+
+`Analytics.astro` does this, adding the Google hosts only when GA or GTM is configured. The search view adds `'wasm-unsafe-eval'` for Pagefind's WebAssembly engine.
+
+For a host every page needs, add it to `security.csp.scriptDirective.resources` instead.
+
+## Testing
+
+CSP isn't applied in `astro dev`. Test it with a production build:
+
+```bash
+pnpm build && pnpm preview
+```
+
+`pnpm test:e2e` fails on any CSP violation.
+
+## HTTP-Only Directives
+
+A `<meta>` CSP ignores `frame-ancestors` and `report-uri`. Velocity sends `X-Frame-Options: DENY` from `vercel.json` and `netlify.toml` instead, along with other security headers.
+
+## Adding `ClientRouter` Back
+
+Astro's CSP doesn't support `<ClientRouter />`. If you need `transition:persist`, `transition:name` or `navigate()`, set `security.csp: false` before adding it. Velocity's components re-initialize on `astro:after-swap`, so they keep working.
+
+<Aside type="caution">
+  Turning CSP off removes a real layer of protection against cross-site scripting. Native view transitions and prefetch cover most of what the router offers.
+</Aside>

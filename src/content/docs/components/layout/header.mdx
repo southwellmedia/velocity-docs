@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The Header component provides full navigation with responsive mobile menu support.
+The Header component provides full navigation with responsive mobile menu support. It reads its navigation, CTA and actions from [`nav.config.ts`](/configuration/routes/), and every label follows the current language.
 
 ## Basic Usage
 
@@ -26,6 +26,7 @@ import Header from '@/components/layout/Header.astro';
   size="md"
   variant="default"
   colorScheme="default"
+  shape="bar"
   showCta
   cta={{ label: 'Get Started', href: '/signup' }}
   showThemeToggle
@@ -72,16 +73,18 @@ Override the default navigation:
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Header height |
 | `variant` | `'default' \| 'solid' \| 'transparent'` | `'default'` | Background style |
 | `colorScheme` | `'default' \| 'invert'` | `'default'` | Color scheme |
-| `nav` | `NavItem[]` | — | Override navigation |
-| `extraNav` | `NavItem[]` | `[]` | Additional nav items |
+| `shape` | `'bar' \| 'floating'` | `'bar'` | Header shape |
+| `nav` | `NavItem[]` | Items from `nav.config.ts` | Override navigation |
+| `extraNav` | `NavItem[]` | `headerConfig.extraNav` | Additional nav items |
 | `showCta` | `boolean` | `false` | Show CTA button |
-| `cta` | `{ label, href }` | `{ label: 'Get Started', href: '#cta' }` | CTA config |
-| `actions` | `HeaderAction[]` | `[]` | Action buttons |
+| `cta` | `{ label, href }` | `headerConfig.cta` | CTA config |
+| `actions` | `HeaderAction[]` | `headerConfig.actions` | Action buttons |
 | `showThemeToggle` | `boolean` | `true` | Show theme toggle |
 | `showMobileMenu` | `boolean` | `true` | Show mobile menu |
 | `showActiveState` | `boolean` | `true` | Highlight current page |
 | `logoText` | `string` | — | Override logo text |
 | `hideLogo` | `boolean` | `false` | Hide logo |
+| `showLanguageSwitcher` | `boolean` | `true` on multi-language sites | Show language switcher |
 
 ## Slots
 

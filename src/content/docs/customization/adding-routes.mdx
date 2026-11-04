@@ -5,99 +5,150 @@ sidebar:
   order: 4
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-Add new pages to your Velocity site.
+Add new pages to your Velocity site. The CLI can do this when you create a project with `--pages`. To add one later, follow the steps here.
 
 ## Adding a Page
 
 <Steps>
-1. **Define the route** in `src/config/routes.ts`:
+1. **Add the route and nav item** in `src/config/nav.config.ts`:
 
    ```typescript
    export const routes = {
-     // ... existing routes
+     // ...existing routes
+     pricing: { path: 'pricing' },
+   };
+
+   export const navItems: NavItem[] = [
+     // ...existing items
+     { label: 'pricing.title', route: 'pricing', order: 6 },
+   ];
+   ```
+
+2. **Add the copy** in `src/i18n/translations/en.ts`:
+
+   ```typescript
+   const en = {
+     // ...
      pricing: {
-       path: '/pricing',
-       nav: { show: true, order: 5, label: 'Pricing' },
+       title: 'Pricing',
+       description: 'View our pricing plans',
      },
    };
    ```
 
-2. **Create the page** at `src/pages/pricing.astro`:
+   On a multi-language site, add the same keys to each file in `src/i18n/translations/`.
+
+3. **Create the view** at `src/views/PricingView.astro`:
 
    ```astro
    ---
    import PageLayout from '@/layouts/PageLayout.astro';
+   import { useTranslations, type Locale } from '@/i18n';
+
+   interface Props {
+     locale: Locale;
+   }
+
+   const { locale } = Astro.props;
+   const t = useTranslations(locale);
    ---
 
-   <PageLayout title="Pricing" description="View our pricing plans">
-     <section class="py-16">
-       <div class="container">
-         <h1 class="text-4xl font-bold mb-8">Pricing</h1>
-         <!-- Content -->
-       </div>
+   <PageLayout title={t('pricing.title')} description={t('pricing.description')}>
+     <section class="mx-auto max-w-4xl px-6 py-24">
+       <h1 class="text-4xl font-bold">{t('pricing.title')}</h1>
      </section>
    </PageLayout>
    ```
+
+4. **Create the page wrapper** at `src/pages/pricing.astro`:
+
+   ```astro
+   ---
+   import PricingView from '@/views/PricingView.astro';
+   import { defaultLocale } from '@/i18n';
+   ---
+
+   <PricingView locale={defaultLocale} />
+   ```
+
+5. **Create the language wrapper** at `src/pages/[lang]/[...pricing].astro`:
+
+   ```astro
+   ---
+   import PricingView from '@/views/PricingView.astro';
+   import { getLocalizedStaticPaths, type Locale } from '@/i18n';
+
+   export function getStaticPaths() {
+     return getLocalizedStaticPaths('pricing', 'pricing');
+   }
+
+   const { locale } = Astro.props as { locale: Locale };
+   ---
+
+   <PricingView locale={locale} />
+   ```
+
+   It generates nothing while your site has one language, so it's safe to add now.
 </Steps>
 
-## Route Configuration
+<Aside type="tip" title="Single-language site?">
+  You can skip the wrappers and write a normal page in `src/pages/`. Add a view and wrappers when you need more languages.
+</Aside>
 
-### Show in Navigation
+## Hide a Page from Navigation
 
-```typescript
-pricing: {
-  path: '/pricing',
-  nav: { show: true, order: 5, label: 'Pricing' },
-},
-```
-
-### Hide from Navigation
+Add the route but leave it out of `navItems`:
 
 ```typescript
-privacy: {
-  path: '/privacy',
-  nav: { show: false, order: 0, label: 'Privacy' },
-},
+export const routes = {
+  // ...
+  privacy: { path: 'privacy' },
+};
 ```
 
-### Navigation Order
+## Navigation Order
 
 Lower numbers appear first:
 
 ```typescript
-about: { path: '/about', nav: { show: true, order: 1, label: 'About' } },
-blog: { path: '/blog', nav: { show: true, order: 2, label: 'Blog' } },
-pricing: { path: '/pricing', nav: { show: true, order: 3, label: 'Pricing' } },
-contact: { path: '/contact', nav: { show: true, order: 4, label: 'Contact' } },
+export const navItems: NavItem[] = [
+  { label: 'nav.about', route: 'about', order: 1 },
+  { label: 'nav.blog', route: 'blog', order: 2 },
+  { label: 'pricing.title', route: 'pricing', order: 3 },
+];
 ```
+
+## Testing a New Page
+
+The E2E suite reads pages from `routes`, so new routes are tested automatically: each must return 200, have no console errors or CSP violations, have one `<main>`, and pass axe accessibility checks.
 
 ## Dynamic Routes
 
-For dynamic pages like blog posts:
+Blog URLs come from `src/lib/blog.ts`. For your own collections, use `getStaticPaths()`:
 
 ```astro
 ---
-// src/pages/blog/[slug].astro
+// src/pages/projects/[slug].astro
 import { getCollection, render } from 'astro:content';
-import BlogLayout from '@/layouts/BlogLayout.astro';
+import PageLayout from '@/layouts/PageLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: { post },
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { project } = Astro.props;
+const { Content } = await render(project);
 ---
 
-<BlogLayout {...post.data}>
+<PageLayout title={project.data.title}>
   <Content />
-</BlogLayout>
+</PageLayout>
 ```
 
 ## Nested Routes
@@ -107,46 +158,32 @@ Create folders for nested paths:
 ```
 src/pages/
 ├── docs/
-│   ├── index.astro        # /docs
+│   ├── index.astro            # /docs
 │   ├── getting-started.astro  # /docs/getting-started
 │   └── components/
-│       └── button.astro   # /docs/components/button
+│       └── button.astro       # /docs/components/button
 ```
 
-## API Routes
+## On-Demand Routes
 
-Create server endpoints:
-
-```typescript
-// src/pages/api/data.ts
-import type { APIRoute } from 'astro';
-
-export const GET: APIRoute = async () => {
-  return new Response(
-    JSON.stringify({ message: 'Hello!' }),
-    { headers: { 'Content-Type': 'application/json' } }
-  );
-};
-```
-
-## Using Route Helpers
+Pages are prerendered. To render one on the server, opt out:
 
 ```astro
 ---
-import { getRoutePath, getNavRoutes } from '@/config/routes';
+export const prerender = false;
+---
+```
 
-// Get path for a route
-const pricingPath = getRoutePath('pricing');
+Don't set `output: 'server'`. For form handling, use [Astro Actions](/api/).
 
-// Get all nav routes
-const navRoutes = getNavRoutes();
+## Linking to Routes
+
+```astro
+---
+import { getLocale, localizeRoute } from '@/i18n';
+
+const locale = getLocale(Astro);
 ---
 
-<a href={pricingPath}>View Pricing</a>
-
-<nav>
-  {navRoutes.map(({ path, label }) => (
-    <a href={path}>{label}</a>
-  ))}
-</nav>
+<a href={localizeRoute('pricing', locale)}>View Pricing</a>
 ```

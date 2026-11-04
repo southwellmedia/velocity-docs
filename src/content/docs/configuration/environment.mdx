@@ -54,11 +54,32 @@ PUBLIC_PRIVACY_POLICY_URL=https://yoursite.com/privacy
   When `PUBLIC_CONSENT_ENABLED` is `false` or omitted, the ConsentBanner component renders nothing. Analytics scripts still load normally without consent gating.
 </Aside>
 
+### Deployment (Optional)
+
+```bash
+# Force an adapter: node | vercel | netlify | cloudflare
+DEPLOY_TARGET=node
+```
+
+This is detected automatically on Vercel, Netlify and Cloudflare. See [Deployment](/deployment/).
+
 ### Form Handling (Optional)
 
 ```bash
-# Custom form endpoint
+# External endpoint for contact form submissions
 CONTACT_FORM_ENDPOINT=https://api.yoursite.com/contact
+
+# Newsletter service API key (server-side only)
+NEWSLETTER_API_KEY=your-api-key
+```
+
+Read these in your [Astro Actions](/api/). They do nothing until you use them there.
+
+### Maps (Optional)
+
+```bash
+# Google Maps key for the GoogleMap component
+PUBLIC_GOOGLE_MAPS_API_KEY=your-api-key
 ```
 
 ### Search Verification (Optional)
@@ -92,21 +113,34 @@ PUBLIC_API_KEY=sk_xxxxx        # ❌ DANGER - exposed to browser!
 
 ## Accessing Variables
 
-### In Astro Components
+Variables are declared in `env.schema` in `astro.config.mjs` and read through `astro:env`, which gives you types and validation. Don't read `import.meta.env` directly.
+
+### Server Code
 
 ```astro
 ---
-// Server-side (both public and private)
-const siteUrl = import.meta.env.SITE_URL;
-const apiKey = import.meta.env.API_SECRET_KEY;
+import { SITE_URL } from 'astro:env/server';
+import { NEWSLETTER_API_KEY } from 'astro:env/server';
 ---
 ```
 
-### In Client-Side JavaScript
+### Client Code
 
 ```typescript
-// Only PUBLIC_ prefixed variables work here
-const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+import { PUBLIC_GA_MEASUREMENT_ID } from 'astro:env/client';
+```
+
+### Adding a Variable
+
+Declare it in `astro.config.mjs` first:
+
+```javascript
+env: {
+  schema: {
+    // ...existing variables
+    RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+  },
+},
 ```
 
 ## Environment-Specific Files
@@ -127,6 +161,6 @@ Set variables in Project Settings → Environment Variables.
 
 Set variables in Site Settings → Build & Deploy → Environment.
 
-### Cloudflare Pages
+### Cloudflare
 
-Set variables in Settings → Environment Variables.
+Set variables in your project's settings.

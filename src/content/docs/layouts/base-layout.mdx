@@ -21,13 +21,14 @@ import { Aside } from '@astrojs/starlight/components';
 | `noindex` | `boolean` | `false` | Prevent search indexing |
 | `nofollow` | `boolean` | `false` | Prevent link following |
 | `includeOrgSchema` | `boolean` | `false` | Include Organization JSON-LD |
+| `alternates` | `{ locale, href }[]` | Matching route in each language | `hreflang` alternates |
 
 ### Article Metadata
 
 ```typescript
 interface ArticleMetadata {
-  publishedTime?: string;
-  modifiedTime?: string;
+  publishedTime?: Date;
+  modifiedTime?: Date;
   authors?: string[];
   tags?: string[];
 }
@@ -56,23 +57,27 @@ import Footer from '@/components/layout/Footer.astro';
 >
   <Header slot="header" />
 
-  <main>
-    <!-- Your content -->
-  </main>
+  <!-- Your content -->
 
   <Footer slot="footer" />
 </BaseLayout>
 ```
 
+`BaseLayout` renders the page's only `<main id="main-content">` around the default slot, so don't add your own.
+
 ## Included Features
 
 ### Fonts
 
-Google Fonts are preconnected and loaded:
+Fonts load through the [Astro Fonts API](/customization/fonts/) and are self-hosted:
 
-- **Outfit** — Primary sans-serif
-- **Manrope** — Secondary sans-serif
+- **Manrope** — Body text, preloaded
+- **Outfit** — Headings
 - **JetBrains Mono** — Monospace for code
+
+### Language
+
+`<html lang>`, `hreflang` links and the skip link all follow the current page's language. See [Internationalization](/configuration/i18n/).
 
 ### SEO Component
 
@@ -113,6 +118,20 @@ If configured, includes:
 - Google Analytics
 - Google Tag Manager
 
+The consent banner is also rendered on every page, and shows when `PUBLIC_CONSENT_ENABLED` is set.
+
+### Page Transitions
+
+Velocity uses native cross-document view transitions, set in `global.css`, and Astro's prefetch instead of a client router:
+
+```css
+@view-transition {
+  navigation: auto;
+}
+```
+
+Supporting browsers cross-fade between pages. Everyone else gets a normal page load. Animations finish instantly for visitors who prefer reduced motion.
+
 <Aside type="note">
   Most pages should use `PageLayout`, `BlogLayout`, or `LandingLayout` instead of `BaseLayout` directly.
 </Aside>
@@ -121,14 +140,18 @@ If configured, includes:
 
 To add global elements, edit `BaseLayout.astro`:
 
+This is a safe file, so upgrades replace it and save your version to `.velocity-backup/`. Reapply your changes after upgrading.
+
 ```astro
 <head>
-  <!-- Add custom fonts, scripts, etc. -->
+  <!-- Add scripts, meta tags, etc. -->
 </head>
 
 <body>
   <slot name="header" />
-  <slot />
+  <main id="main-content" class="flex-1">
+    <slot />
+  </main>
   <slot name="footer" />
 
   <!-- Add global modals, toast containers, etc. -->

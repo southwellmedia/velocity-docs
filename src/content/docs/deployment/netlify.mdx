@@ -7,7 +7,7 @@ sidebar:
 
 import { Steps } from '@astrojs/starlight/components';
 
-Deploy your Velocity site to Netlify.
+Deploy your Velocity site to Netlify. The Netlify adapter ships with Velocity and is selected automatically.
 
 ## Quick Deploy
 
@@ -41,35 +41,23 @@ netlify deploy
 netlify deploy --prod
 ```
 
+## How It Works
+
+Velocity detects Netlify from the `NETLIFY` environment variable and uses `@astrojs/netlify`. Pages are served as static files, and only Astro Actions and routes you mark `prerender = false` run as functions.
+
+Route caching uses the Netlify CDN provider. See [Route Caching](/deployment/#route-caching).
+
 ## Configuration
 
-Create `netlify.toml` in project root:
+`netlify.toml` ships with Velocity, along with security and cache headers:
 
 ```toml
 [build]
-  command = "pnpm build"
+  command = "pnpm run build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "22"
-```
-
-## Server-Side Features
-
-For API routes and SSR, add the Netlify adapter:
-
-```bash
-pnpm add @astrojs/netlify
-```
-
-```javascript
-// astro.config.mjs
-import netlify from '@astrojs/netlify';
-
-export default defineConfig({
-  output: 'server',
-  adapter: netlify(),
-});
+  NODE_VERSION = "24"
 ```
 
 ## Environment Variables
@@ -95,27 +83,13 @@ Or in `netlify.toml`:
 3. Configure DNS
 4. Enable HTTPS
 
-## Functions
-
-Netlify Functions for serverless:
-
-```typescript
-// netlify/functions/hello.ts
-export async function handler(event, context) {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Hello!' }),
-  };
-}
-```
-
 ## Build Settings
 
 | Setting | Value |
 |---------|-------|
-| Build Command | `pnpm build` |
+| Build Command | `pnpm run build` |
 | Publish Directory | `dist` |
-| Node Version | 22 |
+| Node Version | 24 |
 
 ## Deploy Previews
 
@@ -125,24 +99,10 @@ Every pull request gets a preview URL:
 
 ## Troubleshooting
 
-### Build Timeout
-
-Increase timeout in `netlify.toml`:
-
-```toml
-[build]
-  command = "pnpm build"
-  publish = "dist"
-
-[functions]
-  timeout = 60
-```
-
 ### Node Version
 
-Ensure Node 22+ in `netlify.toml`:
+Astro 7.4 needs Node 22.23.4 or later. Keep `NODE_VERSION` at `24` in `netlify.toml`.
 
-```toml
-[build.environment]
-  NODE_VERSION = "22"
-```
+### Forms Don't Submit
+
+Check that the build log shows the Netlify adapter. If you set `DEPLOY_TARGET`, it overrides detection.

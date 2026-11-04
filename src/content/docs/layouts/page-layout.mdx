@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 `PageLayout` is used for standard content pages like About, Contact, and Services.
 
 ## Usage
@@ -28,33 +30,31 @@ import PageLayout from '@/layouts/PageLayout.astro';
 
 ## Props
 
-Inherits all props from `BaseLayout`, plus:
-
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `showHeader` | `boolean` | `true` | Display header |
-| `showFooter` | `boolean` | `true` | Display footer |
-| `headerProps` | `object` | `{}` | Props to pass to Header |
-| `footerProps` | `object` | `{}` | Props to pass to Footer |
+| `title` | `string` | — | Page title |
+| `description` | `string` | — | Meta description |
+| `image` | `string` | — | OG image URL |
+| `imageAlt` | `string` | — | OG image alt text |
+| `noindex` | `boolean` | `false` | Prevent search engine indexing |
+| `nofollow` | `boolean` | `false` | Prevent link following |
+| `searchable` | `boolean` | `true` | Include the page in [site search](/configuration/search/) |
 
 ## Features
 
 ### Fixed Header
 
-Includes the standard Header with:
+Includes the standard `Header` with:
 
-- Logo and navigation
-- GitHub action button
+- Logo and navigation from `nav.config.ts`
+- The CTA and actions from `headerConfig`
+- Language switcher, when the site has more than one language
 - Theme toggle
 - Mobile menu
 
 ### Simple Footer
 
-Includes Footer with:
-
-- Copyright notice
-- Legal links
-- Social links
+Includes `Footer` with the simple layout: links from `nav.config.ts`, social links and a copyright notice.
 
 ### Container Classes
 
@@ -74,36 +74,26 @@ Content is not wrapped in a container by default. Add your own:
 </PageLayout>
 ```
 
-## Customizing Header/Footer
+<Aside type="caution">
+  `BaseLayout` already renders `<main>`. Don't add another one in your page content.
+</Aside>
 
-### Pass Props
+## Customizing Header and Footer
+
+Change the defaults for the whole site in [`nav.config.ts`](/configuration/routes/#header-defaults). For a page that needs something different, use `BaseLayout` directly and render your own `Header` and `Footer`:
 
 ```astro
-<PageLayout
-  title="Page"
-  headerProps={{
-    showCta: true,
-    cta: { label: 'Get Started', href: '/signup' }
-  }}
-  footerProps={{
-    layout: 'columns',
-    columns: 3
-  }}
->
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+---
+
+<BaseLayout title="Page">
+  <Header slot="header" layout="minimal" />
   <!-- Content -->
-</PageLayout>
-```
-
-### Hide Header or Footer
-
-```astro
-<PageLayout
-  title="Minimal Page"
-  showHeader={false}
-  showFooter={false}
->
-  <!-- Full control over page -->
-</PageLayout>
+  <Footer slot="footer" layout="columns" columns={3} />
+</BaseLayout>
 ```
 
 ## Example Pages

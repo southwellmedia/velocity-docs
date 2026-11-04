@@ -5,6 +5,69 @@ sidebar:
   order: 2
 ---
 
+## v2.0.0
+
+### Velocity 2.0 on Astro 7
+
+Velocity moves to **Astro 7.4**, and the CLI moves to **2.0**. This release has breaking changes and manual steps.
+
+> **Upgrade guide:** [v1 to v2.0.0](/upgrade-guides/v1-to-v2/)
+
+### Breaking Changes
+
+- **Node.js 22.23.4 or later** is required. Node 24 LTS is recommended.
+- **`/api/contact` and `/api/newsletter`** are replaced by Astro Actions.
+- **`<ClientRouter />`** is removed in favor of native view transitions and prefetch.
+- **`src/config/routes.ts` is gone.** Routes live in `src/config/nav.config.ts`, which is now protected from upgrades.
+- **`create-velocity-astro` 2.0 or later** is required.
+
+### Dependency Changes
+
+- **Astro** upgraded to **7.4.5**, with **@astrojs/mdx 8** and **@astrojs/react 7**
+- **tailwind-merge** upgraded to **3**, which understands Tailwind v4 syntax
+- **ESLint** upgraded to **10**
+- **satori** upgraded to **0.63**, **lucide-react** to **1**, **schema-dts** to **2**
+- **Adapters added:** `@astrojs/node`, `@astrojs/vercel` and `@astrojs/netlify`
+- **Removed:** `zod`, `astro-seo` and `@pagefind/default-ui`
+
+### Features
+
+- **Astro Actions** power the contact and newsletter forms, with typed input and translated validation messages
+- **Automatic adapters** for Vercel, Netlify, Cloudflare (opt-in) and Node, with CDN route caching
+- **Strict CSP** by default, with hashes for inline scripts
+- **Site search** with Pagefind at `/search`
+- **Fonts API** with self-hosted fonts and metric-matched fallbacks
+- **Core i18n:** every component is locale-aware, with translated slugs, `hreflang`, a no-JavaScript language switcher, per-language search and localized OG images
+- **Views:** page content moves to `src/views/`, and `src/pages/` holds thin wrappers
+- **Tests:** Vitest unit tests and Playwright end-to-end and axe accessibility tests
+- **`AGENTS.md`** for AI coding agents, and `pnpm dev:bg` for a background dev server
+- **Faster:** production builds dropped from 13.9s to 6.3s, and baseline JavaScript from 5.7 KB to 1.2 KB gzipped
+
+### CLI 2.0
+
+- **No bundled templates.** The CLI downloads Velocity and applies the `scaffold` section of its manifest, so the two can't drift
+- **`--ref` and `--template`** choose the Velocity version, and the latest release is now the default
+- **`--no-install`** skips dependency installation
+- **`--pages`** rewritten for views, wrappers, nav and translations, and it accepts a list of names
+- **Upgrades replay your variants,** so minimal and i18n projects are compared with the right files
+- **All eight project shapes** are built in CI
+
+### Bug Fixes
+
+- **`--i18n` projects** failed to build in CLI 1.x
+- **Forms** never ran on static builds, and the blog's subscribe form had no handler
+- **Blog OG images** pointed at files that didn't exist
+- **Partial component installs** deleted files still in use, because of gaps in the component registry
+- **`--demo` with a partial selection** could never build
+- **`cn()`** dropped classes when mixing Tailwind v4 syntax
+- **`PageLayout`** rendered a second `<main>`
+- **`@tailwindcss/typography`** was missing, so blog posts rendered unstyled
+- **Dates** showed a day early in US time zones, and reading time was estimated from the description
+- **Lint** failed on `main` because pnpm hid `@typescript-eslint/parser`
+- **Accessibility:** entrance animations ignored `prefers-reduced-motion`, and the "Featured" badge and code comments failed WCAG AA contrast
+
+---
+
 ## v1.0.0 (2026-03-10)
 
 ### Stable Release
@@ -82,7 +145,7 @@ Velocity reaches **1.0.0** — all Astro 6 beta dependencies replaced with stabl
 - Fixed Analytics race conditions and duplicate event listeners
 - Fixed dynamic consent mapping bugs in GCM integration
 
-> **Upgrade guide:** [v0.4.x-beta to v0.4.5-beta](/upgrade-guides/beta-4-to-beta-4.5/)
+> **Upgrade guide:** [v0.4.x-beta to v0.4.5-beta](/upgrade-guides/beta-4-to-beta-45/)
 
 ---
 

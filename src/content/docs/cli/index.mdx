@@ -1,6 +1,6 @@
 ---
 title: create-velocity-astro
-description: Scaffold production-ready Velocity projects in seconds
+description: Scaffold and upgrade Velocity projects with the official CLI
 sidebar:
   order: 1
   badge:
@@ -10,7 +10,11 @@ sidebar:
 
 import { Tabs, TabItem, Aside, Card, CardGrid, Steps } from '@astrojs/starlight/components';
 
-Scaffold production-ready [Velocity](https://github.com/southwellmedia/velocity) projects in seconds with the official CLI tool.
+`create-velocity-astro` creates and upgrades [Velocity](https://github.com/southwellmedia/velocity) projects. Version 2 ships no template files: it downloads Velocity and applies the recipe in Velocity's own manifest, so what you get is what Velocity tests in CI.
+
+<Aside type="note" title="Requirements">
+  The CLI runs on Node.js 20.19 or later and needs Velocity 2.0 or later. Generated projects need **Node.js 22.23.4 or later** (Node 24 LTS recommended).
+</Aside>
 
 ## Quick Start
 
@@ -39,137 +43,158 @@ Scaffold production-ready [Velocity](https://github.com/southwellmedia/velocity)
 
 ## Interactive Wizard
 
-The CLI guides you through setup with an interactive wizard. Just run the command and answer the prompts:
+Run the command and answer the prompts:
 
 ```
-┌  create-velocity-astro
-│
-◇  Where should we create your project?
-│  my-awesome-site
+◇  What is your project name?
+│  my-site
 │
 ◇  Include demo landing page and sample content?
-│  Yes
-│
-◇  Which components would you like to include?
-│  ● All components (recommended)
-│  ○ UI components only
-│  ○ UI + Patterns
-│  ○ None (minimal)
-│
-◇  Add internationalization (i18n) support?
 │  No
 │
-◇  Generate additional starter pages?
+◇  Include optional components?
+│  ● All
+│  ○ Select categories
+│  ○ Select individual
+│  ○ None
+│
+◇  Add internationalization (i18n)?
 │  No
 │
-◆  Creating your project...
+◇  Generate starter pages?
+│  No
+│
+◇  Which package manager?
+│  pnpm
 ```
 
-<Aside type="tip">
-  The wizard remembers sensible defaults. Press Enter to accept them, or customize each option.
-</Aside>
-
-## Wizard Steps
-
 <Steps>
-1. **Project Location**
+1. **Project name**
 
-   Choose where to create your project. Enter a folder name or path.
+   The folder to create. It's normalized to a valid package name.
 
-2. **Demo Content**
+2. **Demo content**
 
-   Include the demo landing page, sample blog posts, and example pages? Great for learning and customizing.
+   **No** gives a minimal starter with a home page, blog and search. **Yes** adds the demo landing page, About, Contact and component showcase pages, and sample content.
 
-3. **Component Selection**
+3. **Optional components**
 
-   Choose which UI components to include:
-   - **All components** — Full 39-component library
-   - **UI only** — Core interface components
-   - **UI + Patterns** — Add form patterns
-   - **None** — Minimal, just layouts and SEO
+   Keep all of them, pick categories, pick individual components, or keep only what the core pages need. See [Component Selection](/cli/components/).
 
 4. **Internationalization**
 
-   Add multi-language support with locale routing, translations, and language switcher.
+   Enables Spanish and French alongside English. See [i18n](/cli/i18n/).
 
-5. **Starter Pages**
+5. **Starter pages**
 
-   Optionally generate additional pages like Services, Pricing, Team, etc.
+   Enter a comma-separated list of page names, such as `Pricing, Team, FAQ`. See [Starter Pages](#starter-pages).
+
+6. **Package manager**
+
+   Preselected from the command you ran.
 </Steps>
 
 ## What You Get
 
-Every Velocity project includes:
-
 <CardGrid>
-  <Card title="Astro 6" icon="rocket">
-    Latest Astro with View Transitions and Content Layer API.
+  <Card title="Astro 7" icon="rocket">
+    Prerendered pages, Astro Actions, route caching and the Fonts API.
   </Card>
   <Card title="Tailwind CSS v4" icon="seti:css">
-    Modern utility-first CSS with native cascade layers.
+    Design tokens in OKLCH, with light and dark themes.
   </Card>
   <Card title="TypeScript" icon="seti:typescript">
-    Full type safety throughout your project.
+    Strict mode throughout, including typed translations.
   </Card>
-  <Card title="39 Components" icon="puzzle">
-    Production-ready UI components with variants.
+  <Card title="Strict CSP" icon="approve-check">
+    Hash-based Content Security Policy, on by default.
   </Card>
-  <Card title="SEO Ready" icon="magnifier">
-    Meta tags, Open Graph, JSON-LD schemas, sitemap.
+  <Card title="SEO and search" icon="magnifier">
+    Meta tags, OG images, JSON-LD, sitemap and Pagefind site search.
   </Card>
-  <Card title="Dark Mode" icon="moon">
-    System-aware theme switching built in.
+  <Card title="Tests" icon="list-format">
+    Vitest unit tests and Playwright end-to-end and accessibility tests.
   </Card>
 </CardGrid>
 
-## Skip the Wizard (Flags)
+## Flags
 
-For automation or quick setups, use flags to skip prompts:
+Flags skip the matching prompt.
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--demo` | boolean | prompt | Include demo landing page and sample content |
-| `--components` | string | prompt | Component selection (see below) |
-| `--i18n` | boolean | prompt | Add internationalization support |
-| `--pages` | boolean | false | Generate starter pages interactively |
-| `-y, --yes` | boolean | false | Skip all prompts, use defaults |
-| `-h, --help` | - | - | Show help message |
-| `-v, --version` | - | - | Show version number |
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--demo` | prompt | Include the demo pages and sample content |
+| `--components` | prompt | All components |
+| `--components=none` | | Only what core pages need |
+| `--components=ui,patterns,hero` | | Specific categories |
+| `--i18n` | prompt | Enable English, Spanish and French |
+| `--pages` | prompt | Ask for starter page names |
+| `--pages="Pricing, Team"` | | Generate these pages without asking |
+| `--ref <tag\|branch>` | latest release | Velocity tag or branch to scaffold from |
+| `--template <dir>` | | Scaffold from a local Velocity checkout |
+| `--no-install` | | Skip installing dependencies |
+| `-y, --yes` | | Skip all prompts |
+| `-h, --help` | | Show help |
+| `-v, --version` | | Show the CLI version |
 
-### Quick Examples
+`--ref` and `--template` can't be combined.
+
+### Defaults with `--yes`
+
+`-y` creates a **minimal** project with all components, one language and **pnpm**, whichever command you used to start it. Add flags to change that:
 
 ```bash
-# Accept all defaults (full-featured)
+# Minimal project, all components
 pnpm create velocity-astro my-site -y
 
-# Minimal project, no demo
-pnpm create velocity-astro my-site -y --demo=false --components=none
+# Minimal project, only the components core pages need
+pnpm create velocity-astro my-site -y --components=none
 
-# Full project with i18n
-pnpm create velocity-astro my-site --demo --components --i18n
+# Full demo in three languages
+pnpm create velocity-astro my-site -y --demo --i18n
+
+# Pin a Velocity version
+pnpm create velocity-astro my-site -y --ref v2.0.0
+
+# Scaffold without installing
+pnpm create velocity-astro my-site -y --no-install
 ```
 
-<Aside type="note">
-  Flags are optional. Without them, the wizard will prompt for each choice.
+<Aside type="caution" title="Using npm?">
+  npm keeps flags for itself unless you put them after `--`:
+
+  ```bash
+  npm create velocity-astro@latest my-site -- --demo --i18n
+  ```
 </Aside>
+
+## Starter Pages
+
+`--pages` creates pages that follow Velocity's structure. For `--pages="Pricing Plans"` the CLI adds:
+
+| File | What it adds |
+|------|--------------|
+| `src/views/PricingPlansView.astro` | The page content |
+| `src/pages/pricing-plans.astro` | Wrapper for the default language |
+| `src/pages/[lang]/[...pricingPlans].astro` | Wrapper for other languages |
+| `src/config/nav.config.ts` | A route and a nav item |
+| `src/i18n/translations/*.ts` | Title and description strings, in every language file |
+
+The names `index`, `blog`, `404`, `rss`, `search` and `lang` are reserved and skipped. Pages use `PageLayout`. Demo projects created through the wizard can choose `LandingLayout` instead.
 
 ## After Scaffolding
 
-Once complete, the CLI shows next steps:
-
+```bash
+cd my-site
+pnpm dev
 ```
-◆  Done! Your project is ready.
 
-   Next steps:
-   1. cd my-site
-   2. npm run dev
-
-   Your site will be at http://localhost:4321
-```
+Your site runs at `http://localhost:4321`.
 
 ## Next Steps
 
-- [Component Selection](/cli/components) — Details on component options
-- [i18n Support](/cli/i18n) — Internationalization features
-- [How It Works](/cli/how-it-works) — Under the hood
-- [Configuration](/cli/configuration) — Post-scaffold setup
+- [Component Selection](/cli/components/) — Choosing components
+- [i18n](/cli/i18n/) — Languages
+- [How It Works](/cli/how-it-works/) — Variants and the manifest
+- [Configuration](/cli/configuration/) — What to change first
+- [Upgrading Projects](/cli/upgrade/) — The `upgrade` command

@@ -1,0 +1,54 @@
+---
+title: Node
+description: Run Velocity on your own server
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The Node adapter is the fallback for any host Velocity doesn't recognize, including Docker and a VPS. It runs a standalone server that serves prerendered pages and handles Astro Actions.
+
+## Build and Run
+
+```bash
+pnpm build
+HOST=0.0.0.0 PORT=4321 node dist/server/entry.mjs
+```
+
+Or force the target if your build environment sets `VERCEL`, `NETLIFY` or similar:
+
+```bash
+DEPLOY_TARGET=node pnpm build
+```
+
+## Docker
+
+```dockerfile
+FROM node:24-slim AS build
+WORKDIR /app
+RUN corepack enable
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN DEPLOY_TARGET=node pnpm build
+
+FROM node:24-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+ENV HOST=0.0.0.0 PORT=4321
+EXPOSE 4321
+CMD ["node", "dist/server/entry.mjs"]
+```
+
+## Static-Only Hosting
+
+Actions need a server, so a pure static host can serve your pages but not your forms. To use one, deploy `dist/client/` and point the forms at an external endpoint with the [`action` prop](/api/contact/#using-your-own-endpoint).
+
+## Caching and Headers
+
+Route caching uses an in-memory cache, which resets on restart and isn't shared between instances. Velocity's security headers ship in `vercel.json` and `netlify.toml`, so set them in your reverse proxy here.
+
+<Aside type="tip">
+  This is the same server `pnpm test:e2e` runs against.
+</Aside>

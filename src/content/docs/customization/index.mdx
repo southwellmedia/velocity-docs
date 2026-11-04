@@ -58,16 +58,18 @@ Edit `src/styles/tokens/colors.css` line 9:
 
 ### Add Navigation
 
-Update `src/config/routes.ts`:
+Update `src/config/nav.config.ts`:
 
 ```typescript
 export const routes = {
   // ... existing
-  pricing: {
-    path: '/pricing',
-    nav: { show: true, order: 5, label: 'Pricing' },
-  },
+  pricing: { path: 'pricing' },
 };
+
+export const navItems: NavItem[] = [
+  // ... existing
+  { label: 'Pricing', route: 'pricing', order: 6 },
+];
 ```
 
 ### Customize Components
@@ -80,3 +82,4 @@ Edit components in `src/components/` or create new ones following existing patte
 - [Adding Components](/customization/adding-components) — Create new components
 - [Adding Routes](/customization/adding-routes) — Add new pages
 - [Adding Collections](/customization/adding-collections) — New content types
+- [Fonts](/customization/fonts/) — Change fonts with the Astro Fonts API

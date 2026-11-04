@@ -14,6 +14,7 @@ Layout components provide the structural elements for your pages.
 | `Header.astro` | Site header with navigation |
 | `Footer.astro` | Site footer with links |
 | `ThemeToggle.astro` | Dark mode toggle |
+| `LanguageSwitcher.astro` | Language picker |
 | `Analytics.astro` | Analytics integration |
 
 ## Header
@@ -46,6 +47,17 @@ Dark mode toggle component:
 
 ```astro
 <ThemeToggle />
+```
+
+## LanguageSwitcher
+
+Links to the current page in each language, or to that language's home page if the page has no translation. It's a native `<details>` element, so it needs no JavaScript.
+
+`Header` renders it automatically when more than one language is enabled:
+
+```astro
+<LanguageSwitcher />
+<LanguageSwitcher variant="list" />
 ```
 
 ## Analytics

@@ -12,12 +12,13 @@ sidebar:
 ```astro
 ---
 import BlogLayout from '@/layouts/BlogLayout.astro';
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
+import { getPosts, getPostSlug } from '@/lib/blog';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getPosts();
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: getPostSlug(post) },
     props: { post },
   }));
 }
@@ -47,10 +48,12 @@ const { Content } = await render(post);
 | `publishedAt` | `Date` | — | Publication date |
 | `updatedAt` | `Date` | — | Last updated date |
 | `author` | `string` | `"Team"` | Author name |
-| `image` | `string` | — | Cover image URL |
+| `image` | `ImageMetadata` | — | Cover image, also used as the social preview |
 | `imageAlt` | `string` | — | Cover image alt text |
 | `tags` | `string[]` | `[]` | Article tags |
-| `slug` | `string` | — | Article slug for OG image |
+| `slug` | `string` | — | Article slug, used to find related posts |
+| `readingTime` | `number` | — | Reading time in minutes |
+| `alternates` | `{ locale, href }[]` | — | Translations of this post, for `hreflang` |
 
 ## Features
 

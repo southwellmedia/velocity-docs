@@ -1,0 +1,87 @@
+---
+title: Upgrading Projects
+description: Update an existing project with the upgrade command
+sidebar:
+  order: 6
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+The `upgrade` command updates a Velocity project to a newer release. Run it from your project root:
+
+```bash
+pnpm create velocity-astro@latest upgrade
+```
+
+Moving from 1.x? Follow the [v1 to v2 guide](/upgrade-guides/v1-to-v2/), which has manual steps.
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Show what would change without applying it |
+| `-y, --yes` | Skip confirmation prompts |
+| `--ref <tag\|branch>` | Upgrade to a specific Velocity tag or branch |
+| `--template <dir>` | Upgrade from a local Velocity checkout |
+
+Preview an upgrade first:
+
+```bash
+pnpm create velocity-astro@latest upgrade --dry-run
+```
+
+With npm, pass flags after `--`:
+
+```bash
+npm create velocity-astro@latest upgrade -- --dry-run
+```
+
+## What Happens
+
+<Steps>
+1. **Read `.velocity.json`.** Without it, the CLI stops, because it can't tell how the project was created.
+
+2. **Warn about uncommitted changes.** Commit first so you can review the upgrade as a diff.
+
+3. **Fetch Velocity and check requirements.** Unlike scaffolding, an unsupported Node version stops the upgrade.
+
+4. **Rebuild the template with your options.** The CLI replays the variants from `.velocity.json`, so a minimal or i18n project is compared with minimal or i18n files.
+
+5. **Compare files and show a summary,** then ask you to confirm.
+
+6. **Apply changes:** back up conflicts, copy files, and update `package.json` dependencies.
+
+7. **Show manual steps** for the versions you're moving across.
+</Steps>
+
+## Which Files Change
+
+`velocity-manifest.json` sorts files into two groups.
+
+**Safe files** are owned by Velocity and updated by upgrades. These include `src/components/ui/`, `src/components/layout/`, `src/components/seo/`, `src/layouts/`, `src/lib/`, the design tokens and themes, and the core i18n files such as `src/i18n/ui.ts`.
+
+**Protected files** are yours and never overwritten. These include:
+
+- `astro.config.mjs` and `.env`
+- `src/config/site.config.ts`, `src/config/nav.config.ts` and `src/config/consent.config.ts`
+- `src/pages/`, `src/views/`, `src/content/`, `src/assets/` and `src/actions/`
+- `src/i18n/locales.mjs` and `src/i18n/translations/`
+- `src/components/blog/`, `src/components/landing/` and `src/components/patterns/`
+- `tests/`
+
+The CLI lists protected files it can't update so you can merge changes yourself.
+
+## Conflicts
+
+If you edited a safe file, the CLI detects it from the hashes in `.velocity.json`. It saves your version to `.velocity-backup/<old-version>/`, installs the new version, and lists what it backed up. Reapply your changes from the backup.
+
+<Aside type="tip">
+  To change a built-in UI string, override it in `src/i18n/translations/<locale>.ts` rather than editing `ui.ts`. Upgrades won't touch your override.
+</Aside>
+
+## After Upgrading
+
+```bash
+pnpm install
+pnpm validate
+```

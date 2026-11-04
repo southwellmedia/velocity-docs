@@ -11,14 +11,14 @@ Quick reference materials for Velocity development.
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| UI Components | 31 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
-| Layout Components | 4 | Header, Footer, ThemeToggle, Analytics |
+| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
+| Layout Components | 5 | Header, Footer, ThemeToggle, Analytics, LanguageSwitcher |
 | Pattern Components | 7 | ContactForm, NewsletterForm, FormField, SearchInput, etc. |
 | Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
-| Landing Components | 5 | Hero, CTA, FeatureTabs, etc. |
+| Landing Components | 5 | CTA, Credibility, FeatureTabs, LighthouseScores, TechStack |
 | SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
 | Hero Components | 1 | Hero section |
-| **Total** | **55** | |
+| **Total** | **58** | |
 
 ## Key Files
 
@@ -27,7 +27,13 @@ Quick reference materials for Velocity development.
 | `astro.config.mjs` | Astro configuration |
 | `src/content.config.ts` | Content collection schemas |
 | `src/config/site.config.ts` | Site metadata, branding, contact |
-| `src/config/routes.ts` | Type-safe routing |
+| `src/config/nav.config.ts` | Routes, navigation, header and footer defaults |
+| `src/i18n/locales.mjs` | Enabled languages |
+| `src/i18n/translations/` | Your site copy |
+| `src/actions/index.ts` | Form handlers |
+| `src/lib/forms.ts` | Form schemas |
+| `src/lib/blog.ts` | Blog URLs and queries |
+| `integrations/deploy-target.mjs` | Adapter and cache detection |
 | `src/styles/global.css` | Tailwind + design tokens |
 | `src/styles/tokens/colors.css` | Color tokens |
 | `src/lib/og.ts` | OG image configuration |
@@ -43,7 +49,9 @@ Quick reference materials for Velocity development.
 | `pnpm lint` | Run ESLint |
 | `pnpm format` | Format with Prettier |
 | `pnpm check` | Run type checker |
-| `pnpm test` | Run tests |
+| `pnpm test` | Run unit tests |
+| `pnpm test:e2e` | Run E2E and accessibility tests |
+| `pnpm validate` | Lint, type check, unit tests and build |
 
 ## Content Collections
 
@@ -82,19 +90,22 @@ Quick reference materials for Velocity development.
 | `BaseLayout` | Core HTML wrapper |
 | `PageLayout` | Standard pages |
 | `BlogLayout` | Blog articles |
-| `LandingLayout` | Marketing pages |
+| `LandingLayout` | Landing pages |
+| `MarketingLayout` | Marketing pages with a floating header |
 
-## API Endpoints
+## Astro Actions
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/contact` | POST | Contact form |
-| `/api/newsletter` | POST | Newsletter signup |
+| Action | Purpose |
+|--------|---------|
+| `actions.contact` | Contact form |
+| `actions.newsletter` | Newsletter signup |
 
 ## Technology Stack
 
-- **Astro 6** — Web framework
+- **Astro 7** — Web framework
 - **Tailwind CSS v4** — Styling
 - **TypeScript** — Type safety
 - **OKLCH** — Color format
 - **Satori** — OG image generation
+- **Pagefind** — Site search
+- **Vitest and Playwright** — Testing

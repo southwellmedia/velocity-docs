@@ -1,0 +1,229 @@
+---
+title: "Upgrade: v1 to v2.0.0"
+description: Step-by-step guide for upgrading a Velocity 1.x project to Velocity 2.0 on Astro 7
+sidebar:
+  order: 6
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide takes a project from **Velocity 1.x** (Astro 6) to **Velocity 2.0** (Astro 7). The CLI updates the files Velocity owns, but files you own, such as `astro.config.mjs`, need manual changes. Allow time for those.
+
+## Overview
+
+| | v1.0.0 | v2.0.0 |
+|---|---|---|
+| **Astro** | 6.0.0 | 7.4.5 |
+| **Node.js** | 22.12+ | **22.23.4+** (24 LTS recommended) |
+| **`create-velocity-astro`** | 1.x | **2.0+** |
+| **Forms** | `/api/contact`, `/api/newsletter` | Astro Actions |
+| **Adapter** | None | Auto-detected |
+| **Navigation** | `<ClientRouter />` | Native view transitions and prefetch |
+| **CSP** | Off | On, hash-based |
+| **Fonts** | `@fontsource` CSS imports | Astro Fonts API |
+| **i18n** | CLI overlay | In core |
+| **Search** | None | Pagefind at `/search` |
+
+<Aside type="caution" title="Before you start">
+  Commit your work. The CLI 1.x can't read Velocity 2's manifest, so use `create-velocity-astro` 2.0 or later.
+</Aside>
+
+## Step 1: Update Node.js
+
+Astro 7.4 needs Node 22.23.4 or later, and the CLI won't upgrade on an older version.
+
+```bash
+nvm install 24
+nvm use 24
+```
+
+Update Node in CI and on your host as well, such as `NODE_VERSION` on Netlify.
+
+## Step 2: Run the CLI
+
+<Steps>
+1. **Preview the changes**
+
+   ```bash
+   pnpm create velocity-astro@latest upgrade --dry-run
+   ```
+
+2. **Run the upgrade**
+
+   ```bash
+   pnpm create velocity-astro@latest upgrade
+   ```
+
+   The CLI updates safe files and `package.json`, saves files you edited to `.velocity-backup/`, and lists the manual steps below.
+
+3. **Install**
+
+   ```bash
+   pnpm install
+   pnpm add -D @typescript-eslint/parser@8.72.1 @axe-core/playwright@^4.14.0
+   ```
+
+   The CLI can't add these two dev dependencies for you.
+</Steps>
+
+<Aside type="note">
+  `src/config/nav.config.ts` and `src/views/` are now protected: upgrades won't overwrite them. In 2.0, that means the CLI won't add them either, so you'll merge them by hand in the steps below. Download [Velocity v2.0.0](https://github.com/southwellmedia/velocity/releases/tag/v2.0.0) to copy from.
+</Aside>
+
+## Step 3: Update `astro.config.mjs`
+
+The CLI never overwrites this file. Compare it with the [v2.0.0 config](https://github.com/southwellmedia/velocity/blob/v2.0.0/astro.config.mjs) and copy these blocks:
+
+| Block | Why |
+|-------|-----|
+| `fonts`, the `fontsourceVariable()` helper and the `LATIN` / `LATIN_EXT` constants | The build fails with `FontFamilyNotFound` without them |
+| `adapter` and `cache`, from `resolveDeployTarget()` | Actions need a server runtime |
+| `i18n` and the `locales.mjs` import | Locale-aware routing |
+| `security.csp` | Content Security Policy |
+| `prefetch` | Replaces the prefetching `ClientRouter` provided |
+| `compressHTML: true` | Keeps the whitespace behavior from Astro 6 |
+| `session: false` | Optional. Remove it if you use `Astro.session` |
+| `pagefind()` in `integrations` | Builds the search index |
+| `markdown.shikiConfig.theme: 'github-dark-default'` | `github-dark` comments fail WCAG AA contrast |
+
+Also copy `src/pages/search.astro` and `src/views/SearchView.astro` for search.
+
+<Aside type="caution" title="compressHTML">
+  Astro 7 defaults to `'jsx'`, which removes whitespace between inline elements, so `<a>Docs</a> <a>Blog</a>` renders as "DocsBlog". Keep `compressHTML: true` unless you've audited your markup.
+</Aside>
+
+If `astro.config.mjs` uses `markdown.remarkPlugins` or `rehypePlugins`, also run `pnpm add @astrojs/markdown-remark` and set `markdown: { processor: unified({ remarkPlugins: [...] }) }`, because Astro 7's default Markdown processor is Sätteri.
+
+## Step 4: Move Forms to Actions
+
+`src/pages/api/contact.ts` and `newsletter.ts` are gone. On static builds they never ran.
+
+<Steps>
+1. Copy `src/actions/index.ts` from v2.0.0.
+
+2. Move any email or CRM code from your old routes into the action handlers.
+
+3. Replace forms that posted to `/api/contact` or `/api/newsletter` with `<ContactForm />` and `<NewsletterForm />`.
+
+4. If you display schema errors yourself, translate them. Messages are now keys such as `form.errors.messageTooShort`:
+
+   ```typescript
+   const t = useTranslations(locale);
+   t(message);
+   ```
+</Steps>
+
+See [Forms & Actions](/api/).
+
+## Step 5: Remove `ClientRouter` Dependencies
+
+`BaseLayout` no longer renders `<ClientRouter />`. Pages use CSS cross-document view transitions, and links prefetch on hover.
+
+Scripts that only listen for `astro:page-load` won't run on first load. Call your init function directly, and keep the listener if you want it:
+
+```typescript
+function init() {
+  // ...
+}
+
+init();
+document.addEventListener('astro:after-swap', init);
+```
+
+These `astro:transitions` internals were removed in Astro 7: `TRANSITION_*` constants, `isTransitionBeforePreparationEvent()`, `isTransitionBeforeSwapEvent()` and `createAnimationScope()`. Use string event names and compare `event.type`.
+
+<Aside type="note" title="Need the router?">
+  If you use `transition:persist`, `transition:name` or `navigate()`, keep `<ClientRouter />` and set `security.csp: false`, because Astro's CSP doesn't support it.
+</Aside>
+
+## Step 6: Make Inline Scripts CSP-Safe
+
+Astro can only hash scripts whose content is static.
+
+- Move dynamic data out of `define:vars` and interpolated scripts into `<script type="application/json">`, as `Analytics.astro` does.
+- Declare third-party script hosts with `Astro.csp.insertScriptResource()`.
+
+See [Security & CSP](/configuration/security/). CSP doesn't apply in `astro dev`, so test with a production build.
+
+## Step 7: Adopt `nav.config.ts`
+
+`nav.config.ts` now exports `routes`, `navItems`, `headerConfig` and `footerConfig`. Merge the [v2.0.0 file](https://github.com/southwellmedia/velocity/blob/v2.0.0/src/config/nav.config.ts) into yours, then remove hardcoded `cta`, `actions` and `extraNav` props from your layouts and pages. See [Routes & Navigation](/configuration/routes/).
+
+## Step 8: Add Core i18n Files
+
+Every core component now imports from `src/i18n`, so single-language projects need these too:
+
+```javascript
+// src/i18n/locales.mjs
+export const defaultLocale = 'en';
+export const locales = ['en'];
+```
+
+Copy `src/i18n/locales.mjs` and `src/i18n/translations/en.ts` from v2.0.0. Copy the files in `src/views/` and the wrappers in `src/pages/` for any pages you haven't customized.
+
+**Custom pages keep working as they are.** To localize one later, follow `src/views/AboutView.astro` and `src/pages/[lang]/[...about].astro`.
+
+### Projects Created with the 1.x `--i18n` Flag
+
+<Steps>
+1. Move your translations to `src/i18n/translations/<locale>.ts`, using the v2 format.
+
+2. List your locales in `src/i18n/locales.mjs`.
+
+3. Delete `src/i18n/routes.ts`.
+</Steps>
+
+See the [i18n guide](/configuration/i18n/).
+
+## Step 9: Fix Blog URLs
+
+Use the helpers in `src/lib/blog.ts` instead of building URLs from `post.id`:
+
+```typescript
+import { getPosts, getPostUrl } from '@/lib/blog';
+
+const posts = await getPosts(locale);
+const href = getPostUrl(posts[0]);
+```
+
+OG images are now generated at `/og/<page path>.png`. Blog posts used to point at images that didn't exist.
+
+## Step 10: Fix Markup Errors
+
+Astro 7's Rust compiler is stricter. Unclosed tags fail the build, and invalid nesting, such as a `<div>` inside a `<p>`, is no longer corrected.
+
+`BaseLayout` already renders `<main id="main-content">`. If your own layouts or pages render `<main>`, change it to `<div>`.
+
+## Step 11: Smaller Changes
+
+- **Partial component installs.** The 1.x registry was missing React files, `ConsentBanner` and `GoogleMap`, so choosing a subset could delete files still in use. Check that `ConsentBanner` and any `.tsx` components you use exist, and restore them from v2.0.0 if not.
+- **Container renderers.** Import from the new entry point: `import { getContainerRenderer } from '@astrojs/react/container-renderer'`.
+- **ESLint 10** adds `no-useless-assignment` and `preserve-caught-error` to the recommended rules.
+- **tailwind-merge 3** understands Tailwind v4 syntax, so `cn()` now resolves conflicts it used to get wrong. Re-check any class overrides that relied on the old results.
+- **Custom themes** should reference `var(--font-manrope)`, `var(--font-outfit)` and `var(--font-jetbrains-mono)`.
+
+## Step 12: Add Tests (Optional)
+
+Copy `tests/`, `vitest.config.ts` and `playwright.config.ts` from v2.0.0, then:
+
+```bash
+pnpm exec playwright install chromium
+```
+
+## Verify the Upgrade
+
+```bash
+pnpm validate
+pnpm build && pnpm test:e2e
+```
+
+`pnpm validate` runs lint, type checks, unit tests and the build. `pnpm test:e2e` fails on any CSP violation, which is the quickest way to find inline scripts you missed.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v2.0.0
+- [Deployment](/deployment/) — How adapters are chosen
+- [Internationalization](/configuration/i18n/) — Adding languages

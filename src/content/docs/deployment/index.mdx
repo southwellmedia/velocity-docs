@@ -7,42 +7,49 @@ sidebar:
 
 import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
 
-Velocity works out of the box with major hosting platforms.
+Every page is prerendered. A server adapter is still included, because Astro Actions (the contact and newsletter forms) run on demand. `integrations/deploy-target.mjs` picks the adapter for you.
 
 ## Supported Platforms
 
 <CardGrid>
   <Card title="Vercel" icon="rocket">
-    Recommended. Zero-config deployment with edge functions.
+    Recommended. Detected automatically, with CDN route caching.
   </Card>
   <Card title="Netlify" icon="laptop">
-    Great for static sites with serverless functions.
+    Detected automatically, with CDN route caching.
   </Card>
-  <Card title="Cloudflare Pages" icon="setting">
-    Global edge network with Workers support.
+  <Card title="Cloudflare" icon="setting">
+    Opt-in. Install the adapter first.
+  </Card>
+  <Card title="Node" icon="seti:nodejs">
+    The default for Docker, a VPS, or any other host.
   </Card>
 </CardGrid>
+
+## How the Adapter Is Chosen
+
+| Host | Detected by | Adapter | Route cache |
+|------|-------------|---------|-------------|
+| Vercel | `VERCEL` | `@astrojs/vercel` | Vercel CDN |
+| Netlify | `NETLIFY` | `@astrojs/netlify` | Netlify CDN |
+| Cloudflare | `CF_PAGES` or `WORKERS_CI` | `@astrojs/cloudflare` (install it first) | Cloudflare |
+| Anything else | — | `@astrojs/node` (standalone) | In-memory |
+
+Force a target with `DEPLOY_TARGET`:
+
+```bash
+DEPLOY_TARGET=node pnpm build
+```
+
+Accepted values are `node`, `vercel`, `netlify` and `cloudflare`.
 
 ## Before Deploying
 
 1. Set `SITE_URL` in your environment
-2. Run `pnpm build` locally to catch errors
-3. Test with `pnpm preview`
-
-<Aside type="tip">
-  Most platforms detect Astro automatically and configure the build for you.
-</Aside>
-
-## Build Output
-
-Velocity builds to static files by default:
-
-```bash
-pnpm build
-# Output in dist/
-```
-
-For server-side features, configure an adapter in `astro.config.mjs`.
+2. Set Node.js to 22.23.4 or later on your host (24 LTS recommended)
+3. Connect your provider in `src/actions/index.ts`, or the forms won't deliver anything
+4. Run `pnpm validate` to catch errors
+5. Test with `pnpm build && pnpm preview`, because CSP and search only work in production builds
 
 ## Environment Variables
 
@@ -51,11 +58,37 @@ Set these on your hosting platform:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `SITE_URL` | Yes | Your production domain |
+| `DEPLOY_TARGET` | No | Force an adapter |
 | `PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics ID |
 | `PUBLIC_GTM_ID` | No | Google Tag Manager ID |
 
+See [Environment Variables](/configuration/environment/) for the full list.
+
+## Route Caching
+
+Route caching applies to on-demand routes. Prerendered pages are already static. To cache an on-demand route:
+
+```astro
+---
+export const prerender = false;
+
+Astro.cache.set({ maxAge: 300, swr: 60, tags: ['products'] });
+---
+```
+
+You can also add a pattern to `routeRules` in `astro.config.mjs`. On Vercel and Netlify, this writes CDN cache headers and supports tag invalidation. On the Node adapter, Velocity uses an in-memory cache.
+
+## CI
+
+`.github/workflows/deploy.yml` runs lint, type checks, unit tests, a build and the E2E suite on pushes to `main` and on pull requests. It doesn't deploy, because your host's Git integration handles that.
+
+<Aside type="tip">
+  The workflow builds with `DEPLOY_TARGET=node` because the E2E suite runs against the Node server.
+</Aside>
+
 ## Next Steps
 
-- [Vercel](/deployment/vercel) — Deploy to Vercel
-- [Netlify](/deployment/netlify) — Deploy to Netlify
-- [Cloudflare](/deployment/cloudflare) — Deploy to Cloudflare Pages
+- [Vercel](/deployment/vercel/) — Deploy to Vercel
+- [Netlify](/deployment/netlify/) — Deploy to Netlify
+- [Cloudflare](/deployment/cloudflare/) — Deploy to Cloudflare
+- [Node](/deployment/node/) — Run your own server

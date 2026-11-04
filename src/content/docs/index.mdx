@@ -1,9 +1,9 @@
 ---
 title: Velocity Documentation
-description: Modern Astro Starterkit built on Astro 6 + Tailwind CSS v4. Get your next project up and running in minutes.
+description: Modern Astro Starterkit built on Astro 7 + Tailwind CSS v4. Get your next project up and running in minutes.
 template: splash
 hero:
-  tagline: A production-ready Astro starterkit with 57 components, type-safe routing, and a complete design system.
+  tagline: A production-ready Astro starterkit with 58 components, built-in i18n, strict CSP, and a complete design system.
   image:
     file: ../../assets/branding/logomark.svg
   actions:
@@ -21,27 +21,35 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
 ## Why Velocity?
 
 <CardGrid stagger>
-  <Card title="57 Components" icon="puzzle" link="/components/">
-    Button, Input, Card, Badge, Alert, Header, Footer, and 50 more
+  <Card title="58 Components" icon="puzzle" link="/components/">
+    Button, Input, Card, Badge, Alert, Header, Footer, and 51 more
     production-ready components.
   </Card>
   <Card title="Design System" icon="seti:css" link="/design-system/">
     Three-tier token architecture with OKLCH colors, automatic dark mode, and
     inverted sections.
   </Card>
-  <Card title="Type-Safe Routing" icon="rocket" link="/configuration/routes/">
-    Centralized route definitions with TypeScript support and navigation
-    helpers.
+  <Card title="Built-in i18n" icon="translate" link="/configuration/i18n/">
+    Add languages in one file. Localized routes, hreflang, search and social
+    images follow.
+  </Card>
+  <Card title="Working Forms" icon="pencil" link="/api/">
+    Contact and newsletter forms on Astro Actions, with validation and spam
+    protection.
+  </Card>
+  <Card title="Secure by Default" icon="approve-check" link="/configuration/security/">
+    Hash-based Content Security Policy, on from the first commit.
   </Card>
   <Card title="Full SEO Toolkit" icon="magnifier" link="/seo/">
-    Dynamic OG images, JSON-LD schemas, meta tags, sitemap, and robots.txt
-    included.
+    Dynamic OG images, JSON-LD schemas, meta tags, sitemap, robots.txt, and
+    Pagefind site search.
   </Card>
   <Card title="Content Collections" icon="document" link="/content-management/">
     Blog posts, pages, authors, and FAQs with Astro's Content Layer API.
   </Card>
   <Card title="Deploy Anywhere" icon="laptop" link="/deployment/">
-    Pre-configured for Vercel, Netlify, and Cloudflare Pages with zero config.
+    Adapter detected automatically on Vercel, Netlify, and Cloudflare, with a
+    Node server everywhere else.
   </Card>
 </CardGrid>
 
@@ -76,7 +84,7 @@ Your site will be available at `http://localhost:4321`.
 
 ## Built With
 
-- **Astro 6** — The web framework for content-driven websites
+- **Astro 7** — The web framework for content-driven websites
 - **Tailwind CSS v4** — A utility-first CSS framework
 - **TypeScript** — JavaScript with syntax for types
 - **OKLCH Colors** — Perceptually uniform color space

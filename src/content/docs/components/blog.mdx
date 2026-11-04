@@ -102,7 +102,7 @@ import RelatedPosts from '@/components/blog/RelatedPosts.astro';
 <RelatedPosts
   currentSlug="current-article"
   tags={['astro', 'tutorial']}
-  limit={3}
+  maxPosts={3}
 />
 ```
 
@@ -111,8 +111,9 @@ import RelatedPosts from '@/components/blog/RelatedPosts.astro';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `currentSlug` | `string` | — | Current article slug |
-| `tags` | `string[]` | `[]` | Tags to match |
-| `limit` | `number` | `3` | Max related posts |
+| `tags` | `string[]` | — | Tags to match |
+| `locale` | `string` | Current page's language | Language to search |
+| `maxPosts` | `number` | `3` | Max related posts |
 
 ## Examples
 
@@ -120,13 +121,11 @@ import RelatedPosts from '@/components/blog/RelatedPosts.astro';
 
 ```astro
 ---
-import { getCollection } from 'astro:content';
+import { getPosts } from '@/lib/blog';
 import BlogCard from '@/components/blog/BlogCard.astro';
 
-const posts = await getCollection('blog');
-const sortedPosts = posts.sort((a, b) =>
-  b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
-);
+// Published posts in this language, newest first
+const sortedPosts = await getPosts();
 ---
 
 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

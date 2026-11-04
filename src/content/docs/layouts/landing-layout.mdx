@@ -1,19 +1,18 @@
 ---
 title: LandingLayout
-description: Layout for marketing and landing pages
+description: Layouts for landing and marketing pages
 sidebar:
   order: 5
 ---
 
-`LandingLayout` provides a minimal chrome layout for marketing pages with full-width sections.
+`LandingLayout` and `MarketingLayout` are for full-width pages. Neither adds a container or a search index marker, so sections can span the whole page.
 
 ## Usage
 
 ```astro
 ---
 import LandingLayout from '@/layouts/LandingLayout.astro';
-import Hero from '@/components/landing/Hero.astro';
-import Features from '@/components/landing/Features.astro';
+import { Hero } from '@/components/hero';
 import CTA from '@/components/landing/CTA.astro';
 ---
 
@@ -21,39 +20,41 @@ import CTA from '@/components/landing/CTA.astro';
   title="Welcome to Our Product"
   description="The best solution for your needs"
 >
-  <Hero />
-  <Features />
+  <Hero>
+    <h1 slot="title">Welcome</h1>
+  </Hero>
   <CTA />
 </LandingLayout>
 ```
 
 ## Props
 
-Inherits all props from `BaseLayout`.
+Both layouts take the same props:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `showNavbar` | `boolean` | `true` | Show landing navbar |
-| `showFooter` | `boolean` | `true` | Show landing footer |
+| `title` | `string` | — | Page title |
+| `description` | `string` | — | Meta description |
+| `image` | `string` | — | OG image URL |
+| `imageAlt` | `string` | — | OG image alt text |
+| `noindex` | `boolean` | `false` | Prevent search engine indexing |
+| `nofollow` | `boolean` | `false` | Prevent link following |
+| `includeOrgSchema` | `boolean` | `false` | Include Organization JSON-LD |
 
-## Features
+## Choosing a Layout
 
-### Landing Navbar
+| | `LandingLayout` | `MarketingLayout` |
+|---|---|---|
+| **Header** | Fixed, standard | Floating, transparent, inverted |
+| **CTA** | From `headerConfig` | `Get Started`, linking to `#get-started` |
+| **Language switcher** | Shown on multi-language sites | Hidden |
+| **Footer** | Simple, secondary background, no copyright | Same |
 
-A specialized navbar for landing pages:
-
-- Transparent background
-- Compact design
-- CTA button
-- Scrolls to sections
-
-### Full-Width Sections
-
-No container constraints - sections can span full width:
+## Full-Width Sections
 
 ```astro
 <LandingLayout title="Landing">
-  <!-- Full-width hero with gradient -->
+  <!-- Full-width section with contained content -->
   <section class="bg-gradient-to-b from-gray-50 to-white py-24">
     <div class="container">
       <!-- Contained content -->
@@ -68,14 +69,6 @@ No container constraints - sections can span full width:
   </section>
 </LandingLayout>
 ```
-
-### Landing Footer
-
-Simplified footer for conversions:
-
-- CTA section
-- Minimal links
-- Social proof
 
 ## Section Patterns
 
@@ -135,11 +128,11 @@ Simplified footer for conversions:
 
 | Component | Purpose |
 |-----------|---------|
-| `Hero.astro` | Main hero section |
-| `Credibility.astro` | Social proof and trust |
-| `LighthouseScores.astro` | Performance metrics |
-| `TechStack.astro` | Technology showcase |
-| `FeatureTabs.tsx` | Interactive features |
-| `Navbar.astro` | Landing navigation |
-| `LandingFooter.astro` | Landing footer |
-| `CTA.astro` | Call-to-action section |
+| `hero/Hero.astro` | Main hero section |
+| `landing/Credibility.astro` | Social proof and trust |
+| `landing/LighthouseScores.astro` | Performance metrics |
+| `landing/TechStack.astro` | Technology showcase |
+| `landing/FeatureTabs.tsx` | Interactive features |
+| `landing/CTA.astro` | Call-to-action section |
+
+The `landing/` components are removed from minimal projects. `Hero` and the UI `CTA` component are always included.

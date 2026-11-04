@@ -7,41 +7,39 @@ sidebar:
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-The CLI wizard lets you choose which components to include during project setup.
+The CLI can remove the optional components you don't need. Optional components live in `src/components/ui`, `src/components/patterns` and `src/components/hero`.
 
 ## Interactive Selection
 
-During setup, the wizard presents component options:
-
 ```
-◇  Which components would you like to include?
-│  ● All components (recommended)
-│  ○ UI components only
-│  ○ UI + Patterns
-│  ○ None (minimal)
+◇  Include optional components?
+│  ● All
+│  ○ Select categories
+│  ○ Select individual
+│  ○ None
 ```
 
-| Option | What's Included |
-|--------|-----------------|
-| **All components** | Full 39-component library with UI, patterns, and hero sections |
-| **UI components only** | Core interface components (Button, Input, Card, etc.) |
-| **UI + Patterns** | UI components plus pre-built form patterns |
-| **None (minimal)** | Just layouts, SEO, and navigation — add components later |
+| Option | What's kept |
+|--------|-------------|
+| **All** | Every component |
+| **Select categories** | The categories you choose, plus their dependencies |
+| **Select individual** | The components you choose, plus their dependencies |
+| **None** | Only the components core pages need |
 
 <Aside type="tip">
-  Choose **All components** if you're unsure. Unused components don't affect bundle size — Astro only ships what you use.
+  Choose **All** if you're unsure. Astro only ships the components you use, so unused ones don't add to your pages.
 </Aside>
 
-## Skip the Prompt (Flags)
+<Aside type="note" title="Demo projects keep everything">
+  The demo pages use every component, so `--demo` ignores your selection and keeps all of them.
+</Aside>
 
-For automation or quick setups, use the `--components` flag:
+## Skip the Prompt
 
 <Tabs>
-  <TabItem label="All (default)">
+  <TabItem label="All">
     ```bash
     pnpm create velocity-astro my-site --components
-    # or
-    pnpm create velocity-astro my-site --components=all
     ```
   </TabItem>
   <TabItem label="None">
@@ -49,7 +47,7 @@ For automation or quick setups, use the `--components` flag:
     pnpm create velocity-astro my-site --components=none
     ```
   </TabItem>
-  <TabItem label="Specific">
+  <TabItem label="Categories">
     ```bash
     pnpm create velocity-astro my-site --components=ui
     pnpm create velocity-astro my-site --components=ui,patterns
@@ -57,11 +55,32 @@ For automation or quick setups, use the `--components` flag:
   </TabItem>
 </Tabs>
 
+The categories are `ui`, `patterns` and `hero`.
+
+## Always Included
+
+These registry components stay whatever you choose, because the core pages and layouts import them:
+
+- `Badge`, `Button`, `ConsentBanner`, `CTA`, `Hero`, `Icon`, `Logo`, `NewsletterForm` and `SearchInput`
+- Anything those components depend on
+
+Everything outside the optional folders also stays, including layouts, `src/components/layout`, `src/components/seo`, `src/components/blog`, `src/i18n` and `src/lib`.
+
+The list comes from `scaffold.components.alwaysInclude` in `velocity-manifest.json`, so it can change between Velocity releases.
+
+<Aside type="caution" title="Importing from barrels">
+  Partial installs remove the barrel files `src/components/ui/index.ts` and `src/components/ui/<category>/index.ts`. Import from the component's folder instead:
+
+  ```astro
+  ---
+  import Button from '@/components/ui/form/Button/Button.astro';
+  ---
+  ```
+</Aside>
+
 ## Component Categories
 
-### UI Components (31)
-
-Core interface components organized into subcategories.
+### UI Components (33)
 
 | Component | Subcategory | Description |
 |-----------|-------------|-------------|
@@ -80,14 +99,16 @@ Core interface components organized into subcategories.
 | `Pagination` | data-display | Page navigation controls |
 | `Progress` | data-display | Progress bar indicator |
 | `Skeleton` | data-display | Loading placeholders |
+| `GoogleMap` | data-display | Embedded map |
 | `Alert` | feedback | Contextual feedback messages |
 | `Toast` | feedback | Temporary notification messages |
 | `Tooltip` | feedback | Hover tooltips |
 | `Dialog` | overlay | Modal dialogs |
 | `Dropdown` | overlay | Dropdown menus |
-| `Tabs` | navigation | Horizontal tab navigation |
-| `VerticalTabs` | navigation | Vertical tab navigation |
-| `Accordion` | disclosure | Collapsible content sections |
+| `Tabs` | overlay | Horizontal tab navigation |
+| `VerticalTabs` | overlay | Vertical tab navigation |
+| `Accordion` | overlay | Collapsible content sections |
+| `ConsentBanner` | overlay | Cookie consent banner |
 | `Separator` | layout | Visual divider between sections |
 | `Icon` | primitives | SVG icon component |
 | `CodeBlock` | content | Syntax-highlighted code |
@@ -99,12 +120,10 @@ Core interface components organized into subcategories.
 
 ### Pattern Components (7)
 
-Pre-built form and UI patterns for common use cases.
-
 | Component | Description |
 |-----------|-------------|
-| `ContactForm` | Complete contact form with validation |
-| `NewsletterForm` | Email subscription form |
+| `ContactForm` | Contact form backed by an Astro Action |
+| `NewsletterForm` | Email subscription form backed by an Astro Action |
 | `FormField` | Reusable form field wrapper |
 | `SearchInput` | Search input with icon |
 | `PasswordInput` | Password input with visibility toggle |
@@ -113,80 +132,12 @@ Pre-built form and UI patterns for common use cases.
 
 ### Hero Components (1)
 
-Flexible hero sections for landing pages.
-
 | Component | Description |
 |-----------|-------------|
-| `Hero` | Hero section with multiple layout options |
+| `Hero` | Hero section with centered and split layouts |
 
-## Component Features
-
-### Button
-
-```astro
-<Button
-  variant="primary"       <!-- primary | secondary | outline | ghost | destructive -->
-  size="md"               <!-- sm | md | lg -->
-  colorScheme="default"   <!-- default | invert -->
-  fullWidth={false}
-  icon={false}
-  href="/path"            <!-- renders as <a> when provided -->
-/>
-```
-
-### Hero
-
-```astro
-<Hero
-  layout="single"         <!-- single | split -->
-  splitRatio="1:1"        <!-- 1:1 | 1:2 | 2:1 -->
-  align="left"            <!-- left | center | right -->
-  background="default"    <!-- default | secondary | invert | gradient | image -->
-  size="lg"               <!-- sm | md | lg | xl -->
-  showGrid={true}
-  showBlob={true}
-  title="Your Title"
-  titleHighlight="Title"  <!-- text to highlight in brand color -->
-  description="..."
-/>
-```
-
-### CTA
-
-```astro
-<CTA
-  variant="default"       <!-- default | invert -->
-  size="lg"               <!-- sm | md | lg | xl -->
-  align="center"          <!-- center | left -->
-  showLogo={true}
-  heading="Ready to start?"
-  headingHighlight="start"
-  description="Get started in seconds."
-  showCopyCommand={true}
-/>
-```
+See the [component docs](/components/) for props and examples.
 
 ## Dependency Resolution
 
-<Aside type="tip">
-  The CLI automatically resolves component dependencies. If you select `patterns`, required UI components are included.
-</Aside>
-
-Components are managed via `component-registry.json` in Velocity. The registry defines:
-
-- Component files and locations
-- Dependencies between components
-- Required utilities (like `cn` for class merging)
-- Category groupings
-
-## Always Included
-
-Regardless of component selection, these are always included:
-
-- **Header** — Site navigation
-- **Footer** — Site footer
-- **ThemeToggle** — Dark mode toggle
-- **SEO** — Meta tags component
-- **JsonLd** — Structured data
-- **Breadcrumbs** — Navigation breadcrumbs
-- **Layouts** — All page layouts
+Selecting a component also keeps the components it imports. `component-registry.json` in Velocity lists each component's files and dependencies, and Velocity's CI fails if a file is unregistered or a dependency is undeclared.
