@@ -12,10 +12,11 @@ Add custom content collections to your project.
 ## Creating a Collection
 
 <Steps>
-1. **Define the schema** in `src/content.config.ts`:
+1. **Define the schema** in `src/config/collections.ts`, which upgrades leave alone:
 
    ```typescript
-   import { defineCollection, z } from 'astro:content';
+   import { defineCollection } from 'astro:content';
+   import { z } from 'astro/zod';
    import { glob } from 'astro/loaders';
 
    const projects = defineCollection({
@@ -30,13 +31,7 @@ Add custom content collections to your project.
      }),
    });
 
-   export const collections = {
-     blog,
-     pages,
-     authors,
-     faqs,
-     projects, // Add new collection
-   };
+   export const siteCollections = { projects };
    ```
 
 2. **Create the content folder**:

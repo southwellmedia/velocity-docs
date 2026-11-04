@@ -14,8 +14,18 @@ sidebar:
 - `AGENTS.md` is now a short file you own. Upgrading replaces it once and saves your copy to `.velocity-backup/`.
 - `.claude/skills/` is no longer ignored by Git. Local Claude Code state still is.
 
+### Customize without losing changes on upgrade
+
+- `src/styles/theme.css` now sets the active theme, and `src/config/collections.ts` holds your content collections. Upgrades leave both alone.
+- **If you set your theme in `tokens/colors.css`, it resets to the default on upgrade.** Set it again in `src/styles/theme.css`. Move any collections you added in `src/content.config.ts` to `src/config/collections.ts`. Edited files are saved to `.velocity-backup/`.
+- `BaseLayout` renders every font in `astro.config.mjs` and preloads the first, so a new font no longer needs a `<Font />` line.
+- `Header` has a `breakpoint` prop (`md`, `lg` or `xl`) for long or translated nav labels.
+- Six new icons: `calendar`, `clock`, `video`, `stethoscope`, `heart-pulse` and `baby`.
+
 ### Fixes
 
+- `create-velocity-astro` 2.0.4 backs up edited files when upgrading on Windows. Earlier versions overwrote them without a backup. Upgrade with `npm create velocity-astro@latest upgrade` to get the fix.
+- Tailwind now scans only `src/`. This stops dev requests timing out when a project sits in a folder ignored by a parent Git repo.
 - The Accordion chevron now rotates when an item opens.
 - Social images use the page title when a route has no `nav.<id>` label. `create-velocity-astro` 2.0.3 also writes that label for pages added with `--pages`.
 - `validate` no longer needs pnpm installed.

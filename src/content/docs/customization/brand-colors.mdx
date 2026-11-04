@@ -97,14 +97,10 @@ themeColor: '#9333EA',
 
 ## Switching Themes
 
-Velocity ships with two themes: `default` and `midnight`. To switch, edit `src/styles/tokens/colors.css`:
+Velocity ships with two themes: `default` and `midnight`. To switch, edit `src/styles/theme.css`, which upgrades leave alone:
 
 ```css
-@import './primitives.css';
-@import '../themes/default.css';
-/* To use the midnight theme, replace the line above with:
-   @import '../themes/midnight.css';
-*/
+@import './themes/midnight.css';
 ```
 
 ## Creating a New Theme
@@ -123,7 +119,7 @@ Velocity ships with two themes: `default` and `midnight`. To switch, edit `src/s
 | Gradients | `--gradient-start`, `--gradient-end` |
 | Invert sections | `--surface-invert`, `--surface-invert-secondary`, `--surface-invert-tertiary`, `--on-invert`, `--on-invert-secondary`, `--on-invert-muted`, `--border-invert`, `--border-invert-strong` |
 
-3. Update the import in `src/styles/tokens/colors.css` to point to your new theme file
+3. Update the import in `src/styles/theme.css` to point to your new theme file
 
 <Aside type="caution">
   When creating custom themes, maintain WCAG AA contrast ratios: 7:1 for `--foreground`, 4.5:1 for `--foreground-muted` and `--foreground-subtle`. Each theme file documents its contrast ratios inline.
