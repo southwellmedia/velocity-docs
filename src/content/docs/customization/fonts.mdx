@@ -30,7 +30,7 @@ fonts: [
 `BaseLayout` renders them:
 
 ```astro
-<Font cssVariable="--font-manrope" preload />
+<Font cssVariable="--font-manrope" />
 <Font cssVariable="--font-outfit" />
 <Font cssVariable="--font-jetbrains-mono" />
 ```
@@ -87,3 +87,7 @@ fonts: [
 ## OG Images
 
 Generated OG images use a separate font, `public/fonts/inter-latin-400-normal.ttf`, because Satori needs TTF or OTF rather than WOFF2.
+
+## Languages and Subsets
+
+`fontsourceVariable()` registers every subset a font package ships, such as Cyrillic, Greek and Vietnamese. Browsers only download the subsets a page uses. `BaseLayout` preloads the Latin face of the body font. Check that a font covers your language: Outfit, for example, ships only Latin subsets.

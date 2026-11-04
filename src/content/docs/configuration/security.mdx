@@ -94,3 +94,18 @@ Astro's CSP doesn't support `<ClientRouter />`. If you need `transition:persist`
 <Aside type="caution">
   Turning CSP off removes a real layer of protection against cross-site scripting. Native view transitions and prefetch cover most of what the router offers.
 </Aside>
+
+## Inline Scripts
+
+Astro hashes the scripts it bundles, but not `is:inline` ones. A plain `<script>` is bundled and needs nothing extra. For a script that must run inline, such as one that runs before the page renders, put it in its own file and render it with `InlineScript`, which adds its hash to the page's CSP:
+
+```astro
+---
+import InlineScript from '@/components/seo/InlineScript.astro';
+import code from './my-script.js?raw';
+---
+
+<InlineScript code={code} />
+```
+
+Inline event handlers such as `onclick="..."` are blocked. Use `addEventListener` in a script, with `data-` attributes to pass values.
