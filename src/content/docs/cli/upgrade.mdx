@@ -69,7 +69,9 @@ npm create velocity-astro@latest upgrade -- --dry-run
 - `src/components/blog/`, `src/components/landing/` and `src/components/patterns/`
 - `tests/`
 
-The CLI lists protected files it can't update so you can merge changes yourself.
+A release can add new files to these folders, but existing files stay as they are. The CLI lists protected files it can't update so you can merge changes yourself.
+
+**Breaking releases** can replace or remove specific files once, because the old version can't work with the new one. These appear in `--dry-run`, and the CLI saves your versions to `.velocity-backup/<old version>/` first.
 
 ## Conflicts
 
