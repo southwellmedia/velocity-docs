@@ -148,8 +148,9 @@ const { Content } = await render(aboutPage);
 ### 1. Define Schema
 
 ```typescript
-// src/content.config.ts
-import { defineCollection, z } from 'astro:content';
+// src/config/collections.ts
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 const projects = defineCollection({

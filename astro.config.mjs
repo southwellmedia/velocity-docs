@@ -45,6 +45,7 @@ export default defineConfig({
               slug: "getting-started/project-structure",
             },
             { label: "Scripts", slug: "getting-started/scripts" },
+            { label: "AI Coding Agents", slug: "getting-started/ai-agents" },
           ],
         },
         {

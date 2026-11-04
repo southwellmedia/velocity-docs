@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-import { Aside, Steps } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 Velocity loads fonts through the [Astro Fonts API](https://docs.astro.build/en/guides/fonts/). Fonts are self-hosted from the installed `@fontsource-variable` packages, so the build needs no network access. You also get a preload for the body font and metric-matched fallbacks that reduce layout shift.
 
@@ -27,13 +27,7 @@ fonts: [
 ],
 ```
 
-`BaseLayout` renders them:
-
-```astro
-<Font cssVariable="--font-manrope" />
-<Font cssVariable="--font-outfit" />
-<Font cssVariable="--font-jetbrains-mono" />
-```
+`BaseLayout` renders every family in this list and preloads the first, so keep your body font at the top.
 
 Themes reference the variables:
 
@@ -51,24 +45,14 @@ Themes reference the variables:
    pnpm add @fontsource-variable/inter
    ```
 
-2. **Register it** in the `fonts` array in `astro.config.mjs`:
+2. **Register it** in the `fonts` array in `astro.config.mjs`. Put it first if it's your body font:
 
    ```javascript
    fontsourceVariable({ name: 'Inter', pkg: 'inter', cssVariable: '--font-inter', weight: '100 900', fallbacks: ['sans-serif'] }),
    ```
 
-3. **Render it** in `BaseLayout.astro`:
-
-   ```astro
-   <Font cssVariable="--font-inter" preload />
-   ```
-
-4. **Use it** in your theme by pointing `--theme-font-sans` at `var(--font-inter)`.
+3. **Use it** in your theme by pointing `--theme-font-sans` at `var(--font-inter)`.
 </Steps>
-
-<Aside type="caution">
-  `BaseLayout.astro` is a safe file, so an upgrade replaces it and saves your version to `.velocity-backup/`. Reapply the `<Font />` line after upgrading.
-</Aside>
 
 Don't `@import` font CSS. A family rendered with `<Font />` but missing from `fonts` fails the build with `FontFamilyNotFound`.
 

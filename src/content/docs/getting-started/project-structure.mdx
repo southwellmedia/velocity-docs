@@ -57,6 +57,7 @@ Velocity follows a structured organization designed for scalability and maintain
     - blog/ Blog routes
   - styles/
     - global.css Tailwind + design tokens
+    - theme.css Picks the active theme
     - tokens/ colors.css, typography.css, spacing.css
     - themes/ default.css, midnight.css
   - views/ Page content, rendered by the wrappers in pages/
@@ -64,7 +65,9 @@ Velocity follows a structured organization designed for scalability and maintain
 - tests/
   - e2e/ Playwright end-to-end and accessibility tests
   - unit/ Vitest unit tests
-- AGENTS.md Instructions for AI coding agents
+- .agents/ Velocity's rules and skills for AI coding agents
+- .claude/skills/ The same skills for Claude Code
+- AGENTS.md Your project's instructions for AI coding agents
 - astro.config.mjs Astro configuration
 - velocity-manifest.json Upgrade data for the CLI
 - component-registry.json Component files and dependencies
@@ -75,7 +78,8 @@ Velocity follows a structured organization designed for scalability and maintain
 | File | Purpose |
 |------|---------|
 | `astro.config.mjs` | Astro configuration: adapter, fonts, CSP, caching |
-| `src/content.config.ts` | Content collection schemas |
+| `src/content.config.ts` | Velocity's content collection schemas |
+| `src/config/collections.ts` | Your content collection schemas |
 | `src/config/site.config.ts` | Site metadata, branding, contact info |
 | `src/config/nav.config.ts` | Routes, navigation, header and footer defaults |
 | `src/i18n/locales.mjs` | Enabled languages |
