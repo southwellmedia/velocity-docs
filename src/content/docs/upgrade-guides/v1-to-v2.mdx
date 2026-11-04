@@ -104,7 +104,7 @@ If your config used `markdown.remarkPlugins` or `rehypePlugins`, also run `pnpm 
 Forms now post to Astro Actions in `src/actions/index.ts`, which the CLI added.
 
 <Steps>
-1. Move any email or CRM code from `src/pages/api/contact.ts` and `newsletter.ts` into the action handlers, then delete those two routes.
+1. The CLI removed `src/pages/api/contact.ts` and `newsletter.ts`, and saved them in `.velocity-backup/`. Move any email or CRM code from them into the action handlers.
 
 2. Replace forms that post to `/api/contact` or `/api/newsletter` with `<ContactForm />` and `<NewsletterForm />`. The form on the 1.x contact page is one of these: that route never ran on static builds, and the E2E contact tests fail until you replace it.
 

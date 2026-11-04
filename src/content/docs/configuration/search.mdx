@@ -42,7 +42,7 @@ pnpm build && pnpm preview
 ```
 
 <Aside type="note">
-  `/search` is disallowed in `robots.txt`, so results pages stay out of search engines.
+  Search pages are `noindex` and left out of the sitemap in every language, so they stay out of search engines. They are not blocked in `robots.txt`, because crawlers need to read the `noindex` tag.
 </Aside>
 
 ## Removing Search
