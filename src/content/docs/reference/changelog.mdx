@@ -5,6 +5,21 @@ sidebar:
   order: 2
 ---
 
+## v2.1.0 (2026-11-04)
+
+### Built for AI coding agents
+
+- Every project now includes `.agents/velocity.md`, with Velocity's rules and a list of which files upgrades replace.
+- New `velocity-add-page` and `velocity-add-component` skills, in `.agents/skills/` and `.claude/skills/`. See [AI Coding Agents](/getting-started/ai-agents/).
+- `AGENTS.md` is now a short file you own. Upgrading replaces it once and saves your copy to `.velocity-backup/`.
+- `.claude/skills/` is no longer ignored by Git. Local Claude Code state still is.
+
+### Fixes
+
+- The Accordion chevron now rotates when an item opens.
+- Social images use the page title when a route has no `nav.<id>` label. `create-velocity-astro` 2.0.3 also writes that label for pages added with `--pages`.
+- `validate` no longer needs pnpm installed.
+
 ## v2.0.3 (2026-11-04)
 
 - The demo's Lighthouse section no longer shows a hardcoded performance score. It lists accessibility, best practices and SEO, which were measured at 100.

@@ -22,7 +22,7 @@ Documentation site for [Velocity](https://github.com/southwellmedia/velocity), b
 
 | Section | Description |
 |---------|-------------|
-| **Getting Started** | Installation, prerequisites, project structure |
+| **Getting Started** | Installation, prerequisites, project structure, AI coding agents |
 | **Components** | 55 components across UI, layout, patterns, blog, landing, and SEO |
 | **Design System** | Three-tier token architecture, colors, dark mode, Tailwind utilities |
 | **Customization** | Brand colors, themes, adding components/routes/collections |

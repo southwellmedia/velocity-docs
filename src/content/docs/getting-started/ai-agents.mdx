@@ -1,0 +1,85 @@
+---
+title: AI Coding Agents
+description: How Velocity projects guide Claude Code, Codex, Cursor and other AI coding agents
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every Velocity project includes instructions for AI coding agents, so they can follow Velocity's conventions without you explaining them.
+
+## What's in your project
+
+| File | Purpose | On upgrade |
+|------|---------|------------|
+| `AGENTS.md` | Your project's rules, plus a pointer to Velocity's | Left alone |
+| `CLAUDE.md` | Imports `AGENTS.md` for Claude Code | Left alone |
+| `.agents/velocity.md` | Velocity's stack, commands, rules and file ownership | Replaced |
+| `.agents/skills/velocity-*` | Skills for common tasks | Replaced |
+| `.claude/skills/velocity-*` | The same skills, in the folder Claude Code uses | Replaced |
+
+Add your own rules to the **Project notes** section of `AGENTS.md`.
+
+## Skills
+
+Skills are step-by-step instructions for a specific task. You don't need to name them. Describe what you want, and a tool that supports skills can load the right one. If your tool doesn't load skills automatically, `AGENTS.md` tells your agent where to find them.
+
+### `velocity-add-page`
+
+Use it by asking for a new page or route. It covers:
+
+- The view in `src/views/`
+- Wrappers for the default locale and localized URLs
+- The route in `src/config/nav.config.ts`, and the menu entry if you want one
+- Copy for every enabled language
+- What to verify, including what the automated tests don't cover
+
+### `velocity-add-component`
+
+Use it by asking for a new component, or for a Velocity component your project doesn't have. It covers:
+
+- Checking whether Velocity already has the component
+- Restoring a component left out when the project was scaffolded, along with its dependencies
+- Choosing between `src/components/patterns/` and `src/components/ui/`
+- CVA variants, design tokens, translations, CSP and accessibility
+
+## File ownership
+
+Upgrades replace some files and never touch others. `.agents/velocity.md` lists both, so your agent knows where a change is safe. The list comes from `files` in `velocity-manifest.json`.
+
+For example, new strings go in `src/i18n/translations/<locale>.ts`, because upgrades replace `src/i18n/ui.ts`. If a task requires editing a file Velocity owns, your agent is told to warn you. The upgrade saves your version to `.velocity-backup/`, but you'll need to reapply the change by hand.
+
+## Add your own skills
+
+Create a folder with a `SKILL.md` file:
+
+```md
+---
+name: add-case-study
+description: Add a case study to the site. Use when asked to publish a new case study.
+---
+
+# Add a case study
+
+1. Create the entry in `src/content/case-studies/`.
+2. ...
+```
+
+Save it in `.claude/skills/add-case-study/` for Claude Code, and in `.agents/skills/add-case-study/` for other tools.
+
+<Aside type="caution">
+Don't start your skill names with `velocity-`, and don't edit the skills Velocity ships. Upgrades replace them. Other skills in these folders stay in place.
+</Aside>
+
+## Get this in an existing project
+
+These files were added in Velocity 2.1. Upgrade to get them:
+
+```bash
+npm create velocity-astro@latest upgrade
+```
+
+The upgrade replaces your old `AGENTS.md` once, because it contains outdated instructions. Your copy is saved to `.velocity-backup/`. If you added your own rules, copy them into the **Project notes** section of the new file. After that, upgrades leave `AGENTS.md` alone.
+
+Skills are committed with your project, so everyone working on it gets the same instructions. Only local Claude Code state in `.claude/` is ignored.
