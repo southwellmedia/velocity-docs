@@ -1,0 +1,208 @@
+---
+title: "Upgrade: v1 to v2.0.0"
+description: Step-by-step guide for upgrading a Velocity 1.x project to Velocity 2.0 on Astro 7
+sidebar:
+  order: 6
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide takes a project from **Velocity 1.x** (Astro 6) to **Velocity 2.0** (Astro 7). The CLI does most of the work: after it runs, your project installs and builds on Velocity 2. The remaining steps are about bringing your own customizations across.
+
+## Overview
+
+| | v1.0.0 | v2.0.0 |
+|---|---|---|
+| **Astro** | 6.0.0 | 7.4.5 |
+| **Node.js** | 22.12+ | **22.23.4+** (24 LTS recommended) |
+| **`create-velocity-astro`** | 1.x | **2.0+** |
+| **Forms** | `/api/contact`, `/api/newsletter` | Astro Actions |
+| **Adapter** | None | Auto-detected |
+| **Navigation** | `<ClientRouter />` | Native view transitions and prefetch |
+| **CSP** | Off | On, hash-based |
+| **Fonts** | `@fontsource` CSS imports | Astro Fonts API |
+| **i18n** | CLI overlay | In core |
+| **Search** | None | Pagefind at `/search` |
+
+<Aside type="caution" title="Before you start">
+  Commit your work. The CLI 1.x can't read Velocity 2's manifest, so use `create-velocity-astro` 2.0 or later.
+</Aside>
+
+## Step 1: Update Node.js
+
+Astro 7.4 needs Node 22.23.4 or later, and the CLI won't upgrade on an older version.
+
+```bash
+nvm install 24
+nvm use 24
+```
+
+Update Node in CI and on your host as well, such as `NODE_VERSION` on Netlify.
+
+## Step 2: Run the CLI
+
+<Steps>
+1. **Preview the changes**
+
+   ```bash
+   pnpm create velocity-astro@latest upgrade --dry-run
+   ```
+
+2. **Run the upgrade**
+
+   ```bash
+   pnpm create velocity-astro@latest upgrade
+   ```
+
+3. **Install**
+
+   ```bash
+   pnpm install
+   ```
+</Steps>
+
+Because 2.0 is a breaking release, this upgrade does more than usual:
+
+| What | Files |
+|------|-------|
+| **Updated** | Everything Velocity owns, such as `src/components/ui/`, layouts and `src/lib/`, plus dependencies and `package.json` scripts |
+| **Added** | `src/i18n/`, `src/views/`, `src/actions/`, `src/pages/search.astro`, `tests/` and other new files |
+| **Replaced, with a backup** | `astro.config.mjs`, `src/config/nav.config.ts`, `src/i18n/translations/`, `src/pages/blog/`, `src/pages/[lang]/`, and `src/components/{blog,patterns,landing}/` |
+| **Left alone** | Your other pages, content, assets, `site.config.ts`, and any files you added yourself |
+
+Projects created with `--i18n` also have their home, About and Contact pages replaced, and old overlay files removed. See [Step 7](#step-7-move-translations-from-the-i18n-overlay).
+
+Your other pages keep working as they are. To localize one later, follow `src/views/AboutView.astro` and `src/pages/[lang]/[...about].astro`.
+
+## Step 3: Restore Your Customizations
+
+The CLI saves every file it replaced or removed in `.velocity-backup/<your old version>/`, and lists them when it finishes. Only files that differed are saved.
+
+Compare each one with the new version and copy your changes across:
+
+```bash
+git diff --no-index .velocity-backup/1.0.0/astro.config.mjs astro.config.mjs
+```
+
+The most common ones:
+
+- **`astro.config.mjs`:** your own integrations, `vite` settings and redirects. Keep the new `fonts`, `adapter`, `cache`, `security.csp`, `i18n`, `prefetch` and `pagefind()` settings. If you use `Astro.session`, remove `session: false`.
+- **`nav.config.ts`:** your nav links. It now exports `routes`, `navItems`, `headerConfig` and `footerConfig`, so add new pages to `routes`, and move header and footer settings out of your layouts.
+- **Components** you edited in `src/components/{blog,patterns,landing}/`.
+
+<Aside type="caution" title="compressHTML">
+  Keep `compressHTML: true`. Astro 7 defaults to `'jsx'`, which removes whitespace between inline elements, so `<a>Docs</a> <a>Blog</a>` renders as "DocsBlog".
+</Aside>
+
+If your config used `markdown.remarkPlugins` or `rehypePlugins`, also run `pnpm add @astrojs/markdown-remark` and set `markdown: { processor: unified({ remarkPlugins: [...] }) }`, because Astro 7's default Markdown processor is Sätteri.
+
+## Step 4: Move Forms to Actions
+
+Forms now post to Astro Actions in `src/actions/index.ts`, which the CLI added.
+
+<Steps>
+1. Move any email or CRM code from `src/pages/api/contact.ts` and `newsletter.ts` into the action handlers, then delete those two routes.
+
+2. Replace forms that post to `/api/contact` or `/api/newsletter` with `<ContactForm />` and `<NewsletterForm />`. The form on the 1.x contact page is one of these: that route never ran on static builds, and the E2E contact tests fail until you replace it.
+
+3. If you display schema errors yourself, translate them. Messages are now keys such as `form.errors.messageTooShort`:
+
+   ```typescript
+   const t = useTranslations(locale);
+   t(message);
+   ```
+</Steps>
+
+See [Forms & Actions](/api/).
+
+## Step 5: Remove `ClientRouter` Dependencies
+
+`BaseLayout` no longer renders `<ClientRouter />`. Pages use CSS cross-document view transitions, and links prefetch on hover.
+
+Scripts that only listen for `astro:page-load` won't run on first load. Call your init function directly, and keep the listener if you want it:
+
+```typescript
+function init() {
+  // ...
+}
+
+init();
+document.addEventListener('astro:after-swap', init);
+```
+
+These `astro:transitions` internals were removed in Astro 7: `TRANSITION_*` constants, `isTransitionBeforePreparationEvent()`, `isTransitionBeforeSwapEvent()` and `createAnimationScope()`. Use string event names and compare `event.type`.
+
+<Aside type="note" title="Need the router?">
+  If you use `transition:persist`, `transition:name` or `navigate()`, keep `<ClientRouter />` and set `security.csp: false`, because Astro's CSP doesn't support it.
+</Aside>
+
+## Step 6: Make Inline Scripts CSP-Safe
+
+Astro can only hash scripts whose content is static.
+
+- Move dynamic data out of `define:vars` and interpolated scripts into `<script type="application/json">`, as `Analytics.astro` does.
+- Declare third-party script hosts with `Astro.csp.insertScriptResource()`.
+
+See [Security & CSP](/configuration/security/). CSP doesn't apply in `astro dev`, so test with a production build.
+
+## Step 7: Move Translations from the i18n Overlay
+
+Skip this step unless your project was created with `--i18n`.
+
+The 1.x overlay is replaced by core i18n. Your languages are listed in `src/i18n/locales.mjs`, and `src/i18n/routes.ts`, `helpers.ts`, `src/components/i18n/`, `Navbar.astro` and `LandingFooter.astro` are removed.
+
+<Steps>
+1. Move your translations to `src/i18n/translations/<locale>.ts`, using the v2 format.
+
+2. Move translated URLs into `routes` in `nav.config.ts`.
+
+3. Replace imports from `@/i18n/routes` or `@/i18n/helpers` in your own code with `@/i18n`.
+</Steps>
+
+See the [i18n guide](/configuration/i18n/).
+
+## Step 8: Fix Blog URLs
+
+Use the helpers in `src/lib/blog.ts` instead of building URLs from `post.id`:
+
+```typescript
+import { getPosts, getPostUrl } from '@/lib/blog';
+
+const posts = await getPosts(locale);
+const href = getPostUrl(posts[0]);
+```
+
+OG images are now generated at `/og/<page path>.png`. Blog posts used to point at images that didn't exist.
+
+## Step 9: Fix Markup Errors
+
+Astro 7's Rust compiler is stricter. Unclosed tags fail the build, and invalid nesting, such as a `<div>` inside a `<p>`, is no longer corrected.
+
+`BaseLayout` already renders `<main id="main-content">`. If your own layouts or pages render `<main>`, change it to `<div>`.
+
+## Step 10: Smaller Changes
+
+- **Partial component installs.** The 1.x registry was missing React files, `ConsentBanner` and `GoogleMap`, so choosing a subset could delete files still in use. Check that `ConsentBanner` and any `.tsx` components you use exist, and restore them from v2.0.0 if not.
+- **Container renderers.** Import from the new entry point: `import { getContainerRenderer } from '@astrojs/react/container-renderer'`.
+- **ESLint 10** adds `no-useless-assignment` and `preserve-caught-error` to the recommended rules.
+- **tailwind-merge 3** understands Tailwind v4 syntax, so `cn()` now resolves conflicts it used to get wrong. Re-check any class overrides that relied on the old results.
+- **Custom themes** should reference `var(--font-manrope)`, `var(--font-outfit)` and `var(--font-jetbrains-mono)`.
+
+## Verify the Upgrade
+
+```bash
+pnpm exec playwright install chromium
+pnpm validate
+pnpm build && pnpm test:e2e
+```
+
+`pnpm validate` runs lint, type checks, unit tests and the build. `pnpm test:e2e` fails on any CSP violation, which is the quickest way to find inline scripts you missed. Your own pages may show type errors if they use props that changed, so fix those as you go.
+
+## Next Steps
+
+- [Changelog](/reference/changelog/) — Full release notes for v2.0.0
+- [Deployment](/deployment/) — How adapters are chosen
+- [Internationalization](/configuration/i18n/) — Adding languages

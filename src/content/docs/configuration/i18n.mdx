@@ -1,0 +1,219 @@
+---
+title: Internationalization
+description: Add languages, translate copy, and localize routes and posts
+sidebar:
+  order: 5
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Velocity's components are locale-aware, and a site is single-language by default. Adding a language means listing it in one file and adding its copy. From that, Velocity generates:
+
+- `/es/…` routes, with optional translated slugs
+- A language switcher that needs no JavaScript
+- `hreflang` alternates, including `x-default`, and a localized sitemap
+- A separate search index per language
+- Localized OG images
+- Translated form validation messages
+
+The default language has no URL prefix.
+
+## Files
+
+| File | Owner | Purpose |
+|------|-------|---------|
+| `src/i18n/locales.mjs` | You | Enabled languages |
+| `src/i18n/translations/<locale>.ts` | You | Your site copy |
+| `src/i18n/ui.ts` | Velocity | Built-in UI strings in English, Spanish and French |
+| `src/i18n/config.ts` | Velocity | Locale names and helpers |
+| `src/i18n/paths.ts` | Velocity | Localized URLs |
+| `src/config/nav.config.ts` | You | Translated slugs |
+
+Upgrades update the Velocity-owned files and never touch yours.
+
+## Enable Spanish or French
+
+<Steps>
+1. **List the languages** in `src/i18n/locales.mjs`:
+
+   ```javascript
+   /** @type {'en'} */
+   export const defaultLocale = 'en';
+
+   /** @type {readonly ['en', 'es', 'fr']} */
+   export const locales = /** @type {const} */ (['en', 'es', 'fr']);
+   ```
+
+   Update the `@type` comment too, because the `Locale` type comes from it.
+
+2. **Add site copy** in `src/i18n/translations/es.ts`:
+
+   ```typescript
+   import type { SiteStrings } from './en';
+
+   const es: SiteStrings = {
+     site: {
+       tagline: 'Un sitio web moderno creado con Astro y Tailwind CSS',
+     },
+     // ...every key from en.ts
+   };
+
+   export default es;
+   ```
+
+   The `SiteStrings` type makes a missing key a type error. Without it, missing keys fall back to English.
+</Steps>
+
+`--i18n` does this for you when you [create a project](/cli/i18n/).
+
+## Add Another Language
+
+Follow the same steps with the new code, such as `de`. `ui.ts` only covers English, Spanish and French, so built-in strings fall back to English until you add them to your translations file:
+
+```typescript
+// src/i18n/translations/de.ts
+import type { SiteStrings } from './en';
+
+const de: SiteStrings & { nav: Record<string, string> } = {
+  // ...your copy
+  nav: {
+    home: 'Startseite',
+    blog: 'Blog',
+    about: 'Über uns',
+    contact: 'Kontakt',
+  },
+};
+```
+
+Keys in your file override `ui.ts`, so you can use the same approach to reword any built-in string.
+
+Language names and tags come from `Intl`, so any language works: `de` shows as Deutsch and is tagged `de-DE`. Include a region in the locale, such as `en-GB`, to choose the tag yourself.
+
+`locale` values in content frontmatter accept the languages in `locales.mjs`.
+
+## Using Translations
+
+```astro
+---
+import { getLocale, useTranslations, localizeRoute } from '@/i18n';
+
+const locale = getLocale(Astro);
+const t = useTranslations(locale);
+---
+
+<h1>{t('home.hero.title')}</h1>
+<p>{t('blog.minRead', { minutes: 5 })}</p>
+<a href={localizeRoute('about', locale)}>{t('nav.about')}</a>
+```
+
+Keys are looked up in this order:
+
+1. Your translations for the language
+2. Built-in UI strings for the language
+3. Your default-language translations
+4. Built-in default-language UI strings
+5. The key itself
+
+Because the key is the last fallback, plain text such as a nav label of `'Pricing'` passes through `t()` unchanged.
+
+## Links
+
+Never hardcode internal links. Use the helpers so they stay in the current language:
+
+| Helper | Example | Result |
+|--------|---------|--------|
+| `localizeRoute(id, locale)` | `localizeRoute('about', 'es')` | `/es/sobre-nosotros` |
+| `localizePath(href, locale)` | `localizePath('/blog/my-post', 'es')` | `/es/blog/my-post` |
+
+`localizePath` leaves `#hash` links and external URLs alone.
+
+## Translated Slugs
+
+Add `slugs` to a route in `src/config/nav.config.ts`:
+
+```typescript
+export const routes = {
+  about: { path: 'about', slugs: { es: 'sobre-nosotros', fr: 'a-propos' } },
+  contact: { path: 'contact', slugs: { es: 'contacto' } },
+  components: { path: 'components', localized: false },
+};
+```
+
+Languages without a slug use `path`. Set `localized: false` for pages that only exist in the default language.
+
+## Localizing a Page
+
+Page content lives in a view that takes a `locale` prop. Two thin wrappers render it:
+
+```astro
+---
+// src/views/PricingView.astro
+import PageLayout from '@/layouts/PageLayout.astro';
+import { useTranslations, type Locale } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<PageLayout title={t('pricing.title')} description={t('pricing.description')}>
+  <h1>{t('pricing.title')}</h1>
+</PageLayout>
+```
+
+```astro
+---
+// src/pages/pricing.astro
+import PricingView from '@/views/PricingView.astro';
+import { defaultLocale } from '@/i18n';
+---
+
+<PricingView locale={defaultLocale} />
+```
+
+```astro
+---
+// src/pages/[lang]/[...pricing].astro
+import PricingView from '@/views/PricingView.astro';
+import { getLocalizedStaticPaths, type Locale } from '@/i18n';
+
+export function getStaticPaths() {
+  return getLocalizedStaticPaths('pricing', 'pricing');
+}
+
+const { locale } = Astro.props as { locale: Locale };
+---
+
+<PricingView locale={locale} />
+```
+
+The second argument is the rest-parameter name in the file name. The wrapper generates nothing while only one language is enabled, so adding languages later just works. See [Adding Routes](/customization/adding-routes/).
+
+## Translating Blog Posts
+
+Put each translation in its language folder:
+
+```
+src/content/blog/
+├── en/
+│   └── hello-world.mdx
+└── es/
+    └── hello-world.mdx
+```
+
+Posts with the same file name are linked as translations: they get `hreflang` alternates, and the language switcher goes to the translated post. If a post has no translation in a language, the switcher goes to that language's home page.
+
+## SEO
+
+`BaseLayout` adds `hreflang` links for known routes:
+
+```html
+<link rel="alternate" hreflang="en-US" href="https://site.com/about" />
+<link rel="alternate" hreflang="es-ES" href="https://site.com/es/sobre-nosotros" />
+<link rel="alternate" hreflang="x-default" href="https://site.com/about" />
+```
+
+Other pages can pass their own through the `alternates` prop on `BaseLayout`.

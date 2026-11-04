@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-The Footer component supports multiple layouts for different needs.
+The Footer component supports multiple layouts for different needs. Its links come from [`nav.config.ts`](/configuration/routes/#footer-defaults), including `footerConfig.extraLinks`.
 
 ## Layouts
 
@@ -91,7 +91,7 @@ The Footer component supports multiple layouts for different needs.
 | `layout` | `'simple' \| 'columns' \| 'minimal' \| 'stacked'` | `'simple'` | Layout style |
 | `columns` | `2 \| 3 \| 4` | `3` | Column count |
 | `background` | `'default' \| 'secondary' \| 'invert'` | `'default'` | Background color |
-| `nav` | `NavItem[]` | — | Override navigation |
+| `nav` | `NavItem[]` | Items from `nav.config.ts` | Override navigation |
 | `linkGroups` | `FooterLinkGroup[]` | `[]` | Link groups |
 | `socialLinks` | `SocialLink[]` | `[]` | Social links |
 | `showSocial` | `boolean` | `true` | Show social links |

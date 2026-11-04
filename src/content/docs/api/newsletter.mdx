@@ -1,108 +1,58 @@
 ---
-title: Newsletter API
-description: Handle newsletter subscriptions
+title: Newsletter Action
+description: Handle newsletter subscriptions with an Astro Action
 sidebar:
   order: 3
 ---
 
-The newsletter endpoint handles email subscription requests.
+The `newsletter` action handles submissions from the `NewsletterForm` component.
 
-## Endpoint
+## Fields
 
-```
-POST /api/newsletter
-```
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `email` | string | Yes | Valid email format |
+| `website` | string | No | Hidden spam trap |
 
-## Request
+## Handler
 
-### Content-Type
-
-`multipart/form-data` (FormData)
-
-### Fields
-
-| Field | Type | Required |
-|-------|------|----------|
-| `email` | string | Yes |
-
-### Example Request
-
-```javascript
-const response = await fetch('/api/newsletter', {
-  method: 'POST',
-  body: new FormData(form),
-});
-
-const result = await response.json();
-```
-
-## Response
-
-### Success (200)
-
-```json
-{
-  "success": true
-}
-```
-
-### Validation Error (400)
-
-```json
-{
-  "success": false,
-  "error": "Please enter a valid email address"
-}
-```
-
-## Implementation
-
-The endpoint is defined in `src/pages/api/newsletter.ts`:
+Replace the `TODO` in `src/actions/index.ts` with a call to your provider:
 
 ```typescript
-import type { APIRoute } from 'astro';
-import { z } from 'astro/zod';
+newsletter: defineAction({
+  accept: 'form',
+  input: newsletterSchema,
+  handler: async ({ email, website }) => {
+    if (website) return { success: true };
 
-const emailSchema = z.email();
+    await addSubscriber(email);
+    return { success: true };
+  },
+}),
+```
 
-export const POST: APIRoute = async ({ request }) => {
-  const formData = await request.formData();
-  const email = formData.get('email');
+`NEWSLETTER_API_KEY` is already declared in the env schema as a server secret:
 
-  const result = emailSchema.safeParse(email);
-
-  if (!result.success) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'Please enter a valid email address',
-      }),
-      { status: 400 }
-    );
-  }
-
-  // Add to newsletter service
-  await addSubscriber(result.data);
-
-  return new Response(
-    JSON.stringify({ success: true }),
-    { status: 200 }
-  );
-};
+```typescript
+import { NEWSLETTER_API_KEY } from 'astro:env/server';
 ```
 
 ## Integration Examples
 
+To report a failure to the visitor, throw an `ActionError` from `astro:actions`. The form shows its generic error message.
+
 ### Mailchimp
 
 ```typescript
+import { ActionError } from 'astro:actions';
+
 async function addSubscriber(email: string) {
   const response = await fetch(
     `https://${DC}.api.mailchimp.com/3.0/lists/${LIST_ID}/members`,
     {
       method: 'POST',
       headers: {
-        Authorization: `apikey ${API_KEY}`,
+        Authorization: `apikey ${NEWSLETTER_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -113,7 +63,7 @@ async function addSubscriber(email: string) {
   );
 
   if (!response.ok) {
-    throw new Error('Failed to subscribe');
+    throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to subscribe' });
   }
 }
 ```
@@ -128,14 +78,14 @@ async function addSubscriber(email: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        api_key: API_KEY,
+        api_key: NEWSLETTER_API_KEY,
         email,
       }),
     }
   );
 
   if (!response.ok) {
-    throw new Error('Failed to subscribe');
+    throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to subscribe' });
   }
 }
 ```
@@ -145,7 +95,7 @@ async function addSubscriber(email: string) {
 ```typescript
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(NEWSLETTER_API_KEY);
 
 async function addSubscriber(email: string) {
   await resend.contacts.create({
@@ -157,32 +107,22 @@ async function addSubscriber(email: string) {
 
 ## Client-Side Handling
 
-```javascript
+`NewsletterForm` handles loading, success and error states for you, in the visitor's language. To call the action from your own form:
+
+```typescript
+import { actions, isInputError } from 'astro:actions';
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const button = form.querySelector('button');
-  button.disabled = true;
-  button.textContent = 'Subscribing...';
+  const { error } = await actions.newsletter(new FormData(form));
 
-  try {
-    const response = await fetch('/api/newsletter', {
-      method: 'POST',
-      body: new FormData(form),
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      form.innerHTML = '<p>Thanks for subscribing!</p>';
-    } else {
-      showError(result.error);
-    }
-  } catch (error) {
+  if (!error) {
+    form.innerHTML = '<p>Thanks for subscribing!</p>';
+  } else if (isInputError(error)) {
+    showError(error.fields.email?.[0]);
+  } else {
     showError('Something went wrong. Please try again.');
-  } finally {
-    button.disabled = false;
-    button.textContent = 'Subscribe';
   }
 });
 ```

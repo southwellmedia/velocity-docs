@@ -33,7 +33,7 @@ tags: # Optional
   - tutorial
 draft: false # Optional, excludes from production
 featured: false # Optional, for featured sections
-locale: en # Required for i18n
+locale: en # Optional, the folder takes priority
 ---
 Your markdown content here...
 ```
@@ -52,7 +52,7 @@ Your markdown content here...
 | `tags`        | `string[]` | No       | Post tags for categorization     |
 | `draft`       | `boolean`  | No       | Hide from production             |
 | `featured`    | `boolean`  | No       | Mark as featured                 |
-| `locale`      | `string`   | Yes      | Content locale (en, es, fr)      |
+| `locale`      | `string`   | No       | Used if the post has no language folder (en, es, fr) |
 
 ## Example Post
 
@@ -148,8 +148,16 @@ src/content/blog/
 └── fr/           # French posts
 ```
 
-Filter by locale:
+A post's language comes from its folder. Posts are served at `/blog/<slug>` in the default language and `/<locale>/blog/<slug>` in others.
+
+Get the posts for a language:
 
 ```astro
-const enPosts = posts.filter(post => post.data.locale === 'en');
+---
+import { getPosts } from '@/lib/blog';
+
+const posts = await getPosts('es');
+---
 ```
+
+A post with the same file name in two language folders is treated as a translation, and gets `hreflang` alternates. The language switcher links to the other language's home page on posts. See [Translating Blog Posts](/configuration/i18n/#translating-blog-posts).

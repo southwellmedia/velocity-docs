@@ -22,14 +22,14 @@ pnpm install
 
 ### Node version errors
 
-Astro 6 requires Node.js 22.12.0+:
+Astro 7.4 requires Node.js 22.23.4 or later. Node 24 LTS is recommended:
 
 ```bash
-node --version  # Should be 22.12.0 or higher
+node --version  # Should be 22.23.4 or higher
 
 # Using nvm
-nvm install 22
-nvm use 22
+nvm install 24
+nvm use 24
 ```
 
 ## Build Issues
@@ -47,6 +47,18 @@ nvm use 22
 </style>
 ```
 
+### `FontFamilyNotFound`
+
+A `<Font />` tag references a family that isn't in `fonts` in `astro.config.mjs`. See [Fonts](/customization/fonts/).
+
+### Compiler errors about tags
+
+Astro 7's Rust compiler fails on unclosed tags, and no longer fixes invalid nesting such as a `<div>` inside a `<p>`. Fix the markup it reports.
+
+### Words run together
+
+If inline elements lose the space between them, check that `compressHTML: true` is still set in `astro.config.mjs`. Astro 7's default of `'jsx'` removes that whitespace.
+
 ### Content collection type errors
 
 Regenerate types:
@@ -59,9 +71,8 @@ pnpm astro sync
 
 ### OG images not generating
 
-1. Check that dimensions are valid (1200x630 recommended)
-2. Ensure fonts are available
-3. Check build logs for errors
+1. Check that the page is in `routes` in `nav.config.ts`
+2. Check build logs for errors
 
 ```bash
 pnpm build 2>&1 | grep -i error
@@ -102,6 +113,18 @@ Check `tsconfig.json`:
 }
 ```
 
+### Scripts don't run
+
+Velocity has no client router, so `astro:page-load` doesn't fire on first load. Call your init function directly. See [the upgrade guide](/upgrade-guides/v1-to-v2/#step-5-remove-clientrouter-dependencies).
+
+### Search returns nothing
+
+The index is only built by `pnpm build`, so test search with `pnpm preview`. Only content inside `data-pagefind-body` is indexed. See [Site Search](/configuration/search/).
+
+### Scripts blocked by CSP
+
+CSP only applies to production builds. If a script works in `pnpm dev` but not `pnpm preview`, see [Security & CSP](/configuration/security/).
+
 ## Component Issues
 
 ### Styles not scoped
@@ -138,20 +161,25 @@ import myImage from '@/assets/image.png';
 
 ## Deployment Issues
 
+### Forms don't submit
+
+Forms need a server runtime. Check that the build used the right [adapter](/deployment/), and that your host isn't static-only.
+
 ### Environment variables not working
 
 1. Ensure variables are set in hosting dashboard
 2. Redeploy after adding variables
 3. Check `PUBLIC_` prefix for client-side variables
+4. Check that new variables are declared in `env.schema` in `astro.config.mjs`
 
 ### Build fails on hosting
 
-Check that your hosting provider supports Node.js 22+.
+Check that your hosting provider supports Node.js 22.23.4 or later.
 
 Set in your hosting configuration:
 
 ```
-NODE_VERSION=22
+NODE_VERSION=24
 ```
 
 ### 404 on routes

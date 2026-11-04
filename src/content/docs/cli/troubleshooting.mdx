@@ -2,151 +2,147 @@
 title: CLI Troubleshooting
 description: Common issues and solutions for the CLI tool
 sidebar:
-  order: 6
+  order: 7
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
 Solutions for common CLI issues.
 
-## Network Errors
+## Template Issues
 
-### Template Download Fails
+### Download fails
 
-If the template download fails:
+The message `Could not download southwellmedia/velocity#<ref>` means the download failed or the ref doesn't exist.
 
-1. Check your internet connection
-2. Verify GitHub is accessible
-3. Try again in a few minutes
+1. Check your internet connection and that GitHub is reachable
+2. If you passed `--ref`, check that the tag or branch exists
+
+### "Could not determine the latest Velocity release"
+
+The CLI couldn't reach the GitHub API within a few seconds, or hit the rate limit, so it used the `main` branch instead. To get a release, either pin one or set a token:
 
 ```bash
-# Test GitHub access
-curl https://github.com/southwellmedia/velocity
+pnpm create velocity-astro my-site --ref v2.0.0
+
+# Or raise the rate limit
+GITHUB_TOKEN=your-token pnpm create velocity-astro my-site
 ```
 
-### Timeout Errors
+### "has no scaffold section"
 
-For slow connections, the download may timeout. Try:
+The Velocity version you chose predates version 2. Pick a 2.x release with `--ref`. To create a project on an older Velocity, use `create-velocity-astro@1`.
+
+### "requires create-velocity-astro >= x"
+
+The Velocity release needs a newer CLI. Use the latest one:
 
 ```bash
-# Increase timeout
-npm create velocity-astro@latest my-site --timeout=60000
+npm create velocity-astro@latest
+```
+
+### "Use either --ref or --template, not both"
+
+Pass only one of them.
+
+## Flags Are Ignored with npm
+
+npm treats flags as its own unless they come after `--`:
+
+```bash
+npm create velocity-astro@latest my-site -- --demo --i18n
 ```
 
 ## Directory Issues
 
-### Directory Already Exists
+### Directory already exists
 
-The CLI prompts before overwriting existing directories:
-
-```
-? Directory "my-site" already exists. Overwrite? (y/N)
-```
-
-Options:
-- Press `y` to overwrite
-- Press `n` to cancel
-- Use a different directory name
-
-### Permission Errors
-
-On Unix systems, you may need execute permissions:
-
-```bash
-chmod +x node_modules/.bin/create-velocity-astro
-```
-
-<Aside type="tip">
-  Running with `npx` or `pnpm create` usually avoids permission issues.
-</Aside>
+In the wizard, the CLI asks before writing into a non-empty folder. With `--yes`, it stops with an error, so choose a different name or empty the folder first.
 
 ## Dependency Installation
 
-### Installation Fails
+### Installation fails
 
-If automatic installation fails:
+The project is still created. Install dependencies yourself:
 
 ```bash
 cd my-site
-npm install  # or pnpm install / yarn / bun install
+pnpm install  # or npm install / yarn / bun install
 ```
 
-### Node Version Errors
+`--yes` installs with the package manager you ran the CLI with. To use a different one, add `--no-install`, delete `pnpm-lock.yaml` if you're not using pnpm, and install it yourself.
 
-Velocity requires Node.js 22 or higher (Astro 6 dropped support for Node 18 and 20):
+### Node version errors
+
+The CLI itself needs Node.js 20.19 or later. Generated projects need 22.23.4 or later, because Astro 7.4 requires it. Node 24 LTS is recommended:
 
 ```bash
-# Check your version
 node --version
 
 # Update with nvm
-nvm install 22
-nvm use 22
+nvm install 24
+nvm use 24
 ```
 
-### Package Manager Not Found
-
-The CLI auto-detects your package manager. If detection fails:
-
-```bash
-# Specify explicitly
-cd my-site
-pnpm install  # or npm/yarn/bun
-```
+The CLI only warns about this when scaffolding, but `upgrade` stops.
 
 ## Component Issues
 
-### Missing Components
+### Missing components
 
-If components are missing after scaffold:
+Check `features.components` in `.velocity.json` to see what you selected. To add a component later, copy its files from [Velocity](https://github.com/southwellmedia/velocity) using the paths in `component-registry.json`, along with its dependencies.
 
-1. Check your `--components` flag
-2. Verify the category names are correct
-3. Re-run the CLI with correct options
+### Import errors from `@/components/ui`
 
-```bash
-# Include all components
-npm create velocity-astro@latest my-site --components=all
+Partial installs remove the barrel files. Import from the component's folder:
+
+```astro
+---
+import Button from '@/components/ui/form/Button/Button.astro';
+---
 ```
 
-### Component Errors
-
-If components have import errors:
+### Generated types are out of date
 
 ```bash
-# Regenerate types
-cd my-site
-npm run astro sync
+pnpm astro sync
 ```
+
+## `--pages` Issues
+
+### A page was skipped
+
+The CLI skips a page if its name is reserved (`index`, `blog`, `404`, `rss`, `search`, `lang`), and warns if the route, view or page file already exists.
+
+### "--pages requires Velocity 2"
+
+The project has no `src/views/` folder or no `routes` export in `src/config/nav.config.ts`. This only happens when scaffolding from a modified template.
+
+## Upgrade Issues
+
+### "This doesn't appear to be a Velocity project"
+
+Run `upgrade` from the project root. The command needs a `.velocity.json` file, which projects get from the CLI. Projects cloned by hand don't have one.
+
+### Files were overwritten
+
+Check `.velocity-backup/<old-version>/` for your versions. See [Conflicts](/cli/upgrade/#conflicts).
 
 ## i18n Issues
 
-### Routes Not Working
+### A language doesn't show up
 
-If locale routes aren't working:
+Check that it's listed in `src/i18n/locales.mjs`. See the [i18n guide](/configuration/i18n/).
 
-1. Verify `--i18n` was included
-2. Check `src/config/i18n.ts` exists
-3. Ensure pages are in `[locale]/` directories
+### Text appears in English
 
-### Missing Translations
-
-Add missing translations in `src/config/i18n.ts`:
-
-```typescript
-export const translations = {
-  en: { /* ... */ },
-  es: { /* ... */ },
-  // Add your new locale
-  de: { /* ... */ },
-};
-```
+A key missing from a language falls back to English. Add it to `src/i18n/translations/<locale>.ts`.
 
 ## Git Issues
 
-### Git Not Initialized
+### Git not initialized
 
-If git initialization fails:
+If git isn't available, the CLI skips this step. Install [git](https://git-scm.com/downloads), then:
 
 ```bash
 cd my-site
@@ -155,22 +151,12 @@ git add .
 git commit -m "Initial commit"
 ```
 
-### Git Not Installed
-
-Install git from [git-scm.com](https://git-scm.com/downloads).
-
 ## Getting Help
 
-If you're still stuck:
-
-1. Check the [GitHub Issues](https://github.com/southwellmedia/velocity/issues)
+1. Check the [CLI issues](https://github.com/southwellmedia/create-velocity-astro/issues) and [Velocity issues](https://github.com/southwellmedia/velocity/issues)
 2. Search for your error message
-3. Open a new issue with:
-   - Node.js version
-   - Package manager used
-   - Full error message
-   - Steps to reproduce
+3. Open a new issue with your Node.js version, package manager, full error message and steps to reproduce
 
 <Aside type="note">
-  Include the output of `npm create velocity-astro --version` in bug reports.
+  Include the output of `npm create velocity-astro@latest -- --version` in bug reports.
 </Aside>

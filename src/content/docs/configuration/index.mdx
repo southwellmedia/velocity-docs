@@ -15,11 +15,17 @@ Velocity uses a centralized configuration approach with TypeScript for type safe
   <Card title="Site Config" icon="setting">
     `src/config/site.config.ts` — Site metadata, branding, contact info, and social links.
   </Card>
-  <Card title="Routes" icon="rocket">
-    `src/config/routes.ts` — Type-safe route definitions and navigation structure.
+  <Card title="Navigation" icon="rocket">
+    `src/config/nav.config.ts` — Routes, menu items, and header and footer defaults.
+  </Card>
+  <Card title="Languages" icon="translate">
+    `src/i18n/locales.mjs` — The languages your site is available in.
   </Card>
   <Card title="Environment" icon="document">
     `.env` — Environment variables for different deployment contexts.
+  </Card>
+  <Card title="Astro Config" icon="seti:config">
+    `astro.config.mjs` — Adapter, fonts, CSP, caching, and integrations.
   </Card>
 </CardGrid>
 
@@ -31,25 +37,30 @@ The most common configurations you'll change:
 
 ```typescript
 // src/config/site.config.ts
-const siteConfig = {
+const siteConfig: SiteConfig = {
   name: 'Your Site Name',
   description: 'Your site description',
-  url: import.meta.env.SITE_URL,
+  url: SITE_URL || 'https://example.com',
   author: 'Your Name',
   email: 'hello@yoursite.com',
+  // ...
 };
 ```
 
 ### 2. Navigation
 
 ```typescript
-// src/config/routes.ts
+// src/config/nav.config.ts
 export const routes = {
-  home: { path: '/', nav: { show: false, order: 0, label: 'Home' } },
-  about: { path: '/about', nav: { show: true, order: 1, label: 'About' } },
-  blog: { path: '/blog', nav: { show: true, order: 2, label: 'Blog' } },
-  contact: { path: '/contact', nav: { show: true, order: 3, label: 'Contact' } },
+  home: { path: '' },
+  blog: { path: 'blog' },
+  about: { path: 'about' },
 };
+
+export const navItems: NavItem[] = [
+  { label: 'nav.blog', route: 'blog', order: 1 },
+  { label: 'nav.about', route: 'about', order: 2 },
+];
 ```
 
 ### 3. Environment Variables
@@ -62,6 +73,10 @@ PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 ## Next Steps
 
-- [Site Configuration](/configuration/site-config) — Detailed site config options
-- [Routes](/configuration/routes) — Route configuration and helpers
-- [Environment Variables](/configuration/environment) — Environment variable reference
+- [Site Configuration](/configuration/site-config/) — Detailed site config options
+- [Routes & Navigation](/configuration/routes/) — Routes, menus, and header and footer defaults
+- [Environment Variables](/configuration/environment/) — Environment variable reference
+- [Internationalization](/configuration/i18n/) — Adding languages
+- [Security & CSP](/configuration/security/) — Content Security Policy
+- [Site Search](/configuration/search/) — Pagefind
+- [Fonts](/customization/fonts/) — The Astro Fonts API

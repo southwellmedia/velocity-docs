@@ -1,0 +1,50 @@
+---
+title: Site Search
+description: Static site search with Pagefind
+sidebar:
+  order: 7
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity includes site search at `/search`, built on [Pagefind](https://pagefind.app). After each production build, `integrations/pagefind.mjs` indexes the prerendered HTML and writes a static index next to the site. There's no search server or API key, and the browser only downloads the index chunks that match the query.
+
+## What Gets Indexed
+
+Only content inside `data-pagefind-body` is indexed. `PageLayout` and `BlogLayout` set it, so navigation, footers and `LandingLayout` pages stay out of results.
+
+To leave a page out, use the `searchable` prop:
+
+```astro
+<PageLayout title="Thanks" searchable={false}>
+  <!-- Not indexed -->
+</PageLayout>
+```
+
+To add content from a custom layout, mark it yourself:
+
+```astro
+<article data-pagefind-body>
+  <slot />
+</article>
+```
+
+## Languages
+
+Pagefind builds one index per `<html lang>`, so each language searches its own pages.
+
+## Testing Search
+
+The index only exists after a build, so search doesn't return results in `astro dev`:
+
+```bash
+pnpm build && pnpm preview
+```
+
+<Aside type="note">
+  `/search` is disallowed in `robots.txt`, so results pages stay out of search engines.
+</Aside>
+
+## Removing Search
+
+Remove `pagefind()` from `integrations` in `astro.config.mjs`, delete `src/pages/search.astro`, `src/pages/[lang]/[...search].astro` and `src/views/SearchView.astro`, and remove the `search` route and nav item from `nav.config.ts`.

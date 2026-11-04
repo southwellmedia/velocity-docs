@@ -1,124 +1,115 @@
 ---
 title: How It Works
-description: Architecture and scaffolding process
+description: How the CLI builds a project from Velocity's own variants
 sidebar:
   order: 4
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Understanding how the CLI scaffolds your project.
-
-## Architecture Overview
+The CLI contains no template files. Everything a project can contain lives in the [Velocity repository](https://github.com/southwellmedia/velocity), and `velocity-manifest.json` declares how the pieces combine. The CLI applies that recipe.
 
 ```
-User runs CLI
+Resolve the source (latest release, --ref or --template)
     │
     ▼
-Interactive wizard collects preferences
+Download Velocity to a temporary folder
     │
     ▼
-Downloads FULL Velocity repo from GitHub (via giget)
+Check the manifest's version requirements
     │
     ▼
-Applies local template overlays (i18n, base)
+Apply variants → select components → clean up
     │
     ▼
-Configures based on wizard answers (or flags)
+Copy into your project folder
     │
     ▼
-Installs dependencies
+Generate pages, write package.json and .velocity.json
+    │
+    ▼
+Initialize git and install dependencies
 ```
 
-The CLI guides you through an interactive wizard, then downloads the complete [Velocity repository](https://github.com/southwellmedia/velocity) at runtime and applies configuration overlays based on your selections.
-
-<Aside type="tip">
-  This means you always get the latest Velocity features without needing to update the CLI.
+<Aside type="tip" title="Why it works this way">
+  In CLI 1.x, the CLI carried its own copies of Velocity files, and they drifted out of date. Now Velocity's CI scaffolds and builds all eight project shapes, so a change that breaks one fails in Velocity's pull request.
 </Aside>
 
-## 8-Step Scaffolding Process
+## Choosing a Velocity Version
+
+| Source | How | Notes |
+|--------|-----|-------|
+| Latest release | Default | Falls back to the `main` branch, with a notice, if GitHub can't be reached |
+| Tag or branch | `--ref v2.0.0` | Works for `upgrade` too |
+| Local checkout | `--template ../velocity` | Skips `node_modules`, `dist`, `.git` and other build folders |
+
+Set `GITHUB_TOKEN` or `GH_TOKEN` if you hit GitHub's API rate limit when the CLI looks up the latest release.
+
+## Version Requirements
+
+The manifest's `scaffold` section sets what's required:
+
+| Field | Effect |
+|-------|--------|
+| `minCliVersion` | The CLI stops and asks you to update if it's too old |
+| `node` | The CLI warns when scaffolding and stops when upgrading if your Node version doesn't match |
+
+A Velocity version with no `scaffold` section, such as 1.x, is refused.
+
+## Variants
+
+Variants are applied in order. Each one runs only when its `when` condition matches your options:
+
+| Variant | When | What it does |
+|---------|------|--------------|
+| `i18n` | `--i18n` | Enables `es` and `fr` and adds their site copy |
+| `demo` | `--demo` | Keeps every component, because the demo pages use them all |
+| `minimal` | No `--demo` | Replaces the home view and nav config, and removes demo pages, landing components and sample content |
+
+A variant can overlay whole files from `variants/<name>/`, remove paths, and add components that must be kept:
+
+```json
+{
+  "id": "minimal",
+  "when": { "demo": false },
+  "overlay": "variants/minimal",
+  "remove": ["src/components/landing", "src/pages/about.astro"]
+}
+```
+
+The full contract is in [`variants/README.md`](https://github.com/southwellmedia/velocity/blob/main/variants/README.md).
+
+## Scaffolding Steps
 
 <Steps>
-1. **Download template**
+1. **Fetch the template** into a temporary folder.
 
-   Fetches Velocity from GitHub via `giget`, ensuring you get the latest version.
+2. **Check version requirements.**
 
-2. **Configure components**
+3. **Run the variant pipeline:** apply variants, prune components, then delete repo-only files such as `variants/` and the scaffold test scripts.
 
-   Filters components based on your `--components` selection. Removes unused component files.
+4. **Remove `.git` and other package managers' lockfiles.** With pnpm, the CI-tested `pnpm-lock.yaml` is kept.
 
-3. **Apply i18n overlay**
+5. **Copy the result** into your project folder.
 
-   If `--i18n` is enabled, adds locale routing, translations, and language switcher.
+6. **Generate starter pages** if you asked for any.
 
-4. **Remove demo content**
+7. **Update `package.json`** with your project name.
 
-   If `--demo=false`, strips demo landing page and sample blog posts.
+8. **Write `.velocity.json`.** It records the Velocity version, your options and file hashes, which [`upgrade`](/cli/upgrade/) uses later.
 
-5. **Generate pages**
+9. **Initialize git.**
 
-   If `--pages` is enabled, creates starter pages based on your interactive selections.
-
-6. **Update package.json**
-
-   Sets project name and removes CLI-specific metadata.
-
-7. **Initialize git**
-
-   Creates a new git repository with an initial commit.
-
-8. **Install dependencies**
-
-   Runs your package manager's install command.
+10. **Install dependencies,** unless you passed `--no-install`.
 </Steps>
-
-## Template Overlay System
-
-The CLI uses a template overlay approach where files are applied in layers:
-
-### Base Velocity
-
-Downloaded from GitHub. Contains all components, layouts, and features.
-
-### i18n Overlay
-
-When `--i18n` is enabled, overlays:
-
-- Locale-prefixed route structure
-- Translation configuration
-- Language switcher component
-- i18n-aware layouts
-
-### Base Template
-
-For non-demo projects, provides minimal pages:
-
-- Homepage
-- About page
-- Contact page
-- 404 page
-
-Overlays are applied in order, with later files overwriting earlier ones.
 
 ## Component Registry
 
-Components are managed via `component-registry.json` in the Velocity repository:
+`component-registry.json` in Velocity describes each component:
 
 ```json
 {
   "components": {
-    "button": {
-      "name": "Button",
-      "category": "ui",
-      "subcategory": "form",
-      "files": [
-        "src/components/ui/form/Button/Button.astro",
-        "src/components/ui/form/Button/Button.tsx",
-        "src/components/ui/form/Button/button.variants.ts",
-        "src/components/ui/form/Button/index.ts"
-      ],
-      "dependencies": { "utilities": ["cn"], "components": [] }
-    },
     "contact-form": {
       "name": "ContactForm",
       "category": "patterns",
@@ -129,59 +120,16 @@ Components are managed via `component-registry.json` in the Velocity repository:
 }
 ```
 
-### Registry Structure
-
 | Field | Description |
 |-------|-------------|
-| `name` | Display name of the component |
-| `category` | Category grouping (ui, patterns, hero) |
-| `subcategory` | Subcategory within UI (form, data-display, feedback, overlay, etc.) |
+| `name` | Display name |
+| `category` | Category grouping |
+| `subcategory` | Subcategory within UI |
 | `files` | Component file paths |
 | `dependencies` | Required utilities and components |
 
-### Dependency Resolution
+To prune components, the CLI resolves your selection and its dependencies, adds the always-included components, and deletes the rest of the optional folders.
 
-When you select a category, the CLI:
+## Package Managers
 
-1. Identifies all components in that category
-2. Resolves dependencies recursively
-3. Includes required utility files (like `cn.ts`)
-4. Removes unused components
-
-## File Operations
-
-### Kept Always
-
-These files are never removed:
-
-- `src/layouts/` — All layouts
-- `src/components/layout/` — Header, Footer, ThemeToggle
-- `src/components/seo/` — SEO, JsonLd, Breadcrumbs
-- `src/lib/` — Utility functions
-- `src/styles/` — Global styles and tokens
-- `src/config/` — Configuration files
-
-### Conditionally Removed
-
-Based on your selections:
-
-- Demo landing page (if `--demo=false`)
-- Sample blog posts (if `--demo=false`)
-- Component categories (based on `--components`)
-- i18n files (if `--i18n=false`)
-
-## Package Manager Detection
-
-The CLI automatically detects your package manager:
-
-```bash
-# Detects based on lock files
-pnpm-lock.yaml  → pnpm
-yarn.lock       → yarn
-package-lock.json → npm
-bun.lockb       → bun
-
-# Or from the command used
-pnpm create velocity-astro  → pnpm
-npm create velocity-astro   → npm
-```
+The wizard preselects the package manager you ran it with and lets you change it. With `--yes`, the CLI uses the package manager you ran it with. If installation fails, the project is still created and the CLI tells you which command to run.

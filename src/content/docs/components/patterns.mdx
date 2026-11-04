@@ -9,23 +9,20 @@ Pattern components combine multiple UI components into reusable patterns.
 
 ## ContactForm
 
-Complete contact form with validation:
+Complete contact form, backed by the [`contact` action](/api/contact/):
 
 ```astro
 ---
 import ContactForm from '@/components/patterns/ContactForm.astro';
 ---
 
-<ContactForm
-  action="/api/contact"
-  successMessage="Thanks! We'll be in touch soon."
-/>
+<ContactForm successMessage="Thanks! We'll be in touch soon." />
 ```
 
 ### Features
 
-- Name, email, and message fields
-- Client-side validation
+- Name, email, subject, and message fields
+- Server-side validation with translated messages
 - Honeypot spam protection
 - Success/error states
 - Accessible form structure
@@ -34,13 +31,17 @@ import ContactForm from '@/components/patterns/ContactForm.astro';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `action` | `string` | `'/api/contact'` | Form submission endpoint |
-| `successMessage` | `string` | `'Thank you...'` | Success message |
-| `errorMessage` | `string` | `'Something went wrong...'` | Error message |
+| `action` | `string` | `actions.contact` | [Your own endpoint](/api/contact/#using-your-own-endpoint), instead of the action |
+| `successMessage` | `string` | `t('form.sent')` | Success message |
+| `submitLabel` | `string` | `t('form.submit')` | Submit button text |
+| `labels` | `Partial<Record<Field, string>>` | — | Override field labels |
+| `placeholders` | `Partial<Record<Field, string>>` | — | Override field placeholders |
+
+Text defaults come from the built-in UI strings, in the visitor's language.
 
 ## NewsletterForm
 
-Email subscription form:
+Email subscription form, backed by the [`newsletter` action](/api/newsletter/):
 
 ```astro
 ---
@@ -48,7 +49,6 @@ import NewsletterForm from '@/components/patterns/NewsletterForm.astro';
 ---
 
 <NewsletterForm
-  action="/api/newsletter"
   placeholder="Enter your email"
   buttonText="Subscribe"
 />
@@ -65,9 +65,10 @@ import NewsletterForm from '@/components/patterns/NewsletterForm.astro';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `action` | `string` | `'/api/newsletter'` | Submission endpoint |
-| `placeholder` | `string` | `'Enter your email'` | Input placeholder |
-| `buttonText` | `string` | `'Subscribe'` | Button text |
+| `action` | `string` | `actions.newsletter` | Your own endpoint, instead of the action |
+| `placeholder` | `string` | `t('form.emailPlaceholder')` | Input placeholder |
+| `buttonText` | `string` | `t('form.subscribe')` | Button text |
+| `successMessage` | `string` | `t('form.subscribed')` | Success message |
 
 ## FormField
 
@@ -137,7 +138,7 @@ import ContactForm from '@/components/patterns/ContactForm.astro';
 ### Custom Form
 
 ```astro
-<form action="/api/signup" method="post" class="space-y-4">
+<form action={actions.signup} method="post" class="space-y-4">
   <FormField
     label="Full Name"
     name="name"

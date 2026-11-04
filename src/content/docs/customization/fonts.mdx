@@ -1,0 +1,89 @@
+---
+title: Fonts
+description: Self-hosted fonts through the Astro Fonts API
+sidebar:
+  order: 6
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Velocity loads fonts through the [Astro Fonts API](https://docs.astro.build/en/guides/fonts/). Fonts are self-hosted from the installed `@fontsource-variable` packages, so the build needs no network access. You also get a preload for the body font and metric-matched fallbacks that reduce layout shift.
+
+| Font | CSS variable | Used for |
+|------|--------------|----------|
+| Manrope | `--font-manrope` | Body text |
+| Outfit | `--font-outfit` | Headings |
+| JetBrains Mono | `--font-jetbrains-mono` | Code |
+
+## How It's Wired
+
+Families are registered in `astro.config.mjs`:
+
+```javascript
+fonts: [
+  fontsourceVariable({ name: 'Manrope', pkg: 'manrope', cssVariable: '--font-manrope', weight: '200 800', fallbacks: ['sans-serif'] }),
+  fontsourceVariable({ name: 'Outfit', pkg: 'outfit', cssVariable: '--font-outfit', weight: '100 900', fallbacks: ['sans-serif'] }),
+  fontsourceVariable({ name: 'JetBrains Mono', pkg: 'jetbrains-mono', cssVariable: '--font-jetbrains-mono', weight: '100 800', fallbacks: ['monospace'] }),
+],
+```
+
+`BaseLayout` renders them:
+
+```astro
+<Font cssVariable="--font-manrope" preload />
+<Font cssVariable="--font-outfit" />
+<Font cssVariable="--font-jetbrains-mono" />
+```
+
+Themes reference the variables:
+
+```css
+--theme-font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+--theme-font-display: var(--font-outfit), var(--theme-font-sans);
+```
+
+## Changing a Font
+
+<Steps>
+1. **Install the package**
+
+   ```bash
+   pnpm add @fontsource-variable/inter
+   ```
+
+2. **Register it** in the `fonts` array in `astro.config.mjs`:
+
+   ```javascript
+   fontsourceVariable({ name: 'Inter', pkg: 'inter', cssVariable: '--font-inter', weight: '100 900', fallbacks: ['sans-serif'] }),
+   ```
+
+3. **Render it** in `BaseLayout.astro`:
+
+   ```astro
+   <Font cssVariable="--font-inter" preload />
+   ```
+
+4. **Use it** in your theme by pointing `--theme-font-sans` at `var(--font-inter)`.
+</Steps>
+
+<Aside type="caution">
+  `BaseLayout.astro` is a safe file, so an upgrade replaces it and saves your version to `.velocity-backup/`. Reapply the `<Font />` line after upgrading.
+</Aside>
+
+Don't `@import` font CSS. A family rendered with `<Font />` but missing from `fonts` fails the build with `FontFamilyNotFound`.
+
+## Using a Font Provider
+
+To fetch fonts at build time instead, use `fontProviders.google()` or `fontProviders.fontsource()` in place of the `fontsourceVariable()` helper:
+
+```javascript
+import { defineConfig, fontProviders } from 'astro/config';
+
+fonts: [
+  { provider: fontProviders.google(), name: 'Inter', cssVariable: '--font-inter' },
+],
+```
+
+## OG Images
+
+Generated OG images use a separate font, `public/fonts/inter-latin-400-normal.ttf`, because Satori needs TTF or OTF rather than WOFF2.

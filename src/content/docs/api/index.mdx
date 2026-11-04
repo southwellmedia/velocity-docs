@@ -1,55 +1,107 @@
 ---
-title: API Routes
-description: Server-side endpoints for forms and data
+title: Forms & Actions
+description: Server-side form handling with Astro Actions
 sidebar:
   order: 1
 ---
 
-Velocity includes API routes for form handling.
+import { Aside } from '@astrojs/starlight/components';
 
-## Available Endpoints
+Velocity's forms run on [Astro Actions](https://docs.astro.build/en/guides/actions/): typed server functions with validation built in. Every page is still prerendered. Only the action endpoints run on demand, through the [adapter](/deployment/) Velocity picks for your host.
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/contact` | POST | Contact form submission |
-| `/api/newsletter` | POST | Newsletter subscription |
+## Available Actions
 
-## Request Format
+| Action | Used by | Schema |
+|--------|---------|--------|
+| `actions.contact` | `ContactForm` | `contactSchema` |
+| `actions.newsletter` | `NewsletterForm` | `newsletterSchema` |
 
-All endpoints accept `FormData`:
+| File | Purpose |
+|------|---------|
+| `src/actions/index.ts` | Action handlers. This file is yours. |
+| `src/lib/forms.ts` | Zod schemas, kept separate so tests can import them |
 
-```javascript
-const formData = new FormData(form);
-const response = await fetch('/api/contact', {
-  method: 'POST',
-  body: formData,
+<Aside type="caution" title="Connect a provider">
+  The handlers validate input and return success, but they don't deliver anything until you add your email or newsletter provider. Look for the `TODO` comments in `src/actions/index.ts`.
+</Aside>
+
+## Calling an Action
+
+```typescript
+import { actions, isInputError } from 'astro:actions';
+
+const { data, error } = await actions.contact(new FormData(form));
+
+if (isInputError(error)) {
+  console.warn(error.fields); // { email: ['form.errors.invalidEmail'] }
+} else if (error) {
+  // Server error
+}
+```
+
+## Validation Messages
+
+Schema messages are translation keys such as `form.errors.invalidEmail`. `ContactForm` and `NewsletterForm` translate them into the visitor's language. If you display errors yourself, translate them too:
+
+```typescript
+const t = useTranslations(locale);
+const message = t(error.fields.email[0]);
+```
+
+## Spam Protection
+
+Each form has a hidden honeypot field: `honeypot` on the contact form and `website` on the newsletter form. If a bot fills it in, the action returns a normal success response and drops the submission, so the bot learns nothing.
+
+## Adding an Action
+
+Add a schema to `src/lib/forms.ts`, then an action to `src/actions/index.ts`:
+
+```typescript
+// src/lib/forms.ts
+export const quoteSchema = z.object({
+  email: z.email('form.errors.invalidEmail'),
+  budget: z.coerce.number().min(100),
 });
-const result = await response.json();
 ```
 
-## Response Format
-
-### Success
-
-```json
-{
-  "success": true
-}
+```typescript
+// src/actions/index.ts
+export const server = {
+  // ...contact and newsletter
+  quote: defineAction({
+    accept: 'form',
+    input: quoteSchema,
+    handler: async ({ email, budget }) => {
+      // Save the quote request
+      return { success: true };
+    },
+  }),
+};
 ```
 
-### Validation Error
+<Aside type="note">
+  Import `z` from `astro/zod`, not `zod`.
+</Aside>
 
-```json
-{
-  "success": false,
-  "errors": {
-    "email": ["Please enter a valid email address"],
-    "message": ["Message must be at least 10 characters"]
-  }
-}
+## Other API Routes
+
+For a plain endpoint, such as a webhook, add a route and opt out of prerendering:
+
+```typescript
+// src/pages/api/data.ts
+import type { APIRoute } from 'astro';
+
+export const prerender = false;
+
+export const GET: APIRoute = async () => {
+  return Response.json({ message: 'Hello!' });
+};
 ```
+
+Don't set `output: 'server'`. Pages stay static unless they opt out.
 
 ## Next Steps
 
-- [Contact API](/api/contact) — Contact form endpoint
-- [Newsletter API](/api/newsletter) — Newsletter subscription endpoint
+- [Contact Action](/api/contact/) — Contact form handling
+- [Newsletter Action](/api/newsletter/) — Newsletter subscriptions
+- [Pattern Components](/components/patterns/) — `ContactForm` and `NewsletterForm`

@@ -7,7 +7,7 @@ sidebar:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Velocity includes 4 layouts for different page types.
+Velocity includes 5 layouts for different page types.
 
 ## Available Layouts
 
@@ -16,13 +16,16 @@ Velocity includes 4 layouts for different page types.
     Core HTML wrapper with SEO, fonts, and theme initialization. Other layouts extend this.
   </Card>
   <Card title="PageLayout" icon="document">
-    Standard content pages with header, footer, and navigation.
+    Standard content pages with header and footer. Indexed by site search.
   </Card>
   <Card title="BlogLayout" icon="pencil">
     Blog articles with hero, breadcrumbs, and related posts.
   </Card>
   <Card title="LandingLayout" icon="rocket">
-    Marketing pages with flexible sections and minimal chrome.
+    Full-width landing pages with the standard header.
+  </Card>
+  <Card title="MarketingLayout" icon="star">
+    Full-width marketing pages with a floating, inverted header.
   </Card>
 </CardGrid>
 
@@ -32,20 +35,24 @@ Velocity includes 4 layouts for different page types.
 BaseLayout (core)
 ├── PageLayout (extends Base)
 ├── BlogLayout (extends Base)
-└── LandingLayout (extends Base)
+├── LandingLayout (extends Base)
+└── MarketingLayout (extends Base)
 ```
 
 All layouts extend `BaseLayout`, which provides:
 
-- HTML document structure
-- Google Fonts loading
+- HTML document structure, with the page's language in `<html lang>`
+- The page's only `<main>` element
+- Fonts through the Astro Fonts API
 - Favicon and manifest
-- SEO component
+- SEO component and `hreflang` links
 - JSON-LD schemas
-- Analytics integration
+- Analytics integration and the consent banner
 - Theme initialization
 
 ## Quick Usage
+
+Page content usually lives in a [view](/getting-started/project-structure/#pages-and-views) that picks a layout.
 
 ### Standard Page
 
@@ -84,18 +91,21 @@ import BlogLayout from '@/layouts/BlogLayout.astro';
 ```astro
 ---
 import LandingLayout from '@/layouts/LandingLayout.astro';
+import { Hero } from '@/components/hero';
+import CTA from '@/components/landing/CTA.astro';
 ---
 
 <LandingLayout title="Welcome" description="Your landing page">
-  <Hero />
-  <Features />
+  <Hero>
+    <h1 slot="title">Welcome</h1>
+  </Hero>
   <CTA />
 </LandingLayout>
 ```
 
 ## Next Steps
 
-- [BaseLayout](/layouts/base-layout) — Core layout details
-- [PageLayout](/layouts/page-layout) — Standard page layout
-- [BlogLayout](/layouts/blog-layout) — Blog article layout
-- [LandingLayout](/layouts/landing-layout) — Marketing page layout
+- [BaseLayout](/layouts/base-layout/) — Core layout details
+- [PageLayout](/layouts/page-layout/) — Standard page layout
+- [BlogLayout](/layouts/blog-layout/) — Blog article layout
+- [LandingLayout](/layouts/landing-layout/) — Landing and marketing layouts

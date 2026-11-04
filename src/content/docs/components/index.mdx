@@ -1,13 +1,13 @@
 ---
 title: Components Overview
-description: 55 production-ready components for building modern websites
+description: 58 production-ready components for building modern websites
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Velocity includes 55 components organized by purpose.
+Velocity includes 58 components organized by purpose.
 
 ## Component Philosophy
 
@@ -21,10 +21,10 @@ Velocity includes 55 components organized by purpose.
 
 <CardGrid>
   <Card title="UI Components" icon="puzzle">
-    31 components organized by subcategory: form, data-display, feedback, overlay, and more.
+    33 components organized by subcategory: form, data-display, feedback, overlay, and more.
   </Card>
   <Card title="Layout Components" icon="setting">
-    4 components: Header, Footer, ThemeToggle, Analytics.
+    5 components: Header, Footer, ThemeToggle, Analytics, LanguageSwitcher.
   </Card>
   <Card title="Pattern Components" icon="document">
     7 composed components: ContactForm, NewsletterForm, FormField, SearchInput, and more.
@@ -33,7 +33,7 @@ Velocity includes 55 components organized by purpose.
     4 components: ArticleHero, BlogCard, ShareButtons, RelatedPosts.
   </Card>
   <Card title="Landing Components" icon="rocket">
-    5 components: Hero, CTA, FeatureTabs, Credibility, and more.
+    5 components: CTA, Credibility, FeatureTabs, LighthouseScores, TechStack.
   </Card>
   <Card title="SEO Components" icon="magnifier">
     3 components: SEO, JsonLd, Breadcrumbs.
@@ -44,14 +44,14 @@ Velocity includes 55 components organized by purpose.
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| UI Components | 31 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
-| Layout Components | 4 | Header, Footer, ThemeToggle, Analytics |
+| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
+| Layout Components | 5 | Header, Footer, ThemeToggle, Analytics, LanguageSwitcher |
 | Pattern Components | 7 | ContactForm, NewsletterForm, FormField, SearchInput, etc. |
 | Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
-| Landing Components | 5 | Hero, CTA, FeatureTabs, etc. |
+| Landing Components | 5 | CTA, Credibility, FeatureTabs, LighthouseScores, TechStack |
 | SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
 | Hero Components | 1 | Hero section |
-| **Total** | **55** | All components across categories |
+| **Total** | **58** | All components across categories |
 
 ## Import Patterns
 
@@ -65,6 +65,8 @@ import { Button, Card } from '@/components/ui';
 <Button>Click me</Button>
 <Card>Content</Card>
 ```
+
+The `@/components/ui` barrel exists when you install all components. After a partial install, import from the component's folder, such as `@/components/ui/form/Button/Button.astro`.
 
 ### Path Alias
 

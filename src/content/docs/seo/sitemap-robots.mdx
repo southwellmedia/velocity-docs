@@ -22,13 +22,14 @@ https://yoursite.com/sitemap-index.xml
 Sitemap is configured in `astro.config.mjs`:
 
 ```javascript
-import sitemap from '@astrojs/sitemap';
-
-export default defineConfig({
-  site: 'https://yoursite.com',
-  integrations: [sitemap()],
-});
+sitemap(
+  locales.length > 1
+    ? { i18n: { defaultLocale, locales: Object.fromEntries(locales.map((l) => [l, l])) } }
+    : undefined,
+),
 ```
+
+The `site` value comes from `SITE_URL`. On multi-language sites, the sitemap lists each page's language versions.
 
 ### Excluding Pages
 
@@ -61,19 +62,23 @@ Robots.txt is generated at `src/pages/robots.txt.ts`:
 ```typescript
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = () => {
-  const sitemapUrl = new URL('/sitemap-index.xml', import.meta.env.SITE);
+export const GET: APIRoute = ({ site }) => {
+  const siteUrl = site?.toString() || 'https://example.com';
 
   const robotsTxt = `
 User-agent: *
 Allow: /
 
-Sitemap: ${sitemapUrl.href}
+# Block Astro Actions endpoints
+Disallow: /_actions/
+Disallow: /search
+
+Sitemap: ${siteUrl}sitemap-index.xml
 `.trim();
 
   return new Response(robotsTxt, {
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/plain; charset=utf-8',
     },
   });
 };
@@ -87,11 +92,12 @@ Block specific paths:
 const robotsTxt = `
 User-agent: *
 Allow: /
+Disallow: /_actions/
+Disallow: /search
 Disallow: /admin/
-Disallow: /api/
 Disallow: /private/
 
-Sitemap: ${sitemapUrl.href}
+Sitemap: ${siteUrl}sitemap-index.xml
 `.trim();
 ```
 
@@ -108,7 +114,7 @@ User-agent: *
 Allow: /
 Disallow: /private/
 
-Sitemap: ${sitemapUrl.href}
+Sitemap: ${siteUrl}sitemap-index.xml
 `.trim();
 ```
 

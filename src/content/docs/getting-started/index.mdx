@@ -17,7 +17,7 @@ import {
   CardGrid,
 } from "@astrojs/starlight/components";
 
-Get your Velocity project running in just a few commands.
+Get your Velocity project running in just a few commands. You need [Node.js 22.23.4 or later](/getting-started/prerequisites/).
 
 ## Using the CLI (Recommended)
 
@@ -114,11 +114,13 @@ Your site is now available at `http://localhost:4321`.
 
 2. **Update site info** in `src/config/site.config.ts` → name, description, author, contact
 
-3. **Configure navigation** in `src/config/routes.ts` → add/remove pages from nav
+3. **Configure navigation** in `src/config/nav.config.ts` → routes, menu items, header button
 
 4. **Replace branding** in `src/assets/branding/` → your logo SVGs
 
 5. **Update favicon** in `public/favicon.svg` → your icon
+
+6. **Connect your forms** in `src/actions/index.ts` → your email or newsletter provider
 </Steps>
 
 <Aside type="tip" title="First time with Astro?">

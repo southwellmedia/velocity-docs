@@ -5,23 +5,32 @@ sidebar:
   order: 4
 ---
 
-Velocity includes several scripts for development, building, and maintenance.
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity includes several scripts for development, building, and testing.
 
 ## Development
 
 ### `pnpm dev`
 
-Start the development server with hot reload.
+Start the development server with hot reload. Opens at `http://localhost:4321` by default.
+
+### `pnpm dev:bg`
+
+Start the dev server in the background, using Astro 7's background mode. This is the safe way for AI agents to run it.
 
 ```bash
-pnpm dev
+pnpm dev:bg
+pnpm astro dev status
+pnpm astro dev logs
+pnpm astro dev stop
 ```
 
-Opens at `http://localhost:4321` by default.
+A lockfile prevents duplicate servers. For a health check, request `http://localhost:4321/_astro/status`.
 
 ### `pnpm preview`
 
-Preview your production build locally.
+Preview your production build locally. Use this to test CSP and search, which don't apply in `astro dev`.
 
 ```bash
 pnpm build && pnpm preview
@@ -31,58 +40,73 @@ pnpm build && pnpm preview
 
 ### `pnpm build`
 
-Build your site for production.
-
-```bash
-pnpm build
-```
-
-Output is generated in the `dist/` directory.
+Build your site for production. Prerendered pages are written to `dist/client/` and the server to `dist/server/`, unless your host's adapter relocates them. The build also generates the Pagefind search index.
 
 ## Code Quality
 
 ### `pnpm lint`
 
-Run ESLint to check for code issues.
-
-```bash
-pnpm lint
-```
+Run ESLint. Use `pnpm lint:fix` to fix what it can.
 
 ### `pnpm format`
 
-Format code with Prettier.
-
-```bash
-pnpm format
-```
+Format code with Prettier. Use `pnpm format:check` to check without writing.
 
 ### `pnpm check`
 
 Run Astro's type checker.
 
+### `pnpm validate`
+
+Run everything CI runs before the browser tests: lint, type check, unit tests and build.
+
 ```bash
-pnpm check
+pnpm validate
 ```
 
 ## Testing
 
 ### `pnpm test`
 
-Run the test suite.
+Run the Vitest unit tests once. Use `pnpm test:watch` to rerun on changes.
+
+### `pnpm test:e2e`
+
+Run the Playwright suite against the production server. Build first, using the Node target:
 
 ```bash
-pnpm test
+pnpm exec playwright install chromium   # first time only
+DEPLOY_TARGET=node pnpm build
+pnpm test:e2e
 ```
+
+The suite checks that every page:
+
+- Returns 200 with no console errors or CSP violations
+- Has exactly one `<main>`
+- Passes axe WCAG 2 A/AA with no serious or critical issues
+- Has working `og:image` and `hreflang` links
+
+It also submits both forms and tests search. Page lists come from your routes and content, so new pages are covered automatically. The server runs on port 4399 by default. Set `E2E_PORT` to change it.
+
+<Aside type="note">
+  In a multi-language project, the suite also checks that each language renders correctly and that nav links stay within it.
+</Aside>
 
 ## Quick Reference
 
 | Command | Description |
 |---------|-------------|
 | `pnpm dev` | Start development server with hot reload |
+| `pnpm dev:bg` | Start the dev server in the background |
 | `pnpm build` | Build for production |
 | `pnpm preview` | Preview production build locally |
 | `pnpm lint` | Run ESLint |
+| `pnpm lint:fix` | Run ESLint and fix issues |
 | `pnpm format` | Format code with Prettier |
+| `pnpm format:check` | Check formatting |
 | `pnpm check` | Run Astro's type checker |
-| `pnpm test` | Run test suite |
+| `pnpm test` | Run unit tests |
+| `pnpm test:watch` | Run unit tests in watch mode |
+| `pnpm test:e2e` | Run E2E and accessibility tests |
+| `pnpm validate` | Lint, type check, unit tests and build |

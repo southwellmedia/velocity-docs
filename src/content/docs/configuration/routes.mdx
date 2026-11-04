@@ -1,144 +1,125 @@
 ---
-title: Routes Configuration
-description: Type-safe route definitions and navigation helpers
+title: Routes & Navigation
+description: Routes, menu items, and header and footer defaults
 sidebar:
   order: 3
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Velocity provides a centralized routing system with TypeScript support for type-safe navigation.
-
-## Route Definition
-
-Routes are defined in `src/config/routes.ts`:
-
-```typescript
-interface RouteDefinition {
-  path: string;
-  nav?: {
-    show: boolean;    // Show in navigation
-    order: number;    // Sort order (lower = first)
-    label: string;    // Display label
-  };
-}
-
-export const routes = {
-  home: {
-    path: '/',
-    nav: { show: false, order: 0, label: 'Home' },
-  },
-  about: {
-    path: '/about',
-    nav: { show: true, order: 3, label: 'About' },
-  },
-  contact: {
-    path: '/contact',
-    nav: { show: true, order: 4, label: 'Contact' },
-  },
-  blog: {
-    path: '/blog',
-    nav: { show: true, order: 2, label: 'Blog' },
-  },
-} as const;
-```
-
-## Helper Functions
-
-### `getNavRoutes()`
-
-Returns routes configured for navigation, sorted by order.
-
-```typescript
-import { getNavRoutes } from '@/config/routes';
-
-const navItems = getNavRoutes();
-// Returns: [{ routeId, path, label, order }, ...]
-```
-
-### `getRoutePath()`
-
-Get the path for a specific route ID.
-
-```typescript
-import { getRoutePath } from '@/config/routes';
-
-const blogPath = getRoutePath('blog'); // '/blog'
-const aboutPath = getRoutePath('about'); // '/about'
-```
-
-### `isValidRouteId()`
-
-Type guard to validate route IDs.
-
-```typescript
-import { isValidRouteId } from '@/config/routes';
-
-if (isValidRouteId('about')) {
-  // TypeScript knows 'about' is a valid route
-}
-```
-
-## Adding New Routes
+`src/config/nav.config.ts` holds your routes, navigation and header and footer defaults. This file is yours, and upgrades don't overwrite it.
 
 <Aside type="note">
-  Adding a route here doesn't create the page. You still need to create the corresponding file in `src/pages/`.
+  Astro still routes from the filesystem. This file only controls links and menus, so adding a route here doesn't create a page.
 </Aside>
 
-### Step 1: Add Route Definition
+## Routes
+
+`routes` lists each static page and its URL slug in each language:
 
 ```typescript
+export interface RouteDefinition {
+  /** URL path for the default locale, without slashes ('' = home). */
+  path: string;
+  /** Translated slugs for other locales. Falls back to `path`. */
+  slugs?: Partial<Record<string, string>>;
+  /** Set false for pages that only exist in the default locale. */
+  localized?: boolean;
+}
+
 export const routes = {
-  // ... existing routes
-  pricing: {
-    path: '/pricing',
-    nav: { show: true, order: 5, label: 'Pricing' },
-  },
+  home: { path: '' },
+  blog: { path: 'blog' },
+  about: { path: 'about', slugs: { es: 'sobre-nosotros', fr: 'a-propos' } },
+  contact: { path: 'contact', slugs: { es: 'contacto' } },
+  search: { path: 'search', slugs: { es: 'buscar', fr: 'recherche' } },
+  components: { path: 'components', localized: false },
+} satisfies Record<string, RouteDefinition>;
+```
+
+Minimal projects start with `home`, `blog` and `search`.
+
+## Navigation Items
+
+`navItems` controls what appears in the header and footer:
+
+```typescript
+export const navItems: NavItem[] = [
+  { label: 'nav.blog', route: 'blog', order: 1 },
+  { label: 'nav.about', route: 'about', order: 2 },
+  { label: 'Pricing', href: '/#pricing', order: 3 },
+];
+```
+
+| Field | Description |
+|-------|-------------|
+| `label` | A translation key or plain text |
+| `order` | Sort order, lowest first |
+| `route` | An internal route ID, localized automatically |
+| `href` | Any other link: an absolute path, a `#hash` or an external URL |
+| `external` | Marks the link as external |
+
+## Header Defaults
+
+`headerConfig` sets the defaults for `<Header />`. Props passed to `Header` still win.
+
+```typescript
+export const headerConfig = {
+  cta: { label: 'nav.docs', href: 'https://docs.deployvelocity.com' },
+  actions: [
+    {
+      icon: 'github',
+      href: 'https://github.com/your/repo',
+      label: 'nav.github',
+      iconOnly: true,
+      target: '_blank',
+    },
+  ],
+  extraNav: [{ label: 'nav.features', href: '/#features', order: 0 }],
 };
 ```
 
-### Step 2: Create the Page
+## Footer Defaults
 
-```astro
----
-// src/pages/pricing.astro
-import PageLayout from '@/layouts/PageLayout.astro';
----
-
-<PageLayout title="Pricing" description="View our pricing plans">
-  <h1>Pricing</h1>
-  <!-- Content -->
-</PageLayout>
+```typescript
+export const footerConfig = {
+  extraLinks: [
+    { label: 'GitHub', href: 'https://github.com/your/repo', external: true, order: 100 },
+  ],
+};
 ```
 
-## Navigation Component Usage
+## Link Helpers
 
-The Header component automatically uses these routes:
+Build internal links with the i18n helpers, which also work on single-language sites:
 
 ```astro
 ---
-import Header from '@/components/layout/Header.astro';
+import { getLocale, localizeRoute, localizePath } from '@/i18n';
+import { getNavItems } from '@/config/nav.config';
+
+const locale = getLocale(Astro);
+const navItems = getNavItems();
 ---
 
-<!-- Uses routes from getNavRoutes() automatically -->
-<Header />
+<a href={localizeRoute('about', locale)}>About</a>
+<a href={localizePath('/blog/my-post', locale)}>A post</a>
+```
 
-<!-- Or override with custom navigation -->
+`localizeRoute` throws if the route ID is unknown. The `RouteId` type catches that at compile time.
+
+## Custom Navigation
+
+The `Header` reads `navItems` automatically. To override it for one page:
+
+```astro
 <Header nav={[
   { label: 'Home', href: '/' },
   { label: 'Custom', href: '/custom' },
 ]} />
 ```
 
-## Type Safety
+## Next Steps
 
-The routes object uses `as const` for full type inference:
-
-```typescript
-// TypeScript knows all valid route IDs
-type RouteId = keyof typeof routes; // 'home' | 'about' | 'contact' | 'blog'
-
-// Type-safe path access
-const path: string = routes.about.path; // ✅ Works
-const invalid = routes.invalid.path;     // ❌ Type error
-```
+- [Adding Routes](/customization/adding-routes/) — Create a new page
+- [Internationalization](/configuration/i18n/) — Translated slugs and languages

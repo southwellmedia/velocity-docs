@@ -15,9 +15,9 @@ Create in the appropriate directory:
 src/components/
 ├── ui/                # UI components organized by subcategory
 │   ├── form/          # Button, Input, Select, Checkbox, Radio, Switch, Textarea
-│   ├── data-display/  # Card, Badge, Avatar, Table, Pagination, Progress, Skeleton
+│   ├── data-display/  # Card, Badge, Avatar, GoogleMap, Table, Pagination, Progress, Skeleton
 │   ├── feedback/      # Alert, Toast, Tooltip
-│   ├── overlay/       # Dialog, Dropdown, Tabs, VerticalTabs, Accordion
+│   ├── overlay/       # ConsentBanner, Dialog, Dropdown, Tabs, VerticalTabs, Accordion
 │   ├── layout/        # Separator
 │   ├── primitives/    # Icon
 │   ├── content/       # CodeBlock
@@ -166,6 +166,43 @@ Usage:
   Lightning quick builds and deployments.
   <Button slot="footer">Learn More</Button>
 </FeatureCard>
+```
+
+### Use Translated Strings
+
+Don't hardcode user-facing text. Use `useTranslations`, and put new strings in `src/i18n/translations/en.ts`:
+
+```astro
+---
+import { getLocale, useTranslations } from '@/i18n';
+
+const t = useTranslations(getLocale(Astro));
+---
+
+<button>{t('cart.add')}</button>
+```
+
+### Keep Markup Valid
+
+Astro 7's compiler fails on unclosed tags and won't fix invalid nesting, such as a `<div>` inside a `<p>`.
+
+### Keep Inline Scripts Static
+
+The [CSP](/configuration/security/) only allows inline scripts it can hash. Pass data through `<script type="application/json">` instead of `define:vars`.
+
+### Run Scripts on First Load
+
+Velocity has no client router, so call your init function directly. Components also listen for `astro:after-swap`, guarded against double init, so they keep working if a project adds `<ClientRouter />` back:
+
+```astro
+<script>
+  function init() {
+    // Set up the component
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init);
+</script>
 ```
 
 ## Client-Side Interactivity

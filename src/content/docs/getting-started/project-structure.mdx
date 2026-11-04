@@ -12,68 +12,107 @@ Velocity follows a structured organization designed for scalability and maintain
 ## Directory Overview
 
 <FileTree>
+- integrations/ Local Astro integrations
+  - deploy-target.mjs Adapter and cache provider detection
+  - pagefind.mjs Search index
 - src/
+  - actions/ Astro Actions (contact, newsletter)
   - assets/
     - branding/ Logo files (logomark.svg, logo-full.svg, etc.)
   - components/
-    - ui/ 31 components organized by subcategory
+    - ui/ 33 components organized by subcategory
       - form/ Button, Input, Textarea, Select, Checkbox, Radio, Switch
-      - data-display/ Card, Badge, Avatar, AvatarGroup, Table, Pagination, Progress, Skeleton
+      - data-display/ Card, Badge, Avatar, AvatarGroup, GoogleMap, Table, Pagination, Progress, Skeleton
       - feedback/ Alert, Toast, Tooltip
-      - overlay/ Dialog, Dropdown, Tabs, VerticalTabs, Accordion
+      - overlay/ ConsentBanner, Dialog, Dropdown, Tabs, VerticalTabs, Accordion
       - layout/ Separator
       - primitives/ Icon
       - content/ CodeBlock
       - marketing/ Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo
     - patterns/ 7 composed components (ContactForm, FormField, etc.)
-    - layout/ 4 layout components (Header, Footer, ThemeToggle, Analytics)
+    - layout/ 5 layout components (Header, Footer, ThemeToggle, Analytics, LanguageSwitcher)
     - seo/ 3 SEO components (SEO, JsonLd, Breadcrumbs)
     - blog/ 4 blog components (ArticleHero, BlogCard, etc.)
     - landing/ 5 landing page components
-    - hero/ 2 hero components
+    - hero/ Hero component
   - config/
     - site.config.ts Site metadata, branding, contact info
-    - routes.ts Type-safe route definitions
+    - nav.config.ts Routes, nav items, header and footer defaults
+    - consent.config.ts Cookie consent settings
   - content/ Content collections (blog, pages, authors, faqs)
-  - layouts/ 4 page layouts
+  - i18n/
+    - locales.mjs Enabled languages
+    - ui.ts Built-in UI strings
+    - translations/ Your site copy, one file per language
+  - layouts/ 5 page layouts
     - BaseLayout.astro Core HTML wrapper
     - PageLayout.astro Standard content pages
     - BlogLayout.astro Blog articles
-    - LandingLayout.astro Marketing/landing pages
-  - lib/ Utility functions (cn, schema, og, utils)
-  - pages/ Routes and API endpoints
-    - api/ Contact, newsletter endpoints
+    - LandingLayout.astro Landing pages
+    - MarketingLayout.astro Marketing pages with a floating header
+  - lib/ Utility functions (blog, cn, forms, og, schema, utils)
+  - pages/ Routes, as thin wrappers around views
+    - [lang]/ Wrappers for non-default languages
     - og/ Dynamic OG image generation
     - blog/ Blog routes
   - styles/
     - global.css Tailwind + design tokens
     - tokens/ colors.css, typography.css, spacing.css
+    - themes/ default.css, midnight.css
+  - views/ Page content, rendered by the wrappers in pages/
 - public/ Static assets
+- tests/
+  - e2e/ Playwright end-to-end and accessibility tests
+  - unit/ Vitest unit tests
+- AGENTS.md Instructions for AI coding agents
 - astro.config.mjs Astro configuration
+- velocity-manifest.json Upgrade data for the CLI
+- component-registry.json Component files and dependencies
 </FileTree>
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `astro.config.mjs` | Astro configuration |
+| `astro.config.mjs` | Astro configuration: adapter, fonts, CSP, caching |
 | `src/content.config.ts` | Content collection schemas |
 | `src/config/site.config.ts` | Site metadata, branding, contact info |
-| `src/config/routes.ts` | Type-safe routing and navigation |
+| `src/config/nav.config.ts` | Routes, navigation, header and footer defaults |
+| `src/i18n/locales.mjs` | Enabled languages |
+| `src/actions/index.ts` | Form handlers |
+| `src/lib/blog.ts` | Maps posts to URLs |
 | `src/styles/global.css` | Tailwind + design tokens |
-| `src/lib/og.ts` | OG image generation configuration |
+| `src/lib/og.ts` | OG image generation |
+
+## Pages and Views
+
+Page content lives in `src/views/`. Files in `src/pages/` are thin wrappers that render a view with a locale, so the same view serves every language:
+
+```astro
+---
+// src/pages/about.astro
+import AboutView from '@/views/AboutView.astro';
+import { defaultLocale } from '@/i18n';
+---
+
+<AboutView locale={defaultLocale} />
+```
+
+`src/pages/[lang]/` holds the wrappers for other languages. They generate nothing while your site has one language. See [Adding Routes](/customization/adding-routes/).
+
+Pages are prerendered. Only Astro Actions, and any route you mark `export const prerender = false`, run on the server.
 
 ## Component Organization
 
 Components are organized by category:
 
-- **ui/** — 31 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
+- **ui/** — 33 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
 - **patterns/** — Composed patterns (ContactForm, FormField, SearchInput, etc.)
-- **layout/** — Page structure (Header, Footer)
+- **layout/** — Page structure (Header, Footer, LanguageSwitcher)
 - **seo/** — SEO utilities (meta tags, JSON-LD)
 - **blog/** — Blog-specific components
 - **landing/** — Marketing page components
-- **hero/** — Hero section variants
+- **hero/** — Hero section
 
 ## Content Collections
 

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Velocity Documentation</strong> — Official docs for the Velocity Astro 6 starterkit.
+  <strong>Velocity Documentation</strong> — Official docs for the Velocity Astro 7 starterkit.
 </p>
 
 <p align="center">

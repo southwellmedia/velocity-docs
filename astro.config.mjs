@@ -10,7 +10,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Velocity",
-      description: "Modern Astro Starterkit built on Astro 6 + Tailwind CSS v4",
+      description: "Modern Astro Starterkit built on Astro 7 + Tailwind CSS v4",
 
       logo: {
         light: "./src/assets/branding/logo-full.svg",
@@ -28,7 +28,7 @@ export default defineConfig({
       ],
 
       editLink: {
-        baseUrl: "https://github.com/southwellmedia/velocity-docs/edit/main/",
+        baseUrl: "https://github.com/southwellmedia/velocity-docs/edit/master/",
       },
 
       customCss: ["./src/styles/custom.css"],
@@ -96,7 +96,7 @@ export default defineConfig({
         },
         { label: "SEO", collapsed: true, autogenerate: { directory: "seo" } },
         {
-          label: "API Routes",
+          label: "Forms & Actions",
           collapsed: true,
           autogenerate: { directory: "api" },
         },

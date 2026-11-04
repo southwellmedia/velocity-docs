@@ -30,46 +30,54 @@ src/content/
 │       └── premier-post.mdx
 ├── pages/
 ├── authors/
-│   └── authors.json
+│   └── team.json
 └── faqs/
-    └── faqs.json
+    └── general-en.json
 ```
 
 ## Querying Content
 
+Use the helpers in `src/lib/blog.ts`. It's the only place that maps posts to URLs, and it handles languages and drafts:
+
 ```astro
 ---
-import { getCollection } from 'astro:content';
+import { getPosts, getPostUrl } from '@/lib/blog';
 
-// Get all published posts
-const posts = await getCollection('blog', ({ data }) => {
-  return import.meta.env.PROD ? data.draft !== true : true;
-});
-
-// Filter by locale
-const enPosts = posts.filter(post => post.data.locale === 'en');
-
-// Sort by date
-const sortedPosts = posts.sort(
-  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
-);
+// Published posts for a language, newest first.
+// Drafts are included in development.
+const posts = await getPosts('en');
 
 // Get featured posts
-const featured = posts.filter(post => post.data.featured);
+const featured = posts.filter((post) => post.data.featured);
 ---
+
+{posts.map((post) => (
+  <a href={getPostUrl(post)}>{post.data.title}</a>
+))}
 ```
+
+| Helper | Returns |
+|--------|---------|
+| `getPosts(locale)` | Published posts for a language, newest first |
+| `getPostUrl(post)` | `/blog/my-post` or `/es/blog/my-post` |
+| `getPostSlug(post)` | The slug, without the language folder |
+| `getPostLocale(post)` | The language, from the folder or frontmatter |
+| `getPostReadingTime(post)` | Reading time in minutes |
+
+For other collections, use `getCollection()` from `astro:content`.
 
 ## Rendering Content
 
 ```astro
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import BlogLayout from '@/layouts/BlogLayout.astro';
+import { getPosts, getPostSlug } from '@/lib/blog';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getPosts();
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: getPostSlug(post) },
     props: { post },
   }));
 }

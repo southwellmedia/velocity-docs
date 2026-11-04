@@ -1,145 +1,75 @@
 ---
-title: Cloudflare Pages
-description: Deploy Velocity to Cloudflare Pages
+title: Cloudflare
+description: Deploy Velocity to Cloudflare
 sidebar:
   order: 4
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-Deploy to Cloudflare's global edge network.
+Cloudflare is opt-in, because its adapter pulls in the `workerd` runtime and most projects don't need to download it.
 
-## Quick Deploy
+## Setup
 
 <Steps>
-1. Push your code to GitHub or GitLab
+1. **Install the adapter**
 
-2. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+   ```bash
+   pnpm add @astrojs/cloudflare
+   ```
 
-3. Go to Pages → Create a project
+2. **Finish the Worker setup**
 
-4. Connect your repository
+   Follow [Astro's Cloudflare guide](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) for the Worker entrypoint. Velocity's `wrangler.toml` already has an `[assets]` block that serves the prerendered site.
 
-5. Configure build settings
+3. **Build**
 
-6. Deploy
+   The adapter is detected in CI from `CF_PAGES` or `WORKERS_CI`. To force it elsewhere:
+
+   ```bash
+   DEPLOY_TARGET=cloudflare pnpm build
+   ```
+
+4. **Deploy**
+
+   ```bash
+   pnpm add -g wrangler
+   wrangler login
+   wrangler deploy
+   ```
 </Steps>
 
-## CLI Deployment
+<Aside type="caution">
+  If the adapter isn't installed, the build stops with a message telling you to run `pnpm add @astrojs/cloudflare`.
+</Aside>
 
-```bash
-# Install Wrangler CLI
-pnpm add -g wrangler
+## Why an Adapter Is Needed
 
-# Login
-wrangler login
+Velocity's forms use Astro Actions, which need a server runtime. Pages stay prerendered, and only actions and routes you mark `prerender = false` run in the Worker.
 
-# Build
-pnpm build
-
-# Deploy
-wrangler pages deploy dist
-```
-
-## Build Settings
-
-Configure in Cloudflare Dashboard:
-
-| Setting | Value |
-|---------|-------|
-| Framework Preset | Astro |
-| Build Command | `pnpm build` |
-| Build Output | `dist` |
-| Node Version | 22 |
-
-## Server-Side Features
-
-For SSR and API routes, add the Cloudflare adapter:
-
-```bash
-pnpm add @astrojs/cloudflare
-```
-
-```javascript
-// astro.config.mjs
-import cloudflare from '@astrojs/cloudflare';
-
-export default defineConfig({
-  output: 'server',
-  adapter: cloudflare(),
-});
-```
+Route caching uses the Cloudflare provider. See [Route Caching](/deployment/#route-caching).
 
 ## Environment Variables
 
-Set in Pages → Project → Settings → Environment Variables:
+Set these in your Cloudflare project settings:
 
 ```bash
-SITE_URL=https://your-project.pages.dev
+SITE_URL=https://your-project.example.com
 PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-## Custom Domain
+Use Node.js 22.23.4 or later for the build.
 
-1. Go to Pages → Your Project → Custom Domains
-2. Add your domain
-3. Configure DNS (Cloudflare handles this automatically if domain is on CF)
+## Security Headers
 
-## Workers
-
-For advanced serverless:
-
-```typescript
-// functions/api/hello.ts
-export async function onRequest(context) {
-  return new Response(JSON.stringify({ message: 'Hello!' }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
-```
-
-## KV Storage
-
-Use Cloudflare KV for data:
-
-```typescript
-// astro.config.mjs
-export default defineConfig({
-  adapter: cloudflare({
-    mode: 'directory',
-    functionPerRoute: true,
-  }),
-});
-```
-
-```typescript
-// In your API route
-export async function GET({ locals }) {
-  const value = await locals.runtime.env.MY_KV.get('key');
-  return new Response(value);
-}
-```
-
-## Preview Deployments
-
-Branch deploys create preview URLs:
-
-- `branch-name.your-project.pages.dev`
+`vercel.json` and `netlify.toml` send Velocity's security headers on those hosts. On Cloudflare, add them with a `public/_headers` file or a Transform Rule.
 
 ## Troubleshooting
 
-### Node Version
+### Forms Don't Submit
 
-Set in dashboard or `wrangler.toml`:
-
-```toml
-node_compat = true
-```
+Check that the build used the Cloudflare adapter. Without it, the build falls back to the Node adapter, which Cloudflare can't run. Set `DEPLOY_TARGET=cloudflare` if your build environment doesn't set `CF_PAGES` or `WORKERS_CI`.
 
 ### Build Failures
 
-Check build logs in Pages dashboard.
-
-### API Routes Not Working
-
-Ensure `output: 'server'` is set and adapter is configured.
+Check that your build uses a supported Node version and that `@astrojs/cloudflare` is in `package.json`.
