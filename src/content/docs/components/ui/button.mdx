@@ -40,10 +40,12 @@ import { Button } from '@/components/ui';
 
 ## Color Schemes
 
-For buttons on dark backgrounds:
+For buttons on dark backgrounds, wrap them in `.invert-section`, which flips the tokens inside it:
 
 ```astro
-<Button colorScheme="invert">On Dark Background</Button>
+<div class="invert-section bg-background">
+  <Button>On Dark Background</Button>
+</div>
 ```
 
 ## Icon Buttons
@@ -88,8 +90,9 @@ Renders as an anchor tag when `href` is provided:
 |------|------|---------|-------------|
 | `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'destructive'` | `'primary'` | Visual style |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Button size |
-| `colorScheme` | `'default' \| 'invert'` | `'default'` | Color scheme |
 | `icon` | `boolean` | `false` | Icon-only mode (square) |
+| `leadingIcon` | `string` | — | Icon name shown before the label |
+| `trailingIcon` | `string` | — | Icon name shown after the label |
 | `loading` | `boolean` | `false` | Show loading spinner |
 | `fullWidth` | `boolean` | `false` | Full container width |
 | `href` | `string` | — | Renders as `<a>` |
@@ -130,7 +133,7 @@ Renders as an anchor tag when `href` is provided:
 ### CTA on Dark Background
 
 ```astro
-<section class="bg-surface-invert py-16">
-  <Button colorScheme="invert" size="lg">Get Started</Button>
+<section class="invert-section bg-background py-16">
+  <Button size="lg">Get Started</Button>
 </section>
 ```

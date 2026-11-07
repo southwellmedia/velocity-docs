@@ -80,21 +80,25 @@ Content is not wrapped in a container by default. Add your own:
 
 ## Customizing Header and Footer
 
-Change the defaults for the whole site in [`nav.config.ts`](/configuration/routes/#header-defaults). For a page that needs something different, use `BaseLayout` directly and render your own `Header` and `Footer`:
+`PageLayout`, like every layout, renders `SiteHeader` and `SiteFooter` from `src/components/site/`. Those files are yours and upgrades leave them alone, so change the header or footer for every page there. Nav items, the CTA and footer links come from [`nav.config.ts`](/configuration/routes/#header-defaults).
+
+For a page that needs something different, use `BaseLayout` directly and pass props to `SiteHeader` and `SiteFooter`, which forward them to `Header` and `Footer`:
 
 ```astro
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Header from '@/components/layout/Header.astro';
-import Footer from '@/components/layout/Footer.astro';
+import SiteHeader from '@/components/site/SiteHeader.astro';
+import SiteFooter from '@/components/site/SiteFooter.astro';
 ---
 
 <BaseLayout title="Page">
-  <Header slot="header" layout="minimal" />
+  <SiteHeader slot="header" layout="minimal" />
   <!-- Content -->
-  <Footer slot="footer" layout="columns" columns={3} />
+  <SiteFooter slot="footer" showCopyright={false} />
 </BaseLayout>
 ```
+
+`SiteFooter` sets `layout="simple"` after the props it receives, so that setting wins on every page. To use another footer layout, change it in `src/components/site/SiteFooter.astro`.
 
 ## Example Pages
 

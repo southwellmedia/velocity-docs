@@ -1,13 +1,13 @@
 ---
 title: Components Overview
-description: 58 production-ready components for building modern websites
+description: 46 production-ready components for building modern websites
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Velocity includes 58 components organized by purpose.
+Velocity includes 46 components, listed in its component registry (`component-registry.json`). `.agents/components.md` describes all of them for [AI coding agents](/getting-started/ai-agents/), and the [CLI](/cli/components/) lets you choose which UI, pattern and hero components a new project includes.
 
 ## Component Philosophy
 
@@ -21,37 +21,47 @@ Velocity includes 58 components organized by purpose.
 
 <CardGrid>
   <Card title="UI Components" icon="puzzle">
-    33 components organized by subcategory: form, data-display, feedback, overlay, and more.
-  </Card>
-  <Card title="Layout Components" icon="setting">
-    5 components: Header, Footer, ThemeToggle, Analytics, LanguageSwitcher.
+    33 components in 8 subcategories: form, data display, feedback, overlay, layout, primitives, content and marketing.
   </Card>
   <Card title="Pattern Components" icon="document">
-    7 composed components: ContactForm, NewsletterForm, FormField, SearchInput, and more.
+    10 compositions: ContactForm, NewsletterForm, FormField, SearchInput, PasswordInput, StatCard, EmptyState, Section, PageHeader and MediaSlot.
   </Card>
-  <Card title="Blog Components" icon="pencil">
-    4 components: ArticleHero, BlogCard, ShareButtons, RelatedPosts.
+  <Card title="Layout Components" icon="setting">
+    2 components: Header and Footer.
   </Card>
-  <Card title="Landing Components" icon="rocket">
-    5 components: CTA, Credibility, FeatureTabs, LighthouseScores, TechStack.
-  </Card>
-  <Card title="SEO Components" icon="magnifier">
-    3 components: SEO, JsonLd, Breadcrumbs.
+  <Card title="Hero" icon="rocket">
+    1 component: Hero, a flexible hero section.
   </Card>
 </CardGrid>
 
 ## Component Count Summary
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
-| Layout Components | 5 | Header, Footer, ThemeToggle, Analytics, LanguageSwitcher |
-| Pattern Components | 7 | ContactForm, NewsletterForm, FormField, SearchInput, etc. |
-| Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
-| Landing Components | 5 | CTA, Credibility, FeatureTabs, LighthouseScores, TechStack |
-| SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
-| Hero Components | 1 | Hero section |
-| **Total** | **58** | All components across categories |
+| Category | Count | Components |
+|----------|-------|------------|
+| UI: Form | 7 | Button, Input, Textarea, Select, Checkbox, Radio, Switch |
+| UI: Data Display | 9 | Card, Badge, Avatar, AvatarGroup, Table, Pagination, Progress, Skeleton, GoogleMap |
+| UI: Feedback | 3 | Alert, Toast, Tooltip |
+| UI: Overlay | 6 | Dialog, Dropdown, Tabs, VerticalTabs, Accordion, ConsentBanner |
+| UI: Layout | 1 | Separator |
+| UI: Primitives | 1 | Icon |
+| UI: Content | 1 | CodeBlock |
+| UI: Marketing | 5 | Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo |
+| Patterns | 10 | ContactForm, NewsletterForm, FormField, SearchInput, PasswordInput, StatCard, EmptyState, Section, PageHeader, MediaSlot |
+| Layout | 2 | Header, Footer |
+| Hero | 1 | Hero |
+| **Total** | **46** | 33 UI, 10 patterns, 2 layout, 1 hero |
+
+## Also in Your Project
+
+Velocity's layouts and pages also use these building blocks. They aren't in the component registry, so they aren't counted above or offered by the CLI's component picker:
+
+| Folder | Contents |
+|--------|----------|
+| `src/components/site/` | `SiteHeader` and `SiteFooter`, which every layout renders. These are yours, and upgrades leave them alone |
+| `src/components/layout/` | `ThemeToggle`, `LanguageSwitcher` and `Analytics`, alongside `Header` and `Footer` |
+| `src/components/seo/` | `SEO`, `JsonLd`, `Breadcrumbs` and `InlineScript` |
+| `src/components/blog/` | `ArticleHero`, `BlogCard`, `ShareButtons` and `RelatedPosts` |
+| `src/components/landing/` | `CTA`, `Credibility`, `FeatureTabs`, `LighthouseScores` and `TechStack`, used by the demo pages |
 
 ## Import Patterns
 
@@ -94,22 +104,14 @@ Most components accept `variant` and `size` props:
 <Button variant="outline" size="sm">Small Outline</Button>
 ```
 
-### Color Schemes
+### Dark Sections
 
-For components on dark backgrounds:
-
-```astro
-<Button colorScheme="invert">On Dark Background</Button>
-```
-
-### Responsive Props
-
-Some components support responsive variants:
+For components on a dark background, wrap them in `.invert-section`, which flips the tokens inside it:
 
 ```astro
-<Card padding={{ base: 'md', lg: 'lg' }}>
-  Responsive padding
-</Card>
+<div class="invert-section bg-background">
+  <Button>On Dark Background</Button>
+</div>
 ```
 
 ## Next Steps

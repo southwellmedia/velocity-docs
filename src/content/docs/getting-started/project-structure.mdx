@@ -29,9 +29,10 @@ Velocity follows a structured organization designed for scalability and maintain
       - primitives/ Icon
       - content/ CodeBlock
       - marketing/ Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo
-    - patterns/ 7 composed components (ContactForm, FormField, etc.)
-    - layout/ 5 layout components (Header, Footer, ThemeToggle, Analytics, LanguageSwitcher)
-    - seo/ 3 SEO components (SEO, JsonLd, Breadcrumbs)
+    - patterns/ 10 composed components (ContactForm, Section, PageHeader, etc.)
+    - layout/ Header, Footer, ThemeToggle, Analytics, LanguageSwitcher
+    - site/ SiteHeader and SiteFooter, rendered by every layout (yours)
+    - seo/ SEO, JsonLd, Breadcrumbs, InlineScript
     - blog/ 4 blog components (ArticleHero, BlogCard, etc.)
     - landing/ 5 landing page components
     - hero/ Hero component
@@ -50,7 +51,7 @@ Velocity follows a structured organization designed for scalability and maintain
     - BlogLayout.astro Blog articles
     - LandingLayout.astro Landing pages
     - MarketingLayout.astro Marketing pages with a floating header
-  - lib/ Utility functions (blog, cn, forms, og, schema, utils)
+  - lib/ Utility functions (blog, cn, forms, form-delivery, og, schema, utils)
   - pages/ Routes, as thin wrappers around views
     - [lang]/ Wrappers for non-default languages
     - og/ Dynamic OG image generation
@@ -60,13 +61,16 @@ Velocity follows a structured organization designed for scalability and maintain
     - theme.css Picks the active theme
     - tokens/ colors.css, typography.css, spacing.css
     - themes/ default.css, midnight.css
-  - views/ Page content, rendered by the wrappers in pages/
+  - views/ Page content, rendered by the wrappers in pages/ (including NotFoundView.astro for the 404)
 - public/ Static assets
+- scripts/
+  - check-agent.mjs The agent-ready check (`npm run check:agent`)
 - tests/
   - e2e/ Playwright end-to-end and accessibility tests
   - unit/ Vitest unit tests
-- .agents/ Velocity's rules and skills for AI coding agents
+- .agents/ Velocity's rules, component reference and skills for AI coding agents
 - .claude/skills/ The same skills for Claude Code
+- .velocity/baseline.json Velocity-owned files as of scaffold or last upgrade
 - AGENTS.md Your project's instructions for AI coding agents
 - astro.config.mjs Astro configuration
 - velocity-manifest.json Upgrade data for the CLI
@@ -84,6 +88,8 @@ Velocity follows a structured organization designed for scalability and maintain
 | `src/config/nav.config.ts` | Routes, navigation, header and footer defaults |
 | `src/i18n/locales.mjs` | Enabled languages |
 | `src/actions/index.ts` | Form handlers |
+| `src/lib/form-delivery.ts` | Forwards form submissions to your endpoints |
+| `src/views/NotFoundView.astro` | Your 404 page |
 | `src/lib/blog.ts` | Maps posts to URLs |
 | `src/styles/global.css` | Tailwind + design tokens |
 | `src/lib/og.ts` | OG image generation |
@@ -111,9 +117,10 @@ Pages are prerendered. Only Astro Actions, and any route you mark `export const 
 Components are organized by category:
 
 - **ui/** — 33 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
-- **patterns/** — Composed patterns (ContactForm, FormField, SearchInput, etc.)
-- **layout/** — Page structure (Header, Footer, LanguageSwitcher)
-- **seo/** — SEO utilities (meta tags, JSON-LD)
+- **patterns/** — 10 composed patterns (ContactForm, FormField, SearchInput, Section, PageHeader, MediaSlot, etc.)
+- **layout/** — Page structure (Header, Footer, ThemeToggle, LanguageSwitcher, Analytics)
+- **site/** — Your `SiteHeader` and `SiteFooter`. Every layout renders them, and upgrades leave them alone
+- **seo/** — SEO utilities (meta tags, JSON-LD, inline scripts with CSP hashes)
 - **blog/** — Blog-specific components
 - **landing/** — Marketing page components
 - **hero/** — Hero section

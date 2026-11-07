@@ -124,6 +124,18 @@ export const navItems: NavItem[] = [
 
 The E2E suite reads pages from `routes`, so new routes are tested automatically: each must return 200, have no console errors or CSP violations, have one `<main>`, and pass axe accessibility checks.
 
+`pnpm validate` ends with [`check:agent`](/getting-started/ai-agents/#the-agent-ready-check), which catches what those tests don't: translation keys with no English string, broken internal links, inline handlers that CSP blocks and hardcoded text. On a multilingual site it also warns about a page that exists in only one language.
+
+## Customizing the 404 Page
+
+Edit `src/views/NotFoundView.astro`. It's yours, so upgrades leave it alone. `src/pages/404.astro` only renders the view, and upgrades replace it.
+
+The view gets the visitor's language from the URL with `getLocale(Astro)`, and its quick links come from the nav items in `src/config/nav.config.ts`, so they always point at pages that exist. Put new copy in `src/i18n/translations/<locale>.ts` and render it with `t()`, as the rest of the view does.
+
+<Aside type="note">
+  Before Velocity 2.4.1, the 404 content lived in `src/pages/404.astro`. If you customized that file, the upgrade replaces it and saves your version to `.velocity-backup/`. Move your markup into `src/views/NotFoundView.astro`.
+</Aside>
+
 ## Dynamic Routes
 
 Blog URLs come from `src/lib/blog.ts`. For your own collections, use `getStaticPaths()`:

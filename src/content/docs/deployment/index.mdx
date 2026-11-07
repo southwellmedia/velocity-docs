@@ -47,8 +47,8 @@ Accepted values are `node`, `vercel`, `netlify` and `cloudflare`.
 
 1. Set `SITE_URL` in your environment
 2. Set Node.js to 22.23.4 or later on your host (24 LTS recommended)
-3. Connect your provider in `src/actions/index.ts`, or the forms won't deliver anything
-4. Run `pnpm validate` to catch errors
+3. Set `CONTACT_FORM_ENDPOINT` and `NEWSLETTER_ENDPOINT`, or connect a provider in `src/actions/index.ts`, or form submissions are discarded. See [Forms & Actions](/api/#delivering-submissions)
+4. Run `pnpm validate` to catch errors. It ends with the [agent-ready check](/getting-started/ai-agents/#the-agent-ready-check)
 5. Test with `pnpm build && pnpm preview`, because CSP and search only work in production builds
 
 ## Environment Variables
@@ -80,7 +80,7 @@ You can also add a pattern to `routeRules` in `astro.config.mjs`. On Vercel and 
 
 ## CI
 
-`.github/workflows/deploy.yml` runs lint, type checks, unit tests, a build and the E2E suite on pushes to `main` and on pull requests. It doesn't deploy, because your host's Git integration handles that.
+`.github/workflows/deploy.yml` runs lint, type checks, unit tests, a build, the agent-ready check (`pnpm check:agent`) and the E2E suite on pushes to `main` and on pull requests. It doesn't deploy, because your host's Git integration handles that.
 
 <Aside type="tip">
   The workflow builds with `DEPLOY_TARGET=node` because the E2E suite runs against the Node server.

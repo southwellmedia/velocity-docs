@@ -61,7 +61,7 @@ The categories are `ui`, `patterns` and `hero`.
 
 These registry components stay whatever you choose, because the core pages and layouts import them:
 
-- `Badge`, `Button`, `ConsentBanner`, `CTA`, `Hero`, `Icon`, `Logo`, `NewsletterForm` and `SearchInput`
+- `Badge`, `Button`, `ConsentBanner`, `CTA`, `Hero`, `Icon`, `Logo`, `MediaSlot`, `NewsletterForm`, `PageHeader`, `SearchInput` and `Section`
 - Anything those components depend on
 
 Everything outside the optional folders also stays, including layouts, `src/components/layout`, `src/components/seo`, `src/components/blog`, `src/i18n` and `src/lib`.
@@ -118,7 +118,7 @@ The list comes from `scaffold.components.alwaysInclude` in `velocity-manifest.js
 | `SocialProof` | marketing | Testimonial cards |
 | `TerminalDemo` | marketing | Animated terminal demo |
 
-### Pattern Components (7)
+### Pattern Components (10)
 
 | Component | Description |
 |-----------|-------------|
@@ -129,6 +129,9 @@ The list comes from `scaffold.components.alwaysInclude` in `velocity-manifest.js
 | `PasswordInput` | Password input with visibility toggle |
 | `StatCard` | Statistics display card |
 | `EmptyState` | Empty state placeholder |
+| `Section` | Page section with standard spacing and width, an optional eyebrow, title and lead, and a tinted tone |
+| `PageHeader` | Opening band for inner pages, holding the page's only `<h1>` |
+| `MediaSlot` | Image from `src/assets/photos/` at a fixed aspect ratio, or a labelled placeholder until the photo exists |
 
 ### Hero Components (1)
 
@@ -136,7 +139,7 @@ The list comes from `scaffold.components.alwaysInclude` in `velocity-manifest.js
 |-----------|-------------|
 | `Hero` | Hero section with centered and split layouts |
 
-See the [component docs](/components/) for props and examples.
+That's 44 optional components. With `Header` and `Footer` in `src/components/layout/`, which always stay, the registry lists 46. See the [component docs](/components/) for props and examples.
 
 ## Dependency Resolution
 

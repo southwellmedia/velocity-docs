@@ -60,7 +60,7 @@ Edit `src/config/site.config.ts` with your name, description, contact details, s
 
 ## Forms
 
-The contact and newsletter forms validate input but don't deliver anything until you connect a provider. Fill in the handlers in `src/actions/index.ts`. See [Forms & Actions](/api/).
+The contact and newsletter forms validate input, then forward each submission to `CONTACT_FORM_ENDPOINT` or `NEWSLETTER_ENDPOINT` when you set them. Until you set an endpoint or connect a provider in `src/actions/index.ts`, submissions are discarded. See [Forms & Actions](/api/#delivering-submissions).
 
 ## Development Commands
 
@@ -68,7 +68,7 @@ The contact and newsletter forms validate input but don't deliver anything until
 pnpm dev        # Start the dev server at localhost:4321
 pnpm build      # Build for production
 pnpm preview    # Preview the production build
-pnpm validate   # Lint, type check, unit tests and build
+pnpm validate   # Lint, type check, unit tests, build and agent-ready check
 ```
 
 See [Scripts](/getting-started/scripts/) for the rest.

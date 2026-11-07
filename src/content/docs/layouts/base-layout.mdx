@@ -47,21 +47,23 @@ interface ArticleMetadata {
 ```astro
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Header from '@/components/layout/Header.astro';
-import Footer from '@/components/layout/Footer.astro';
+import SiteHeader from '@/components/site/SiteHeader.astro';
+import SiteFooter from '@/components/site/SiteFooter.astro';
 ---
 
 <BaseLayout
   title="Page Title"
   description="Page description"
 >
-  <Header slot="header" />
+  <SiteHeader slot="header" />
 
   <!-- Your content -->
 
-  <Footer slot="footer" />
+  <SiteFooter slot="footer" />
 </BaseLayout>
 ```
+
+`SiteHeader` and `SiteFooter` in `src/components/site/` wrap Velocity's `Header` and `Footer` with your site's defaults. Every layout renders them, so render them here too rather than `Header` and `Footer` directly.
 
 `BaseLayout` renders the page's only `<main id="main-content">` around the default slot, so don't add your own.
 

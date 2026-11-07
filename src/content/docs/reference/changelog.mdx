@@ -5,6 +5,117 @@ sidebar:
   order: 2
 ---
 
+## v2.4.1 (2026-11-07)
+
+### Agent checks that cover everything you build
+
+- **Hardcoded text, everywhere you write code.** `check:agent` now scans every `.astro` and `.tsx` file under `src/`: pages written straight into `src/pages`, components in new folders, React islands, and new files inside Velocity's folders. Velocity's own untouched files are skipped.
+- **Pages missing in other languages.** On a multilingual site, a page built outside the localized routes is now reported. Before, it existed in English only and the language switcher sent other visitors to their home page. Blog posts are exempt. Add a `velocity-single-language` comment to a page in `src/pages/` to opt out deliberately.
+- **No more false broken links.** Links to server-rendered routes (`prerender = false`, including `[id]` and `[...rest]`), API endpoints, `redirects` from `astro.config` (both forms) and sites with a `base` path no longer fail `validate`.
+- **Fewer false warnings.** Honeypot fields (`aria-hidden="true"`), lone HTML entities in JSX and deliberately empty translations are no longer flagged.
+- `npm run check:agent -- --json` no longer truncates large output when piped.
+
+### New
+
+- **Customize the 404 page safely.** `src/pages/404.astro` now renders `src/views/NotFoundView.astro`, which is yours, so upgrades no longer overwrite a custom 404. See [Customizing the 404 Page](/customization/adding-routes/#customizing-the-404-page).
+- **`defaultTheme` in `site.config.ts`.** Set `'light'` or `'dark'` to fix the theme for visitors who haven't used the toggle. `'system'`, the default, follows their operating system. See [Dark Mode](/design-system/dark-mode/#default-theme).
+
+### Fixes
+
+- **Midnight theme:** muted text in dark mode now meets WCAG AA (5:1).
+- **Demo:** the component showcase shows the real component count.
+
+### Upgrading
+
+- **Custom 404?** The upgrade replaces `src/pages/404.astro` and saves your version in `.velocity-backup/`. Move your markup into `src/views/NotFoundView.astro`.
+- **Edited the theme script?** Use `defaultTheme` in `src/config/site.config.ts` instead of editing `src/layouts/theme-script.js`. If your `SiteConfig` interface predates it, add `defaultTheme?: 'system' | 'light' | 'dark'`.
+- **Stray test file.** If your project has `tests/unit/check-agent.test.ts`, delete it unless you've made it your own. 2.4.0 copied Velocity's own test there, and upgrades don't update `tests/`.
+- **Expect new warnings.** The wider scan may report hardcoded text in pages or components it didn't check before. Move the text into `src/i18n/translations/<locale>.ts`, or add a `velocity-allow-hardcoded` comment to a file that is deliberately single-language.
+
+> **Upgrade guide:** [v2.x to v2.4.1](/upgrade-guides/v2-to-v2-4/)
+
+## v2.4.0 (2026-11-07)
+
+### Built for agents
+
+- **`npm run check:agent`** runs at the end of `validate` and in CI, and scans your source and build. Every finding names the file, the rule in `.agents/velocity.md` and the fix. See [The agent-ready check](/getting-started/ai-agents/#the-agent-ready-check).
+  - **Errors:** translation keys with no English string or that render raw, inline scripts and handlers your CSP blocks, `javascript:` links, and broken internal links and anchors.
+  - **Warnings:** forms still discarding submissions, edits to files Velocity replaces on upgrade, hardcoded user-facing text, and keys a language falls back to English for.
+  - `--json` gives machine-readable output, and `--strict` makes warnings fail too.
+- **Component reference:** `.agents/components.md` describes all 46 components, so agents use them instead of reinventing them. For each it gives what it's for, its props, variants, an example, and what to use instead.
+- **Four new skills:** `velocity-rebrand`, `velocity-connect-forms`, `velocity-add-locale` and `velocity-add-content`.
+- **Agent benchmark:** the same six tasks in Velocity, in Velocity without its agent files, and in plain Astro, scored independently. The harness is in `benchmark/` in the Velocity repository. Results will be published once runs are done.
+
+### Fixes
+
+- `PasswordInput`'s show/hide button label is translated.
+
+### Upgrading
+
+- **`validate`:** the upgrade adds `check:agent` to the end of your `validate` script. If you customized `validate`, append `&& node scripts/check-agent.mjs` yourself.
+- **Baseline:** `create-velocity-astro` 2.1 records `.velocity/baseline.json` so the check can spot edits to Velocity-owned files. Commit it. With an older CLI, run `npm run check:agent -- --write-baseline` once.
+- **Forms:** `check:agent` warns while a form has no delivery configured. Set `CONTACT_FORM_ENDPOINT` / `NEWSLETTER_ENDPOINT`, or ask your agent to use the `velocity-connect-forms` skill.
+
+## v2.3.0 (2026-11-07)
+
+### Forms that deliver
+
+- The contact and newsletter Actions forward each submission as JSON to `CONTACT_FORM_ENDPOINT` / `NEWSLETTER_ENDPOINT` when set. `NEWSLETTER_API_KEY`, when set, is sent as a Bearer token. See [Forms & Actions](/api/#delivering-submissions).
+- A failing endpoint now shows the form's error instead of reporting success. Redirects are refused, and logs show only the HTTP status, never the endpoint URL.
+- With no delivery configured, the server logs a warning once per form that submissions are being discarded.
+- New `src/lib/form-delivery.ts`, with unit tests.
+
+### New projects get their own identity
+
+- New projects start with a neutral `site.config.ts`, without Velocity's author, social links or demo phone and address, and a starter README that credits Velocity.
+- The minimal starter's footer has a translated "Built with Velocity" link.
+- The contact page shows the map only when an address is set.
+
+### Cleanup
+
+- The unused `ogImage` setting is removed from `site.config.ts`.
+
+## v2.2.2 (2026-11-05)
+
+- `astro check` works again on fresh installs. New projects have no lockfile, so a loose peer range let pnpm install a beta of `@emnapi/runtime` that crashed `astro check`. Velocity now pins it, and Velocity's CI checks a no-lockfile install daily so a dependency release can't break new projects unnoticed.
+
+## v2.2.1 (2026-11-05)
+
+### Share images for every page
+
+- **Every page gets an image.** Images were only generated for routes and blog posts, so pages built from a collection pointed at a file that didn't exist. A build step now checks every finished page and draws what's missing.
+- **Cards follow your brand.** They use your logo and `branding.colors.themeColor`, not a hardcoded orange. The "PAGE" badge is gone, and near-black theme colors get a white accent so they stay visible.
+- **Missing custom images fail the build.** The error names the page and the file.
+
+## v2.2.0 (2026-11-04)
+
+### Your site, your design system
+
+- **Your header and footer, in one file.** Every layout now renders `SiteHeader` and `SiteFooter` from `src/components/site/`. Change them once and every page follows. Upgrades never touch these files.
+- **Themes can change anything.** Themes load last, so they can override any token. `--brand-hue` recolors the default brand scale from one value.
+- **Buttons** follow `--primary`, and `--theme-radius-button` and `--theme-button-weight` style every button.
+- **Logo** renders inline, so it can use `currentColor` and `--logo-accent`.
+- **Header height:** `--header-offset` keeps content clear of a taller fixed header. Set it to `0` for a sticky one.
+- **New patterns:** `Section`, `PageHeader` and `MediaSlot`. Drop a file in `src/assets/photos/` and `MediaSlot` shows it. Until then, a placeholder holds the space.
+- **Button icons:** `leadingIcon` and `trailingIcon` props.
+
+### Fewer silent failures
+
+- A missing translation now fails `npm test` instead of showing raw text such as `services.title` on the page.
+- E2E tests read your font and nav, so changing them no longer breaks the suite.
+- Every route is checked in every enabled language.
+- Skills read your project notes first, cover footer-only links, and use the new patterns in their examples.
+
+### Fixes
+
+- Local images no longer break the build on Windows. Velocity now uses one version of `sharp`.
+
+### Upgrading
+
+- **Blog index:** `src/views/BlogIndexView.astro` is yours, so upgrades leave it alone. Switch it to `SiteHeader` and `SiteFooter` by hand.
+- **Edited layouts:** files in `src/layouts/` are replaced as usual and backed up to `.velocity-backup/`. Move header and footer changes into `src/components/site/`.
+- **Buttons:** `primary` now uses `--primary`. Check your buttons if you customized `--primary`.
+
 ## v2.1.0 (2026-11-04)
 
 ### Built for AI coding agents

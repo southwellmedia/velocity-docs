@@ -11,14 +11,13 @@ Quick reference materials for Velocity development.
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| UI Components | 33 | Button, Input, Card, Badge, Alert, etc. (organized by subcategory) |
-| Layout Components | 5 | Header, Footer, ThemeToggle, Analytics, LanguageSwitcher |
-| Pattern Components | 7 | ContactForm, NewsletterForm, FormField, SearchInput, etc. |
-| Blog Components | 4 | ArticleHero, BlogCard, ShareButtons, RelatedPosts |
-| Landing Components | 5 | CTA, Credibility, FeatureTabs, LighthouseScores, TechStack |
-| SEO Components | 3 | SEO, JsonLd, Breadcrumbs |
+| UI Components | 33 | Button, Input, Card, Badge, Alert, etc., in 8 subcategories (form, data display, feedback, overlay, layout, primitives, content, marketing) |
+| Pattern Components | 10 | ContactForm, NewsletterForm, FormField, SearchInput, Section, PageHeader, MediaSlot, etc. |
+| Layout Components | 2 | Header, Footer |
 | Hero Components | 1 | Hero section |
-| **Total** | **58** | |
+| **Total** | **46** | From `component-registry.json` |
+
+Projects also include supporting components that aren't in the registry: `SiteHeader` and `SiteFooter` in `src/components/site/`, plus layout, SEO, blog and landing components. See [Components Overview](/components/#also-in-your-project).
 
 ## Key Files
 
@@ -27,17 +26,20 @@ Quick reference materials for Velocity development.
 | `astro.config.mjs` | Astro configuration |
 | `src/content.config.ts` | Velocity's content collection schemas |
 | `src/config/collections.ts` | Your content collection schemas |
-| `src/config/site.config.ts` | Site metadata, branding, contact |
+| `src/config/site.config.ts` | Site metadata, branding, contact, default theme |
 | `src/config/nav.config.ts` | Routes, navigation, header and footer defaults |
 | `src/i18n/locales.mjs` | Enabled languages |
 | `src/i18n/translations/` | Your site copy |
 | `src/actions/index.ts` | Form handlers |
+| `src/lib/form-delivery.ts` | Forwards form submissions to your endpoints |
 | `src/lib/forms.ts` | Form schemas |
 | `src/lib/blog.ts` | Blog URLs and queries |
 | `integrations/deploy-target.mjs` | Adapter and cache detection |
 | `src/styles/global.css` | Tailwind + design tokens |
 | `src/styles/tokens/colors.css` | Color tokens |
 | `src/styles/theme.css` | Active theme |
+| `src/views/NotFoundView.astro` | Your 404 page |
+| `.agents/velocity.md` | Velocity's rules for AI coding agents |
 | `src/lib/og.ts` | OG image configuration |
 | `src/lib/schema.ts` | JSON-LD schema helpers |
 
@@ -53,7 +55,8 @@ Quick reference materials for Velocity development.
 | `pnpm check` | Run type checker |
 | `pnpm test` | Run unit tests |
 | `pnpm test:e2e` | Run E2E and accessibility tests |
-| `pnpm validate` | Lint, type check, unit tests and build |
+| `pnpm validate` | Lint, type check, unit tests, build and agent-ready check |
+| `pnpm check:agent` | Agent-ready check of source and build |
 
 ## Content Collections
 

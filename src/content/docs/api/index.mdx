@@ -20,10 +20,44 @@ Velocity's forms run on [Astro Actions](https://docs.astro.build/en/guides/actio
 |------|---------|
 | `src/actions/index.ts` | Action handlers. This file is yours. |
 | `src/lib/forms.ts` | Zod schemas, kept separate so tests can import them |
+| `src/lib/form-delivery.ts` | Forwards submissions to your endpoints |
 
-<Aside type="caution" title="Connect a provider">
-  The handlers validate input and return success, but they don't deliver anything until you add your email or newsletter provider. Look for the `TODO` comments in `src/actions/index.ts`.
+## Delivering Submissions
+
+Velocity doesn't choose an email or newsletter provider for you. Each action validates the input, then delivers it in one of three ways:
+
+| Setup | What happens |
+|-------|--------------|
+| `CONTACT_FORM_ENDPOINT` or `NEWSLETTER_ENDPOINT` is set | The action POSTs the submission as JSON to that URL. `NEWSLETTER_API_KEY`, when set, is sent as `Authorization: Bearer <key>` with newsletter requests |
+| You wire a provider in `src/actions/index.ts` | Your code sends it, for example with Resend or Postmark |
+| Neither | The submission is discarded. The visitor still sees a success message, and the server logs a warning once per form |
+
+```bash
+# .env
+CONTACT_FORM_ENDPOINT=https://api.example.com/contact    # receives { name, email, subject, message }
+NEWSLETTER_ENDPOINT=https://api.example.com/subscribe    # receives { email }
+NEWSLETTER_API_KEY=your-api-key                          # optional
+```
+
+The endpoint can be a webhook, a serverless function, Zapier, Formspree or anything else that accepts a JSON POST. Delivery through `src/lib/form-delivery.ts` is strict:
+
+- **A failure shows the form's error.** A non-2xx response, an unreachable endpoint or a 10-second timeout makes the action throw an `ActionError`, so the visitor isn't told a lost message was sent.
+- **Redirects are refused.** A redirected POST would be followed as a GET without the body, so a redirect counts as a failure. Use the endpoint's final URL.
+- **Logs show only the HTTP status,** never the endpoint URL, which can contain a token.
+
+<Aside type="caution" title="Discarded until you connect them">
+  With nothing set, forms look like they work but deliver nothing. [`check:agent`](/getting-started/ai-agents/#the-agent-ready-check) warns about each form until its endpoint is set where the check runs, or until you wire a provider and delete the `// @velocity-stub` line. Send a real test message before you launch.
 </Aside>
+
+Set the variables on your host as well as in `.env`. Hosting platforms read them from their environment settings. A self-hosted Node server doesn't load `.env` by itself, so start it with the file or set the variables in its environment:
+
+```bash
+node --env-file=.env dist/server/entry.mjs
+```
+
+### Connect a Provider
+
+To send email or add subscribers directly, replace the forwarding in `src/actions/index.ts` with your provider's SDK. See the [Contact](/api/contact/#sending-email) and [Newsletter](/api/newsletter/#integration-examples) pages for examples. If you use an AI coding agent, ask it to connect the forms: the `velocity-connect-forms` [skill](/getting-started/ai-agents/#skills) uses Resend by default and also covers Postmark, webhooks and newsletter services.
 
 ## Calling an Action
 

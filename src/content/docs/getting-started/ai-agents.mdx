@@ -1,13 +1,18 @@
 ---
 title: AI Coding Agents
-description: How Velocity projects guide Claude Code, Codex, Cursor and other AI coding agents
+description: How Velocity projects guide Claude Code, Codex, Cursor and other AI coding agents, and check their work
 sidebar:
   order: 5
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Every Velocity project includes instructions for AI coding agents, so they can follow Velocity's conventions without you explaining them.
+Velocity isn't an agent. It gives the agent you already use, such as Claude Code, the rules, skills and checks it needs to follow Velocity's conventions without you explaining them:
+
+- **Rules:** `AGENTS.md` and `.agents/velocity.md` describe the stack, the commands and which files upgrades replace.
+- **Skills:** six step-by-step guides for common tasks, from adding a page to connecting the forms.
+- **Component reference:** `.agents/components.md` lists all 46 components, so agents reuse them instead of writing new ones.
+- **A check:** `npm run check:agent` finds the mistakes agents make that the build lets through, and tells the agent how to fix each one.
 
 ## What's in your project
 
@@ -16,39 +21,135 @@ Every Velocity project includes instructions for AI coding agents, so they can f
 | `AGENTS.md` | Your project's rules, plus a pointer to Velocity's | Left alone |
 | `CLAUDE.md` | Imports `AGENTS.md` for Claude Code | Left alone |
 | `.agents/velocity.md` | Velocity's stack, commands, rules and file ownership | Replaced |
+| `.agents/components.md` | Reference for every component Velocity ships | Replaced |
 | `.agents/skills/velocity-*` | Skills for common tasks | Replaced |
 | `.claude/skills/velocity-*` | The same skills, in the folder Claude Code uses | Replaced |
+| `scripts/check-agent.mjs` | The agent-ready check | Replaced |
+| `.velocity/baseline.json` | Velocity-owned files as they were at scaffold or last upgrade | Rewritten by the CLI |
 
 Add your own rules to the **Project notes** section of `AGENTS.md`.
 
+## Which agents
+
+Velocity is tested with Claude Code, which reads `CLAUDE.md` and loads skills from `.claude/skills/`. Codex, Cursor and other tools that read `AGENTS.md` get the same rules, and `AGENTS.md` tells them where the skills are. How well a given tool follows them depends on the tool.
+
 ## Skills
 
-Skills are step-by-step instructions for a specific task. You don't need to name them. Describe what you want, and a tool that supports skills can load the right one. If your tool doesn't load skills automatically, `AGENTS.md` tells your agent where to find them.
+Skills are step-by-step instructions for a specific task. You don't need to name them. Describe what you want, and a tool that supports skills can load the right one. If your tool doesn't load skills automatically, `AGENTS.md` tells your agent to read the matching `SKILL.md` first.
 
-### `velocity-add-page`
+| Skill | Use it by asking to… |
+|-------|----------------------|
+| `velocity-add-page` | Add a page or route, with its view, locale wrappers, nav entry and translated copy |
+| `velocity-add-component` | Add, restore or customize a component, following its CVA variants, design tokens, i18n and upgrade rules |
+| `velocity-add-content` | Publish a blog post with valid frontmatter, or add a content collection with its own pages, URLs, search indexing and share images |
+| `velocity-add-locale` | Add a language, with a complete translation file, translated URL slugs, content and `hreflang` checks |
+| `velocity-connect-forms` | Connect the contact and newsletter forms to a real provider (Resend by default, or Postmark, a webhook or a newsletter service), with secrets in `astro:env` |
+| `velocity-rebrand` | Change the brand color, theme, fonts, logo, favicon, site name and share-image color |
 
-Use it by asking for a new page or route. It covers:
+Each skill is in both `.agents/skills/` and `.claude/skills/`, and the two copies are identical.
 
-- The view in `src/views/`
-- Wrappers for the default locale and localized URLs
-- The route in `src/config/nav.config.ts`, and the menu entry if you want one
-- Copy for every enabled language
-- What to verify, including what the automated tests don't cover
+## Component reference
 
-### `velocity-add-component`
+`.agents/components.md` is generated from Velocity's component registry. For each of the 46 components it gives the import path, what it's for, its props and variants, an example, and what to use instead when another component fits better. `.agents/velocity.md` tells agents to read it before building a component.
 
-Use it by asking for a new component, or for a Velocity component your project doesn't have. It covers:
+A project scaffolded with only some components still has the full reference. The reference tells the agent to check that the import path exists, and the `velocity-add-component` skill restores a missing component with its dependencies.
 
-- Checking whether Velocity already has the component
-- Restoring a component left out when the project was scaffolded, along with its dependencies
-- Choosing between `src/components/patterns/` and `src/components/ui/`
-- CVA variants, design tokens, translations, CSP and accessibility
+## The agent-ready check
+
+```bash
+npm run build
+npm run check:agent
+```
+
+`check:agent` scans your source and your build for mistakes that `astro check` and the build let through. Every finding names the file, the rule in `.agents/velocity.md` it breaks, and the fix, so an agent can act on it without asking you.
+
+It runs at the end of `npm run validate`, and as its own step in the deploy workflow in `.github/workflows/deploy.yml`. It needs a build to scan: without one, it reports an error and asks you to build first.
+
+### What it checks
+
+**Errors** fail the check:
+
+| Rule | Finds |
+|------|-------|
+| `i18n/missing-key` | `t('a.b')` with no English string, so the raw key renders |
+| `i18n/raw-key` | A translation key rendered as text in the build |
+| `csp/inline-handler` | `onclick=` and other inline event handlers |
+| `csp/unhashed-script` | An inline `<script>` whose hash isn't in the page's CSP |
+| `csp/javascript-url` | `href="javascript:…"` |
+| `links/broken` | An internal link, asset or `#anchor` that doesn't exist |
+
+**Warnings** are printed but pass:
+
+| Rule | Finds |
+|------|-------|
+| `i18n/untranslated` | Keys an enabled language doesn't translate, so it falls back to English |
+| `i18n/single-locale-page` | A page with no other-language versions on a multilingual site |
+| `forms/stub` | A form Action that tells visitors their message was sent but delivers nothing |
+| `ownership/edited` | A Velocity-owned file changed since scaffold or the last upgrade |
+| `strings/hardcoded` | User-facing text written into a page, view or component |
+
+The hardcoded-text check covers every `.astro` and `.tsx` file under `src/`, outside content, i18n, assets and styles. Velocity's own files are skipped while they're untouched. With a baseline, a Velocity-owned file you've changed, or a file you've added inside a Velocity folder, is scanned too.
+
+Links to server-rendered routes, API endpoints, `redirects` in `astro.config.mjs` and sites with a `base` path aren't reported as broken.
+
+### Example
+
+An agent asked for a pricing page wrote a view with a missing translation key, an inline `onclick` handler and a link to a page that doesn't exist. `npm run check:agent` reported (output shortened):
+
+```
+✖ i18n/missing-key (1)  .agents/velocity.md → Rules → No hardcoded user-facing strings
+  src/views/PricingView.astro:8  t('pricingPage.title') has no English string, so the page shows "pricingPage.title".
+  fix: Add pricingPage.title to src/i18n/translations/en.ts (under `pricingPage`), then to each other locale's file.
+
+✖ csp/inline-handler (1)  .agents/velocity.md → Rules → CSP is on
+  dist/client/pricing/index.html:24  <button onclick="…"> is an inline event handler; CSP blocks it.
+  fix: Remove onclick and add the listener in the component's <script> with addEventListener, guarded for astro:after-swap.
+
+✖ links/broken (1)  .agents/velocity.md → Rules → Internal links
+  dist/client/pricing/index.html:24  <a href="/checkout"> points at a page or file the build doesn't contain.
+  fix: Build internal links with localizeRoute()/localizePath() from @/i18n and check the route exists in src/config/nav.config.ts; for assets, use a file that exists in public/ or import it.
+
+⚠ strings/hardcoded (3)  .agents/velocity.md → Rules → No hardcoded user-facing strings
+  src/views/PricingView.astro:10  "Buy now" is written into the markup, so it won't translate.
+  ...
+
+✖ check:agent: 4 error(s), 5 warning(s)
+```
+
+### Options
+
+| Command | Does |
+|---------|------|
+| `npm run check:agent -- --json` | Prints the findings as JSON, for scripts and agents |
+| `npm run check:agent -- --strict` | Makes warnings fail too |
+| `npm run check:agent -- --write-baseline` | Records Velocity-owned files as they are now in `.velocity/baseline.json` |
+
+With pnpm, drop the `--`: `pnpm check:agent --json`.
+
+### The ownership baseline
+
+`.velocity/baseline.json` records a hash of each Velocity-owned file. `ownership/edited` compares against it to warn when a change would be lost on the next upgrade. Commit the file.
+
+`create-velocity-astro` 2.1 and later write it when you scaffold or upgrade a project. With an older CLI, run `npm run check:agent -- --write-baseline` once on a clean checkout. Without a baseline, the check skips this rule and says so.
+
+### Opting out
+
+Some warnings are deliberate. Add a comment to the file to opt out:
+
+- **`velocity-allow-hardcoded`** in a file that is deliberately single-language turns off `strings/hardcoded` for it.
+- **`velocity-single-language`** in a page in `src/pages/` turns off `i18n/single-locale-page` for it. Blog posts are already exempt.
+
+```astro
+---
+// velocity-allow-hardcoded: this landing page is English-only
+---
+```
 
 ## File ownership
 
 Upgrades replace some files and never touch others. `.agents/velocity.md` lists both, so your agent knows where a change is safe. The list comes from `files` in `velocity-manifest.json`.
 
-For example, new strings go in `src/i18n/translations/<locale>.ts`, because upgrades replace `src/i18n/ui.ts`. If a task requires editing a file Velocity owns, your agent is told to warn you. The upgrade saves your version to `.velocity-backup/`, but you'll need to reapply the change by hand.
+For example, new strings go in `src/i18n/translations/<locale>.ts`, because upgrades replace `src/i18n/ui.ts`. If a task requires editing a file Velocity owns, your agent is told to warn you, and `check:agent` reports the edit. The upgrade saves your version to `.velocity-backup/`, but you'll need to reapply the change by hand.
 
 ## Add your own skills
 
@@ -72,14 +173,21 @@ Save it in `.claude/skills/add-case-study/` for Claude Code, and in `.agents/ski
 Don't start your skill names with `velocity-`, and don't edit the skills Velocity ships. Upgrades replace them. Other skills in these folders stay in place.
 </Aside>
 
+## The agent benchmark
+
+The Velocity repository includes a benchmark harness in `benchmark/`. It gives the same six plain-language tasks to an agent in a Velocity project, in the same project without its agent files, and in plain Astro, then scores the built sites in a browser. No results have been published yet. See `benchmark/README.md` in the [Velocity repository](https://github.com/southwellmedia/velocity) to run it yourself. The harness isn't copied into your project.
+
 ## Get this in an existing project
 
-These files were added in Velocity 2.1. Upgrade to get them:
+Upgrade to get the latest rules, skills and check:
 
 ```bash
 npm create velocity-astro@latest upgrade
 ```
 
-The upgrade replaces your old `AGENTS.md` once, because it contains outdated instructions. Your copy is saved to `.velocity-backup/`. If you added your own rules, copy them into the **Project notes** section of the new file. After that, upgrades leave `AGENTS.md` alone.
+- **From 2.0:** the upgrade replaces your old `AGENTS.md` once, because it contains outdated instructions. Your copy is saved to `.velocity-backup/`. If you added your own rules, copy them into the **Project notes** section of the new file. After that, upgrades leave `AGENTS.md` alone.
+- **From 2.1 or later:** the upgrade adds `check:agent` to the end of your `validate` script. If you customized `validate`, append `&& node scripts/check-agent.mjs` yourself.
+
+See [Upgrading to 2.4](/upgrade-guides/v2-to-v2-4/) for the other steps.
 
 Skills are committed with your project, so everyone working on it gets the same instructions. Only local Claude Code state in `.claude/` is ignored.
