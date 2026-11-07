@@ -16,7 +16,9 @@ The `newsletter` action handles submissions from the `NewsletterForm` component.
 
 ## Handler
 
-Replace the `TODO` in `src/actions/index.ts` with a call to your provider:
+The handler in `src/actions/index.ts` forwards the email address to `NEWSLETTER_ENDPOINT` when it's set, as JSON `{ "email": "..." }`. If `NEWSLETTER_API_KEY` is also set, it's sent as `Authorization: Bearer <key>`. With no endpoint, the signup is discarded and the server logs a warning. See [Delivering Submissions](/api/#delivering-submissions).
+
+To call a provider's API directly instead, replace the forwarding and the `@velocity-stub` block, then delete the `@velocity-stub` line so `check:agent` stops warning:
 
 ```typescript
 newsletter: defineAction({

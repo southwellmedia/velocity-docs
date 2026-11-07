@@ -1,0 +1,117 @@
+---
+title: "Upgrade: v2.x to v2.4.1"
+description: Upgrade a Velocity 2.0–2.3 project to Velocity 2.4.1, with the agent-ready check, form delivery, a customizable 404 page and defaultTheme
+sidebar:
+  order: 7
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide takes a project from any **Velocity 2.x** release to **Velocity 2.4.1**. There are no breaking changes to Astro or Node, and the CLI does most of the work. The steps below are the checks it can't do for you. The CLI shows the ones that apply to your starting version at the end of the upgrade.
+
+## Overview
+
+| | 2.1.0 | 2.4.1 |
+|---|---|---|
+| **Astro** | 7.4.5 | 7.4.5 |
+| **Node.js** | 22.23.4+ | 22.23.4+ (24 LTS recommended) |
+| **`create-velocity-astro`** | 2.0.4+ | **2.1+** recommended, to write the ownership baseline |
+| **Header and footer** | `Header` and `Footer` in each layout | `SiteHeader` and `SiteFooter` in `src/components/site/` |
+| **Forms** | Stubs with `TODO` comments | Forward to `CONTACT_FORM_ENDPOINT` / `NEWSLETTER_ENDPOINT` |
+| **Agent skills** | 2 | 6, plus `.agents/components.md` |
+| **`validate`** | Lint, type check, unit tests, build | Adds `check:agent` at the end |
+| **404 page** | `src/pages/404.astro` | `src/views/NotFoundView.astro` |
+| **Default theme** | Edit `theme-script.js` | `defaultTheme` in `site.config.ts` |
+
+<Aside type="caution" title="Before you start">
+  Commit your work, so you can review the upgrade as a diff. Files you edited that the upgrade replaces are saved to `.velocity-backup/`.
+</Aside>
+
+## Run the Upgrade
+
+```bash
+npm create velocity-astro@latest upgrade
+```
+
+Use `create-velocity-astro` 2.1 or later. It writes `.velocity/baseline.json`, which `check:agent` uses to spot edits to Velocity-owned files.
+
+## Step 1: Check `validate`
+
+The upgrade adds `check:agent` to the end of your `validate` script. If you had customized `validate`, the CLI leaves it alone, so append the check yourself:
+
+```json
+"validate": "eslint . && astro check && vitest run && astro build && node scripts/check-agent.mjs"
+```
+
+## Step 2: Commit the Baseline
+
+Commit `.velocity/baseline.json`. If you upgraded with a CLI older than 2.1, write it once on a clean checkout:
+
+```bash
+npm run check:agent -- --write-baseline
+```
+
+See [The ownership baseline](/getting-started/ai-agents/#the-ownership-baseline).
+
+## Step 3: Connect Your Forms
+
+Your contact and newsletter Actions in `src/actions/index.ts` are yours, so the upgrade didn't change them. `check:agent` still finds their original `TODO` comments and warns that the forms discard submissions.
+
+Either set `CONTACT_FORM_ENDPOINT` and `NEWSLETTER_ENDPOINT` and copy the forwarding code from a new project's `src/actions/index.ts`, or wire your provider directly. If you use an AI coding agent, ask it to use the `velocity-connect-forms` skill. See [Forms & Actions](/api/#delivering-submissions).
+
+## Step 4: Delete the Stray Test File
+
+If your project has `tests/unit/check-agent.test.ts`, delete it unless you've made it your own. Velocity 2.4.0 copied its own test there by mistake. Upgrades replace `scripts/check-agent.mjs` but leave `tests/` alone, so the old test can fail after a later upgrade.
+
+## Step 5: Move a Custom 404 Page
+
+`src/pages/404.astro` now renders `src/views/NotFoundView.astro`, which is yours. If you had customized `src/pages/404.astro`, the upgrade replaced it and saved your version to `.velocity-backup/`. Move your markup into `src/views/NotFoundView.astro`. See [Customizing the 404 Page](/customization/adding-routes/#customizing-the-404-page).
+
+## Step 6: Use `defaultTheme`
+
+If you had edited `src/layouts/theme-script.js` to force light or dark mode, the upgrade replaced it. Set `defaultTheme` in `src/config/site.config.ts` instead:
+
+```typescript
+defaultTheme: 'dark', // 'system' | 'light' | 'dark'
+```
+
+If your `SiteConfig` interface predates it, add `defaultTheme?: 'system' | 'light' | 'dark';` to it. See [Dark Mode](/design-system/dark-mode/#default-theme).
+
+## Step 7: Switch the Blog Index to the Site Shell
+
+From Velocity 2.2, layouts render `SiteHeader` and `SiteFooter` from `src/components/site/`. Your views are yours, so the upgrade didn't change `src/views/BlogIndexView.astro`. In it, replace the `Header` and `Footer` imports and tags with `SiteHeader` and `SiteFooter`, and remove any `position`, `size`, `showActiveState`, `showCta` and `layout` props.
+
+If you had edited files in `src/layouts/`, they were replaced and backed up as usual. Move header and footer changes into `src/components/site/`.
+
+## Step 8: Check Your Brand
+
+<Steps>
+1. **Buttons:** `primary` buttons use `--primary` from 2.2. The default themes look the same, but check your buttons if you customized `--primary`.
+
+2. **Share images:** from 2.2.1, generated share images use `branding.colors.themeColor` in `src/config/site.config.ts`. Set it to your brand color.
+
+3. **Custom share images:** from 2.2.1, a page whose `image` points at a file that doesn't exist fails the build, and the error names the page and the file. Add the file, or remove the `image` prop to get a generated card.
+</Steps>
+
+## Coming from 2.0
+
+The 2.1 steps also apply:
+
+- **Theme:** if you set your theme in `tokens/colors.css`, it resets to the default. Set it again in `src/styles/theme.css`.
+- **Collections:** move any you added in `src/content.config.ts` to `src/config/collections.ts`.
+- **`AGENTS.md`:** it's replaced once. Copy any rules you added from `.velocity-backup/` into its **Project notes** section.
+
+## Verify
+
+```bash
+npm install
+npm run validate
+npm run build && npm run test:e2e
+```
+
+<Aside type="note" title="Expect new warnings">
+  `check:agent` scans every page and component under `src/`, so it may report hardcoded text in files nothing checked before. These are warnings, not errors. Move the text into `src/i18n/translations/<locale>.ts`, or add a `velocity-allow-hardcoded` comment to a file that is deliberately single-language.
+</Aside>

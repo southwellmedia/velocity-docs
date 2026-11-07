@@ -11,10 +11,33 @@ Velocity includes automatic dark mode with system preference detection and manua
 
 ## How It Works
 
-1. On page load, checks `localStorage` for saved preference
-2. Falls back to system preference (`prefers-color-scheme`)
-3. Adds/removes `.dark` class on `<html>`
-4. All semantic tokens automatically switch values
+1. Before the page renders, a small script checks `localStorage` for a theme the visitor chose with the toggle
+2. If there isn't one, it uses `defaultTheme` from `site.config.ts`. With `'system'`, the default, it follows `prefers-color-scheme`
+3. It adds or removes the `.dark` class on `<html>`
+4. All semantic tokens switch values automatically
+
+## Default Theme
+
+Set `defaultTheme` in `src/config/site.config.ts` to choose what visitors see before they use the toggle:
+
+```typescript
+const siteConfig: SiteConfig = {
+  // ...
+  defaultTheme: 'dark', // 'system' | 'light' | 'dark'
+};
+```
+
+| Value | Visitors who haven't used the toggle see |
+|-------|-------------------------------------------|
+| `'system'` | Their operating system's setting. This is the default |
+| `'light'` | Light mode |
+| `'dark'` | Dark mode |
+
+A theme the visitor picks with the toggle always wins. You don't need to edit `src/layouts/theme-script.js`, which upgrades replace.
+
+<Aside type="note">
+  `defaultTheme` was added in Velocity 2.4.1. If your `SiteConfig` interface predates it, add `defaultTheme?: 'system' | 'light' | 'dark';` to it.
+</Aside>
 
 ## Theme Toggle Component
 
@@ -27,9 +50,9 @@ import ThemeToggle from '@/components/layout/ThemeToggle.astro';
 ```
 
 The toggle:
-- Cycles through: System → Light → Dark
-- Persists choice in `localStorage`
-- Updates immediately without flash
+- Switches between light and dark
+- Saves the choice in `localStorage`, so it overrides `defaultTheme` on later visits
+- Updates immediately without a flash
 
 ## Token Switching
 
@@ -51,22 +74,7 @@ Semantic tokens swap values automatically:
 
 ## Preventing Flash
 
-The theme is initialized in `<head>` before page render:
-
-```html
-<script is:inline>
-  const theme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  if (theme === 'dark' || (!theme && prefersDark)) {
-    document.documentElement.classList.add('dark');
-  }
-</script>
-```
-
-<Aside type="tip">
-  The `is:inline` directive ensures this runs before any rendering occurs.
-</Aside>
+`BaseLayout` runs `src/layouts/theme-script.js` in `<head>`, before the page renders, so visitors never see the wrong theme first. It's rendered with `<InlineScript />`, which adds the script's hash to the page's CSP. `BaseLayout` passes `defaultTheme` to it as a `data-default-theme` attribute on `<html>`.
 
 ## Manual Control
 
@@ -101,32 +109,14 @@ localStorage.removeItem('theme');
 <div class="bg-white dark:bg-gray-900">
 ```
 
-## Component Patterns
+## Reading the Theme in a Script
 
-### Conditional Rendering
+Pages are prerendered, so the server doesn't know the visitor's theme. Check the class on `<html>` in a client script:
 
 ```astro
----
-// Server-side: use client hint or default
-const theme = Astro.request.headers.get('Sec-CH-Prefers-Color-Scheme');
----
-
-<!-- Client-side: check class -->
 <script>
   const isDark = document.documentElement.classList.contains('dark');
 </script>
-```
-
-### Color Scheme Props
-
-Many components accept a `colorScheme` prop:
-
-```astro
-<!-- Automatic (follows theme) -->
-<Button>Default</Button>
-
-<!-- Force inverted colors (for dark backgrounds) -->
-<Button colorScheme="invert">On Dark</Button>
 ```
 
 ## Inverted Sections
@@ -137,7 +127,15 @@ For dark sections on light pages, use inverted tokens:
 <section class="bg-surface-invert">
   <h2 class="text-on-invert">Title</h2>
   <p class="text-on-invert-muted">Description</p>
-  <Button colorScheme="invert">CTA</Button>
+</section>
+```
+
+To flip every token inside a section, including the ones components use, wrap it in `.invert-section`:
+
+```astro
+<section class="invert-section bg-background">
+  <h2 class="text-foreground">Title</h2>
+  <Button>CTA</Button>
 </section>
 ```
 

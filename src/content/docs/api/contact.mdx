@@ -38,7 +38,7 @@ export const contactSchema = z.object({
 
 ## Handler
 
-Replace the `TODO` in `src/actions/index.ts` with your delivery code:
+The handler in `src/actions/index.ts` forwards the message to `CONTACT_FORM_ENDPOINT` when it's set. Otherwise it discards the message and logs a warning:
 
 ```typescript
 contact: defineAction({
@@ -48,13 +48,34 @@ contact: defineAction({
     // Bots fill hidden fields. Report success so they don't retry, but drop it.
     if (honeypot) return { success: true };
 
-    // TODO: deliver the message
+    if (CONTACT_FORM_ENDPOINT) {
+      await deliver('contact', () => postJson(CONTACT_FORM_ENDPOINT!, data));
+      return { success: true };
+    }
+
+    // @velocity-stub contact (no delivery configured: discarded, see npm run check:agent)
+    warnUndelivered('contact', 'CONTACT_FORM_ENDPOINT');
+    // ...
     return { success: true };
   },
 }),
 ```
 
+`deliver()` turns any delivery failure into an `ActionError`, so the form shows its error message. See [Delivering Submissions](/api/#delivering-submissions).
+
+## Forwarding to an Endpoint
+
+Set `CONTACT_FORM_ENDPOINT` in `.env` and on your host. Each submission is POSTed as JSON:
+
+```json
+{ "name": "Ada", "email": "ada@example.com", "subject": "Hello", "message": "..." }
+```
+
+Any non-2xx response, or a redirect, shows the form's error.
+
 ## Sending Email
+
+To send email directly, replace the forwarding and the `@velocity-stub` block with your provider's code. Delete the `@velocity-stub` line so `check:agent` stops warning.
 
 ### Resend
 
@@ -80,20 +101,6 @@ if (error) {
 
 Add secrets to `env.schema` in `astro.config.mjs` so `astro:env/server` can read them. See [Environment Variables](/configuration/environment/).
 
-### Forwarding to an Endpoint
-
-`CONTACT_FORM_ENDPOINT` is already declared in the env schema:
-
-```typescript
-import { CONTACT_FORM_ENDPOINT } from 'astro:env/server';
-
-await fetch(CONTACT_FORM_ENDPOINT, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(data),
-});
-```
-
 ## Using Your Own Endpoint
 
 `ContactForm` calls the action by default. To post somewhere else, pass `action`:
@@ -110,4 +117,4 @@ The endpoint receives `FormData` and must return JSON: `{ "success": true }` or 
 
 ## Testing
 
-`tests/unit/forms.test.ts` covers the schemas, and `tests/e2e/forms.spec.ts` submits the real form, including server-side validation errors.
+`tests/unit/forms.test.ts` covers the schemas, `tests/unit/form-delivery.test.ts` covers forwarding, and `tests/e2e/forms.spec.ts` submits the real form, including server-side validation errors.

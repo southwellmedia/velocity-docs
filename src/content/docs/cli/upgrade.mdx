@@ -13,7 +13,7 @@ The `upgrade` command updates a Velocity project to a newer release. Run it from
 pnpm create velocity-astro@latest upgrade
 ```
 
-Moving from 1.x? Follow the [v1 to v2 guide](/upgrade-guides/v1-to-v2/), which has manual steps.
+Moving from 1.x? Follow the [v1 to v2 guide](/upgrade-guides/v1-to-v2/), which has manual steps. Moving to 2.4 from an earlier 2.x release? See [Upgrading to 2.4](/upgrade-guides/v2-to-v2-4/).
 
 ## Flags
 
@@ -58,13 +58,14 @@ npm create velocity-astro@latest upgrade -- --dry-run
 
 `velocity-manifest.json` sorts files into two groups.
 
-**Safe files** are owned by Velocity and updated by upgrades. These include `src/components/ui/`, `src/components/layout/`, `src/components/seo/`, `src/layouts/`, `src/lib/`, the design tokens and themes, and the core i18n files such as `src/i18n/ui.ts`.
+**Safe files** are owned by Velocity and updated by upgrades. These include `src/components/ui/`, `src/components/layout/`, `src/components/seo/`, `src/components/hero/`, `src/layouts/`, `src/lib/`, the design tokens and themes, the core i18n files such as `src/i18n/ui.ts`, `src/pages/404.astro`, the agent files in `.agents/` and `.claude/skills/`, and `scripts/check-agent.mjs`.
 
 **Protected files** are yours and never overwritten. These include:
 
-- `astro.config.mjs` and `.env`
-- `src/config/site.config.ts`, `src/config/nav.config.ts` and `src/config/consent.config.ts`
-- `src/pages/`, `src/views/`, `src/content/`, `src/assets/` and `src/actions/`
+- `astro.config.mjs`, `.env` and `AGENTS.md`
+- `src/config/site.config.ts`, `src/config/nav.config.ts`, `src/config/consent.config.ts` and `src/config/collections.ts`
+- `src/styles/theme.css` and `src/components/site/`
+- `src/pages/` (except `404.astro`), `src/views/`, `src/content/`, `src/assets/` and `src/actions/`
 - `src/i18n/locales.mjs` and `src/i18n/translations/`
 - `src/components/blog/`, `src/components/landing/` and `src/components/patterns/`
 - `tests/`
@@ -81,9 +82,21 @@ If you edited a safe file, the CLI detects it from the hashes in `.velocity.json
   To change a built-in UI string, override it in `src/i18n/translations/<locale>.ts` rather than editing `ui.ts`. Upgrades won't touch your override.
 </Aside>
 
+## The Ownership Baseline
+
+`create-velocity-astro` 2.1 and later write `.velocity/baseline.json` when they scaffold or upgrade a project. It records the Velocity-owned files as they are after the upgrade, so [`check:agent`](/getting-started/ai-agents/#the-ownership-baseline) can warn when one is edited later, before the next upgrade replaces the edit. Commit it.
+
+With an older CLI, write it yourself once on a clean checkout:
+
+```bash
+npm run check:agent -- --write-baseline
+```
+
 ## After Upgrading
 
 ```bash
 pnpm install
 pnpm validate
 ```
+
+`validate` ends with `check:agent`, which reports anything the upgrade left for you to fix, such as hardcoded text in a page or a form with no delivery configured.

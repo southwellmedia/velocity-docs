@@ -16,7 +16,15 @@ pnpm build
 HOST=0.0.0.0 PORT=4321 node dist/server/entry.mjs
 ```
 
-Or force the target if your build environment sets `VERCEL`, `NETLIFY` or similar:
+The server doesn't load `.env` by itself. To use it for runtime variables such as `CONTACT_FORM_ENDPOINT`, pass it to Node, or set the variables in the server's environment:
+
+```bash
+node --env-file=.env dist/server/entry.mjs
+```
+
+Without the form endpoints, the server discards submissions and logs a warning. See [Forms & Actions](/api/#delivering-submissions).
+
+Force the target if your build environment sets `VERCEL`, `NETLIFY` or similar:
 
 ```bash
 DEPLOY_TARGET=node pnpm build

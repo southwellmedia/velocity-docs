@@ -16,7 +16,6 @@ interface SiteConfig {
   name: string;
   description: string;
   url: string;
-  ogImage: string;
   author: string;
   email: string;
   phone?: string;
@@ -36,6 +35,7 @@ interface SiteConfig {
     google?: string;
     bing?: string;
   };
+  defaultTheme?: 'system' | 'light' | 'dark';
   branding: {
     logo: {
       alt: string;
@@ -60,7 +60,6 @@ const siteConfig: SiteConfig = {
   name: 'Velocity',
   description: 'A modern website built with Astro and Tailwind CSS',
   url: SITE_URL || 'https://example.com',
-  ogImage: '/og-default.png',
   author: 'Your Name',
   email: 'hello@example.com',
   phone: '+1 (555) 123-4567',
@@ -83,6 +82,7 @@ const siteConfig: SiteConfig = {
     google: 'your-google-verification-code',
     bing: 'your-bing-verification-code',
   },
+  defaultTheme: 'system',
   branding: {
     logo: { alt: 'Your Site Name' },
     favicon: { svg: '/favicon.svg' },
@@ -105,7 +105,6 @@ export default siteConfig;
 | `name` | `string` | Your site/brand name |
 | `description` | `string` | Default meta description |
 | `url` | `string` | Production URL |
-| `ogImage` | `string` | Default OG image path |
 | `author` | `string` | Default author name |
 | `email` | `string` | Contact email |
 
@@ -118,6 +117,7 @@ export default siteConfig;
 | `socialLinks` | `string[]` | Social media profile URLs |
 | `twitter` | `object` | Twitter card configuration |
 | `verification` | `object` | Search engine verification codes |
+| `defaultTheme` | `'system' \| 'light' \| 'dark'` | Theme for visitors who haven't used the toggle. `'system'`, the default, follows their operating system. See [Dark Mode](/design-system/dark-mode/#default-theme) |
 
 ### Branding
 

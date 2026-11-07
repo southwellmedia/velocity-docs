@@ -58,11 +58,25 @@ Run Astro's type checker.
 
 ### `pnpm validate`
 
-Run everything CI runs before the browser tests: lint, type check, unit tests and build.
+Run lint, type check, unit tests, the build and the agent-ready check, in that order. It stops at the first step that fails.
 
 ```bash
 pnpm validate
 ```
+
+### `pnpm check:agent`
+
+Scan your source and build for mistakes the build lets through: translation keys with no English string, inline scripts and handlers your CSP blocks, broken internal links, forms that still discard submissions, edits to Velocity-owned files and hardcoded text. Run it after a build. `validate` runs it last.
+
+```bash
+pnpm build
+pnpm check:agent
+pnpm check:agent --json             # machine-readable findings
+pnpm check:agent --strict           # warnings fail too
+pnpm check:agent --write-baseline   # record Velocity-owned files as they are now
+```
+
+Errors exit with code 1. Warnings are printed but pass unless you add `--strict`. See [The agent-ready check](/getting-started/ai-agents/#the-agent-ready-check) for every rule.
 
 ## Testing
 
@@ -109,4 +123,5 @@ It also submits both forms and tests search. Page lists come from your routes an
 | `pnpm test` | Run unit tests |
 | `pnpm test:watch` | Run unit tests in watch mode |
 | `pnpm test:e2e` | Run E2E and accessibility tests |
-| `pnpm validate` | Lint, type check, unit tests and build |
+| `pnpm validate` | Lint, type check, unit tests, build and agent-ready check |
+| `pnpm check:agent` | Agent-ready check of source and build |

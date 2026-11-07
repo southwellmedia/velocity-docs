@@ -17,6 +17,8 @@ Layout components provide the structural elements for your pages.
 | `LanguageSwitcher.astro` | Language picker |
 | `Analytics.astro` | Analytics integration |
 
+Layouts don't render `Header` and `Footer` directly. They render `SiteHeader` and `SiteFooter` from `src/components/site/`, which wrap them with your site's defaults. Those two files are yours and upgrades leave them alone, so customize the header and footer there. Upgrades replace the files in `src/components/layout/`.
+
 ## Header
 
 Full-featured header with navigation, actions, and mobile menu:

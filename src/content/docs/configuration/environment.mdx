@@ -66,14 +66,17 @@ This is detected automatically on Vercel, Netlify and Cloudflare. See [Deploymen
 ### Form Handling (Optional)
 
 ```bash
-# External endpoint for contact form submissions
+# Contact form: each submission is POSTed here as JSON { name, email, subject, message }
 CONTACT_FORM_ENDPOINT=https://api.yoursite.com/contact
 
-# Newsletter service API key (server-side only)
+# Newsletter form: each signup is POSTed here as JSON { email }
+NEWSLETTER_ENDPOINT=https://api.yoursite.com/subscribe
+
+# Optional: sent as "Authorization: Bearer <key>" with newsletter requests
 NEWSLETTER_API_KEY=your-api-key
 ```
 
-Read these in your [Astro Actions](/api/). They do nothing until you use them there.
+The [form actions](/api/#delivering-submissions) forward to these endpoints when they're set. Without them, submissions are discarded and the server logs a warning. All three are server-only secrets.
 
 ### Maps (Optional)
 
@@ -152,6 +155,16 @@ For different environments, create:
 - `.env.example` — Template for team members (committed)
 
 ## Deployment Platforms
+
+Set the same variables on your host. Hosting platforms read them from their environment settings, not from `.env`.
+
+### Self-Hosted Node
+
+The Node server doesn't load `.env` by itself. Start it with the file, or set the variables in its environment:
+
+```bash
+node --env-file=.env dist/server/entry.mjs
+```
 
 ### Vercel
 

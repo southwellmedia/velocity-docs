@@ -35,6 +35,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | `Pagination` | Page navigation controls |
 | `Progress` | Progress bar indicator |
 | `Skeleton` | Loading placeholders |
+| `GoogleMap` | Consent-aware embedded map |
 
 ### Feedback (`ui/feedback/`)
 
@@ -53,6 +54,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | `Tabs` | Horizontal tab navigation |
 | `VerticalTabs` | Vertical tab navigation |
 | `Accordion` | Collapsible content sections |
+| `ConsentBanner` | Cookie consent banner |
 
 ### Layout (`ui/layout/`)
 
@@ -107,12 +109,14 @@ Size options (usually `sm`, `md`, `lg`):
 <Button size="lg">Large</Button>
 ```
 
-### Color Scheme
+### Dark Sections
 
-For dark backgrounds:
+For dark backgrounds, wrap components in `.invert-section` instead of passing a prop:
 
 ```astro
-<Button colorScheme="invert">On Dark</Button>
+<div class="invert-section bg-background">
+  <Button>On Dark</Button>
+</div>
 ```
 
 ## Import Example
@@ -127,3 +131,5 @@ import { Button, Input, Card } from '@/components/ui';
   <Button>Submit</Button>
 </Card>
 ```
+
+The `@/components/ui` barrel exists when you install all components. After a partial install, import from the component's folder, such as `@/components/ui/form/Button/Button.astro`.
