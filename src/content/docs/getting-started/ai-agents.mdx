@@ -7,10 +7,10 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-Velocity isn't an agent. It gives the agent you already use, such as Claude Code, the rules, skills and checks it needs to follow Velocity's conventions without you explaining them:
+Velocity isn't an agent, and it doesn't decide what your site looks like. It gives the agent you already use, such as Claude Code, the rules, skills and checks it needs to follow Velocity's conventions without you explaining them:
 
 - **Rules:** `AGENTS.md` and `.agents/velocity.md` describe the stack, the commands and which files upgrades replace.
-- **Skills:** six step-by-step guides for common tasks, from adding a page to connecting the forms.
+- **Skills:** seven step-by-step guides, from setting up the whole site to adding a page or connecting the forms.
 - **Component reference:** `.agents/components.md` lists all 46 components, so agents reuse them instead of writing new ones.
 - **A check:** `npm run check:agent` finds the mistakes agents make that the build lets through, and tells the agent how to fix each one.
 
@@ -22,12 +22,34 @@ Velocity isn't an agent. It gives the agent you already use, such as Claude Code
 | `CLAUDE.md` | Imports `AGENTS.md` for Claude Code | Left alone |
 | `.agents/velocity.md` | Velocity's stack, commands, rules and file ownership | Replaced |
 | `.agents/components.md` | Reference for every component Velocity ships | Replaced |
+| `.agents/site.md` | Your site brief, written by the CLI and your agent | Left alone |
 | `.agents/skills/velocity-*` | Skills for common tasks | Replaced |
 | `.claude/skills/velocity-*` | The same skills, in the folder Claude Code uses | Replaced |
 | `scripts/check-agent.mjs` | The agent-ready check | Replaced |
 | `.velocity/baseline.json` | Velocity-owned files as they were at scaffold or last upgrade | Rewritten by the CLI |
 
 Add your own rules to the **Project notes** section of `AGENTS.md`.
+
+## Set up your site
+
+Create an own-site project, open it in your agent and ask:
+
+> Set up this site for my business.
+
+The `velocity-start-site` skill then:
+
+1. **Asks** up to seven questions it can't answer from your request: the business, the audience, the main action, the pages, languages, the look you want, and any existing site to take facts from.
+2. **Writes a brief** to `.agents/site.md` and shows you the sitemap before building.
+3. **Prepares the project:** removes the demo if there is one, sets your site's name and contact details, and applies your colours, fonts and logo with `velocity-rebrand`.
+4. **Builds your pages** with the other skills, using Velocity's components where they fit and writing new ones where they don't.
+5. **Writes real copy** in every enabled language. Anything it doesn't know, such as prices or opening hours, becomes a `[[placeholder: …]]` instead of a guess.
+6. **Checks its work** with `npm run validate` and hands off with a list of placeholders and assumptions to confirm.
+
+You don't have to use it. Velocity is a starter kit: build by hand, use your own components, or ask your agent for anything else.
+
+### The site brief
+
+`.agents/site.md` is the project's memory: the business, audience, voice, brand, sitemap, facts, placeholders, assumptions and a dated decisions log. Later sessions read it first, so your agent builds on earlier decisions instead of starting over. The CLI seeds it with your site name, description, languages and starter pages, and leaves every other heading for the agent to fill with you. Upgrades never touch it. Edit it like any other file.
 
 ## Which agents
 
@@ -39,6 +61,7 @@ Skills are step-by-step instructions for a specific task. You don't need to name
 
 | Skill | Use it by asking to… |
 |-------|----------------------|
+| `velocity-start-site` | Set up or rebuild the whole site for a business, from a brief to built pages, replacing the demo or starter content |
 | `velocity-add-page` | Add a page or route, with its view, locale wrappers, nav entry and translated copy |
 | `velocity-add-component` | Add, restore or customize a component, following its CVA variants, design tokens, i18n and upgrade rules |
 | `velocity-add-content` | Publish a blog post with valid frontmatter, or add a content collection with its own pages, URLs, search indexing and share images |
@@ -87,6 +110,9 @@ It runs at the end of `npm run validate`, and as its own step in the deploy work
 | `forms/stub` | A form Action that tells visitors their message was sent but delivers nothing |
 | `ownership/edited` | A Velocity-owned file changed since scaffold or the last upgrade |
 | `strings/hardcoded` | User-facing text written into a page, view or component |
+| `content/placeholder` | A `[[placeholder: …]]` marker or an empty `MediaSlot` image still on a page |
+| `config/default-identity` | The scaffold's name, author or email in `site.config.ts`, or a build that uses `example.com` because `SITE_URL` isn't set |
+| `a11y/multiple-h1` | A page with more than one `<h1>` |
 
 The hardcoded-text check covers every `.astro` and `.tsx` file under `src/`, outside content, i18n, assets and styles. Velocity's own files are skipped while they're untouched. With a baseline, a Velocity-owned file you've changed, or a file you've added inside a Velocity folder, is scanned too.
 
@@ -188,6 +214,6 @@ npm create velocity-astro@latest upgrade
 - **From 2.0:** the upgrade replaces your old `AGENTS.md` once, because it contains outdated instructions. Your copy is saved to `.velocity-backup/`. If you added your own rules, copy them into the **Project notes** section of the new file. After that, upgrades leave `AGENTS.md` alone.
 - **From 2.1 or later:** the upgrade adds `check:agent` to the end of your `validate` script. If you customized `validate`, append `&& node scripts/check-agent.mjs` yourself.
 
-See [Upgrading to 2.4](/upgrade-guides/v2-to-v2-4/) for the other steps.
+See [Upgrading to 2.5](/upgrade-guides/v2-4-to-v2-5/) and [Upgrading to 2.4](/upgrade-guides/v2-to-v2-4/) for the other steps.
 
 Skills are committed with your project, so everyone working on it gets the same instructions. Only local Claude Code state in `.claude/` is ignored.

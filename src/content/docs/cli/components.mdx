@@ -9,32 +9,23 @@ import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
 The CLI can remove the optional components you don't need. Optional components live in `src/components/ui`, `src/components/patterns` and `src/components/hero`.
 
-## Interactive Selection
+Every project gets all components unless you pass `--components`. The wizard doesn't ask.
 
-```
-◇  Include optional components?
-│  ● All
-│  ○ Select categories
-│  ○ Select individual
-│  ○ None
-```
-
-| Option | What's kept |
-|--------|-------------|
-| **All** | Every component |
-| **Select categories** | The categories you choose, plus their dependencies |
-| **Select individual** | The components you choose, plus their dependencies |
-| **None** | Only the components core pages need |
+| Flag | What's kept |
+|------|-------------|
+| `--components` (or no flag) | Every component |
+| `--components=ui,patterns` | The categories you choose, plus their dependencies |
+| `--components=none` | Only the components core pages need |
 
 <Aside type="tip">
-  Choose **All** if you're unsure. Astro only ships the components you use, so unused ones don't add to your pages.
+  Keep all of them if you're unsure. Astro only ships the components you use, so unused ones don't add to your pages, and your AI agent can use any of them.
 </Aside>
 
 <Aside type="note" title="Demo projects keep everything">
-  The demo pages use every component, so `--demo` ignores your selection and keeps all of them.
+  The demo pages use every component, so `--start demo` ignores your selection and keeps all of them.
 </Aside>
 
-## Skip the Prompt
+## Examples
 
 <Tabs>
   <TabItem label="All">

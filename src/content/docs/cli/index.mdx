@@ -47,21 +47,20 @@ Run the command and answer the prompts:
 
 ```
 ◇  What is your project name?
-│  my-site
+│  rosas-bakery
 │
-◇  Include demo landing page and sample content?
-│  No
+◇  What are you starting?
+│  ● My own site       A clean project your AI agent builds into your site
+│  ○ Explore the Velocity demo
+│  ○ Blank project
 │
-◇  Include optional components?
-│  ● All
-│  ○ Select categories
-│  ○ Select individual
-│  ○ None
+◇  Site name?
+│  Rosa's Bakery
+│
+◇  What's the site for? One sentence, or Enter to skip
+│  A neighbourhood bakery in Leith with a wood-fired oven
 │
 ◇  Add internationalization (i18n)?
-│  No
-│
-◇  Generate starter pages?
 │  No
 │
 ◇  Which package manager?
@@ -73,26 +72,30 @@ Run the command and answer the prompts:
 
    The folder to create. It's normalized to a valid package name.
 
-2. **Demo content**
+2. **What you're starting**
 
-   **No** gives a minimal starter with a home page, blog and search. **Yes** adds the demo landing page, About, Contact and component showcase pages, and sample content.
+   - **My own site:** a minimal project (home page, blog and search) set up for your AI agent to build into your site. The CLI writes your answers to a site brief, `.agents/site.md`.
+   - **Explore the Velocity demo:** the demo landing page, About, Contact and component showcase pages, and sample content.
+   - **Blank project:** the same minimal project, without the brief, for building by hand.
 
-3. **Optional components**
+3. **Site name** (own site only)
 
-   Keep all of them, pick categories, pick individual components, or keep only what the core pages need. See [Component Selection](/cli/components/).
+   Written to `src/config/site.config.ts`, the README and the brief. Defaults to the project name, title-cased.
 
-4. **Internationalization**
+4. **What the site is for** (own site only)
+
+   One sentence for the brief. Press Enter to skip, and your agent will ask.
+
+5. **Internationalization**
 
    Enables Spanish and French alongside English. See [i18n](/cli/i18n/).
-
-5. **Starter pages**
-
-   Enter a comma-separated list of page names, such as `Pricing, Team, FAQ`. See [Starter Pages](#starter-pages).
 
 6. **Package manager**
 
    Preselected from the command you ran.
 </Steps>
+
+Components and starter pages aren't prompts: every project gets all components, and you can change that with [`--components`](/cli/components/) and [`--pages`](#starter-pages).
 
 ## What You Get
 
@@ -123,12 +126,15 @@ Flags skip the matching prompt.
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--demo` | prompt | Include the demo pages and sample content |
-| `--components` | prompt | All components |
+| `--start own\|demo\|blank` | prompt | What you're starting. `own` if you skip prompts |
+| `--demo` | | Same as `--start demo` |
+| `--name "Rosa's Bakery"` | project name, title-cased | Site name (own site) |
+| `--describe "…"` | | One sentence on what the site is for (own site) |
+| `--components` | all | All components |
 | `--components=none` | | Only what core pages need |
 | `--components=ui,patterns,hero` | | Specific categories |
 | `--i18n` | prompt | Enable English, Spanish and French |
-| `--pages` | prompt | Ask for starter page names |
+| `--pages` | | Ask for starter page names |
 | `--pages="Pricing, Team"` | | Generate these pages without asking |
 | `--ref <tag\|branch>` | latest release | Velocity tag or branch to scaffold from |
 | `--template <dir>` | | Scaffold from a local Velocity checkout |
@@ -141,9 +147,15 @@ Flags skip the matching prompt.
 
 ### Defaults with `--yes`
 
-`-y` creates a **minimal** project with all components, one language and **pnpm**, whichever command you used to start it. Add flags to change that:
+`-y` creates an **own site** project with all components, one language and **pnpm**, whichever command you used to start it. The site name defaults to the project name, title-cased. Add flags to change that:
 
 ```bash
+# Own site with its brief seeded
+pnpm create velocity-astro rosas-bakery -y --name "Rosa's Bakery" --describe "Neighbourhood bakery in Leith"
+
+# Blank project, only the components core pages need
+pnpm create velocity-astro my-site -y --start blank --components=none
+
 # Minimal project, all components
 pnpm create velocity-astro my-site -y
 
@@ -180,7 +192,7 @@ pnpm create velocity-astro my-site -y --no-install
 | `src/config/nav.config.ts` | A route and a nav item |
 | `src/i18n/translations/*.ts` | Title and description strings, in every language file |
 
-The names `index`, `blog`, `404`, `rss`, `search` and `lang` are reserved and skipped. Pages use `PageLayout`. Demo projects created through the wizard can choose `LandingLayout` instead.
+The names `index`, `blog`, `404`, `rss`, `search` and `lang` are reserved and skipped. Pages use `PageLayout`. On an own site, the pages are also listed in the brief's sitemap as planned.
 
 ## After Scaffolding
 
@@ -190,6 +202,8 @@ pnpm dev
 ```
 
 Your site runs at `http://localhost:4321`.
+
+For an own site, open the project in your AI coding agent and ask it to **"Set up this site"**. It reads the brief, asks what's missing, and builds your pages. See [Set up your site with an agent](/getting-started/ai-agents/#set-up-your-site). For the demo, ask it to **"Replace the demo with my site"** when you're ready.
 
 ## Next Steps
 

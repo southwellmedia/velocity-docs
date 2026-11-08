@@ -1,0 +1,45 @@
+---
+title: "Upgrade: v2.4 to v2.5.1"
+description: Upgrade a Velocity 2.4 or 2.5.0 project to Velocity 2.5.1, with the site setup skill, the site brief and new agent checks
+sidebar:
+  order: 8
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This guide takes a project from **Velocity 2.4** or **2.5.0** to **Velocity 2.5.1**. There are no breaking changes, and nothing changes in your pages. Coming from 2.0–2.3? Follow [v2.x to v2.4.1](/upgrade-guides/v2-to-v2-4/) first; the upgrade itself goes straight to 2.5.1.
+
+## What's new
+
+| | 2.4.1 | 2.5.1 |
+|---|---|---|
+| **Agent skills** | 6 | 7, with `velocity-start-site` |
+| **Site brief** | | `.agents/site.md`, created by your agent or the CLI |
+| **`check:agent` warnings** | | Adds `content/placeholder`, `config/default-identity` and `a11y/multiple-h1` |
+| **`create-velocity-astro`** | 2.1+ | **2.3+** recommended |
+
+<Aside type="caution" title="Before you start">
+  Commit your work, so you can review the upgrade as a diff.
+</Aside>
+
+## Run the upgrade
+
+```bash
+npm create velocity-astro@latest upgrade
+```
+
+## After the upgrade
+
+- **Ask your agent to set up the site.** If your project still has starter or demo content, ask it to **"Set up this site for my business"**. See [Set up your site](/getting-started/ai-agents/#set-up-your-site).
+- **Expect new warnings.** `check:agent` now reports placeholders still on a page, the scaffold's default name, author and email in `site.config.ts`, a build without `SITE_URL`, and pages with more than one `<h1>`. They're warnings, so `validate` still passes. Run `npm run check:agent -- --strict` before launch to make them fail.
+- **Coming from 2.5.0:** the upgrade deletes files Velocity no longer ships and backs them up to `.velocity-backup/`. If `package.json` has a `design` script, delete it. Your theme, components and `.agents/site.md` aren't touched.
+
+## Verify
+
+```bash
+npm install
+npm run validate
+```

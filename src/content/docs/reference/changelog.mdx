@@ -5,6 +5,35 @@ sidebar:
   order: 2
 ---
 
+## v2.5.1 (2026-11-08)
+
+### Set up your site with your agent
+
+- **`velocity-start-site` skill.** Ask your agent to "set up this site for my business". It asks what it can't work out, writes a brief, shows you the sitemap, builds your pages with Velocity's components and the other skills, and writes copy in every enabled language. See [Set up your site](/getting-started/ai-agents/#set-up-your-site).
+- **The site brief.** `.agents/site.md` records the business, audience, voice, brand, sitemap, facts and decisions, so later sessions build on earlier ones. Upgrades leave it alone.
+- **No invented facts.** Anything the agent doesn't know becomes a `[[placeholder: …]]` and is listed in the handoff.
+- **`create-velocity-astro` 2.3** asks what you're starting (your own site, the demo or a blank project), then your site name and a one-line description, and seeds the brief with them. See [create-velocity-astro](/cli/).
+
+### New agent checks
+
+`check:agent` adds three warnings:
+
+- `content/placeholder`: a placeholder or an empty `MediaSlot` image still on a page.
+- `config/default-identity`: the scaffold's name, author or email in `site.config.ts`, or a build using `example.com` because `SITE_URL` isn't set.
+- `a11y/multiple-h1`: a page with more than one `<h1>`.
+
+### Fixes
+
+- **Dark mode:** subtle and muted text in the default and Midnight themes, and status colours, now meet WCAG AA.
+- **Starter blog post:** no longer renders two `<h1>`s.
+- **404 page:** the large digits scale with the viewport.
+
+### Upgrading
+
+Nothing breaks. If you're on 2.5.0, the upgrade removes files Velocity no longer ships (backed up to `.velocity-backup/`); delete the `design` script from `package.json` if you have one. 2.5.1 replaces 2.5.0.
+
+> **Upgrade guide:** [v2.4 to v2.5.1](/upgrade-guides/v2-4-to-v2-5/)
+
 ## v2.4.1 (2026-11-07)
 
 ### Agent checks that cover everything you build
