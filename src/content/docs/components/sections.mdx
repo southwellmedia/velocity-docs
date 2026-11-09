@@ -1,0 +1,325 @@
+---
+title: Sections
+description: 15 page sections to build pages from, in src/components/blocks/
+sidebar:
+  order: 3
+---
+
+Velocity ships 15 page sections in `src/components/blocks/`. Build pages from them before writing your own section markup. Every section:
+
+- takes its copy as props, so it works with your translations;
+- takes a `tone`: `default`, `secondary` (tinted), `invert` (dark) or `brand` (filled with your brand colour);
+- uses semantic tokens, so it follows your theme in light and dark mode.
+
+`src/components/blocks/` is Velocity's: upgrades replace it, so fixes reach you. To change how a section looks, pass a `tone` or `class`, or wrap it in your own component. Sections you write yourself can live in `src/components/sections/`, which is yours.
+
+## Band
+
+Page band with tone (default, secondary, invert, brand), width (default, wide, narrow), padding, an optional eyebrow/title/lead heading and a background slot for a photo or texture layer. Every section renders one.
+
+```astro
+---
+import Band from '@/components/blocks/Band.astro';
+---
+
+<Band eyebrow="Why us" title="Built for speed" tone="invert" width="wide">
+  <div class="grid gap-6 md:grid-cols-3"><!-- cards --></div>
+</Band>
+```
+
+- Use Band (or Section) for a custom content band instead of hand-rolled `<section>` padding, container and background classes.
+- Use tone="invert" or tone="brand" for contrast bands; text and buttons inside recolour automatically.
+
+## PageHero
+
+Opening band for inner pages: the page's only `<h1>`, eyebrow, lead, tone, size, and slots for breadcrumbs, content after the title and a wide-screen aside.
+
+```astro
+---
+import PageHero from '@/components/blocks/PageHero.astro';
+import Breadcrumbs from '@/components/seo/Breadcrumbs.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
+
+<PageHero eyebrow="Services" title="Family medicine" lead="Care for every age, same-week appointments.">
+  <Breadcrumbs slot="breadcrumbs" items={[{ label: 'Home', href: '/' }, { label: 'Services' }]} />
+  <Button variant="brand" size="lg" href="/book">Book a visit</Button>
+</PageHero>
+```
+
+- Use PageHero for inner pages that need breadcrumbs, buttons, a search form or an image; PageHeader is the plain version. Don't add another `<h1>`.
+- Put seo/Breadcrumbs in the breadcrumbs slot instead of building your own trail.
+
+## CtaBand
+
+Closing call-to-action panel with a heading, lead and your buttons, on a brand, invert or secondary tone.
+
+```astro
+---
+import CtaBand from '@/components/blocks/CtaBand.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
+
+<CtaBand title="Ready to start?" lead="Set up takes five minutes." tone="brand">
+  <Button size="lg" href="/contact">Get in touch</Button>
+</CtaBand>
+```
+
+- Use CtaBand to close a page with an action instead of a hand-built dark box; put Buttons in the default slot.
+- CTA (ui/marketing) is the older centered variant with logo and slots; use CtaBand for new pages.
+
+## Faq
+
+Questions and answers as an accordion, stacked in a narrow band or split with the heading beside the answers, with FAQPage JSON-LD.
+
+```astro
+---
+import Faq from '@/components/blocks/Faq.astro';
+---
+
+<Faq
+  eyebrow="FAQ"
+  title="Common questions"
+  items={[
+    { question: 'Do you take walk-ins?', answer: 'Yes, every weekday morning.' },
+    { question: 'Is parking free?', answer: 'Yes, behind the building.' },
+  ]}
+/>
+```
+
+- Use Faq for question-and-answer content instead of Accordion plus hand-written FAQ structured data.
+
+## Steps
+
+Numbered how-it-works steps in columns or a list, in its own band or bare inside another layout.
+
+```astro
+---
+import Steps from '@/components/blocks/Steps.astro';
+---
+
+<Steps
+  title="How it works"
+  items={[
+    { title: 'Book online', body: 'Pick a time that suits you.' },
+    { title: 'Visit us', body: 'Arrive ten minutes early.' },
+    { title: 'Follow up', body: 'Results in your inbox.' },
+  ]}
+/>
+```
+
+- Use Steps for any numbered process (how it works, your first visit) instead of a hand-numbered list.
+
+## Testimonials
+
+Customer quotes in a grid of cards with name, role, optional avatar and star rating.
+
+```astro
+---
+import Testimonials from '@/components/blocks/Testimonials.astro';
+---
+
+<Testimonials
+  title="What customers say"
+  items={[
+    { quote: 'Fast, friendly and on time.', name: 'Ana Ruiz', role: 'Patient since 2021', rating: 5 },
+    { quote: 'The best decision we made this year.', name: 'Sam Lee', role: 'Owner, Lee & Co' },
+  ]}
+/>
+```
+
+- Use Testimonials for quotes and reviews instead of hand-built quote cards. Only publish real, permitted testimonials.
+
+## Hours
+
+Opening hours table (days as row headers, times in tabular figures) with an optional note and per-row data attributes for a "today" highlight; in its own band or bare inside another layout.
+
+```astro
+---
+import Hours from '@/components/blocks/Hours.astro';
+---
+
+<Hours
+  bare
+  rows={[
+    { days: 'Mon–Fri', time: '8:00–18:00' },
+    { days: 'Sat', time: '9:00–13:00' },
+  ]}
+  note="Closed on public holidays."
+/>
+```
+
+- Use Hours for opening times instead of a hand-built table or list.
+
+## FeatureGrid
+
+Features in a 2, 3 or 4 column grid: icon, title and a line or two each, open or on cards; in its own band or bare.
+
+```astro
+---
+import FeatureGrid from '@/components/blocks/FeatureGrid.astro';
+---
+
+<FeatureGrid
+  eyebrow="Why Velocity"
+  title="Everything a site needs"
+  items={[
+    { icon: 'zap', title: 'Fast by default', body: 'Static HTML, no client router.' },
+    { icon: 'globe', title: 'Every language', body: 'Translated URLs and hreflang.' },
+    { icon: 'shield-check', title: 'Strict CSP', body: 'Hash-based script policy.' },
+  ]}
+/>
+```
+
+- Use FeatureGrid for a set of features or services instead of hand-built icon cards.
+
+## FeatureSplit
+
+One feature beside a picture: eyebrow, title, lead, checked points and buttons, with a MediaSlot or your own media; reverse alternates sides.
+
+```astro
+---
+import FeatureSplit from '@/components/blocks/FeatureSplit.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
+
+<FeatureSplit
+  eyebrow="Themes"
+  title="Change the whole look in one file"
+  lead="Semantic tokens feed every component."
+  points={['Light and dark', 'OKLCH colours', 'One brand hue']}
+  photo="theme-preview"
+  alt="The theme editor"
+>
+  <Button href="/docs/themes">Read the guide</Button>
+</FeatureSplit>
+```
+
+- Use FeatureSplit for a text-and-image row instead of a hand-built two-column grid; alternate reverse for a feature tour.
+
+## Pricing
+
+Plans side by side: name, price, description, included features and a button, with one plan highlighted and an optional badge.
+
+```astro
+---
+import Pricing from '@/components/blocks/Pricing.astro';
+---
+
+<Pricing
+  title="Simple pricing"
+  plans={[
+    { name: 'Starter', price: '$0', period: '/ month', features: ['1 site', 'Community support'], cta: { label: 'Start free', href: '/signup' } },
+    { name: 'Pro', price: '$29', period: '/ month', features: ['10 sites', 'Email support'], cta: { label: 'Go Pro', href: '/signup?plan=pro' }, highlighted: true, badge: 'Most popular' },
+  ]}
+  note="Prices exclude tax."
+/>
+```
+
+- Use Pricing for plan cards instead of hand-built price cards. Prices are display text ("$29", "Free").
+
+## LogoCloud
+
+A row of customer or partner logos under a short label, muted until hovered; imported images or public/ paths.
+
+```astro
+---
+import LogoCloud from '@/components/blocks/LogoCloud.astro';
+import acme from '@/assets/logos/acme.svg';
+---
+
+<LogoCloud
+  label="Trusted by teams at"
+  logos={[
+    { name: 'Acme', src: acme },
+    { name: 'Globex', src: '/logos/globex.svg', href: 'https://example.com' },
+  ]}
+/>
+```
+
+- Use LogoCloud for "trusted by" logos instead of a hand-built image row.
+
+## StatsBand
+
+A band of headline numbers, set large over their labels or as StatCards with icons and trends.
+
+```astro
+---
+import StatsBand from '@/components/blocks/StatsBand.astro';
+---
+
+<StatsBand
+  tone="secondary"
+  stats={[
+    { value: '100', label: 'Lighthouse performance' },
+    { value: '0 KB', label: 'JavaScript by default' },
+    { value: '3', label: 'Languages out of the box' },
+  ]}
+/>
+```
+
+- Use StatsBand for a row of headline figures; use StatCard alone for a single metric in a dashboard.
+
+## ContactSection
+
+Heading and ways to reach you (icon, label, linked value) beside ContactForm on a card; extra content such as Hours in the default slot.
+
+```astro
+---
+import ContactSection from '@/components/blocks/ContactSection.astro';
+---
+
+<ContactSection
+  eyebrow="Contact"
+  title="Talk to a person"
+  lead="We answer within a day."
+  details={[
+    { icon: 'mail', label: 'Email', value: 'hello@example.com', href: 'mailto:hello@example.com' },
+    { icon: 'phone', label: 'Phone', value: '+1 555 0100', href: 'tel:+15550100' },
+    { icon: 'map-pin', label: 'Office', value: '12 Main St, Dallas' },
+  ]}
+/>
+```
+
+- Use ContactSection for a contact page or band instead of placing ContactForm beside hand-built details.
+
+## Timeline
+
+Dated events down a line (history, milestones): date, title and an optional line each; in its own band or bare.
+
+```astro
+---
+import Timeline from '@/components/blocks/Timeline.astro';
+---
+
+<Timeline
+  title="Our story"
+  items={[
+    { date: '2021', title: 'Founded in Dallas', body: 'Two people and a client list.' },
+    { date: '2024', title: 'Velocity 1.0' },
+    { date: '2026', title: 'Velocity 2.6', body: 'Page sections and every Lucide icon.' },
+  ]}
+/>
+```
+
+- Use Timeline for dated events in order; use Steps for a numbered process.
+
+## Team
+
+People in a grid: portrait (MediaSlot or placeholder), name, role, an optional line and icon links.
+
+```astro
+---
+import Team from '@/components/blocks/Team.astro';
+---
+
+<Team
+  title="Meet the team"
+  people={[
+    { name: 'Ana Ruiz', role: 'Founder', photo: 'ana', links: [{ label: 'Email', href: 'mailto:ana@example.com', icon: 'mail' }] },
+    { name: 'Sam Lee', role: 'Designer' },
+  ]}
+/>
+```
+
+- Use Team for staff, providers or speakers instead of hand-built profile cards.

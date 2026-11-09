@@ -63,6 +63,25 @@ Dropdown select menu:
 />
 ```
 
+### ToggleGroup
+
+A segmented control (one choice from a few, e.g. Monthly / Yearly) built from native radio inputs: works without JavaScript and submits with a form.
+
+```astro
+---
+import ToggleGroup from '@/components/ui/form/ToggleGroup/ToggleGroup.astro';
+---
+
+<ToggleGroup
+  name="billing"
+  label="Billing period"
+  value="monthly"
+  options={[{ value: 'monthly', label: 'Monthly' }, { value: 'yearly', label: 'Yearly' }]}
+/>
+```
+
+- Use ToggleGroup for a short set of mutually exclusive options instead of hand-built segmented buttons; use Tabs when each option shows different content.
+
 ## Display Components
 
 ### Avatar
@@ -90,12 +109,62 @@ Loading placeholder. Extends `HTMLAttributes<'div'>`.
 
 ### Icon
 
-SVG icon component:
+Any [Lucide](https://lucide.dev/icons) icon by its kebab-case name, aliases included, drawn as an inline SVG at build time (no JavaScript). Sizes are presets: `xs`, `sm`, `md` (default), `lg`, `xl`. A few brand marks Lucide doesn't ship (`github`, `twitter`, `linkedin` and the `brand-*` logos) are built in. An unknown name draws an `x` and warns during the build.
 
 ```astro
-<Icon name="search" size={24} />
-<Icon name="heart" size={16} strokeWidth={2} />
+<Icon name="search" size="sm" />
+<Icon name="calendar-check" size="lg" strokeWidth={1.5} />
 ```
+
+In a React island that needs the icon in its first paint, import it from `lucide-react` by name instead.
+
+### Carousel
+
+A sideways-scrolling row of slides on CSS scroll snap (swipe, trackpad, keyboard) with previous / next buttons; 1-4 slides in view.
+
+```astro
+---
+import Carousel from '@/components/ui/data-display/Carousel/Carousel.astro';
+import Card from '@/components/ui/data-display/Card/Card.astro';
+---
+
+<Carousel label="Customer stories" perView={3}>
+  <Card>One</Card>
+  <Card>Two</Card>
+  <Card>Three</Card>
+  <Card>Four</Card>
+</Carousel>
+```
+
+- Use Carousel for galleries and card rows that scroll sideways instead of a hand-built slider script.
+
+### Kbd
+
+A keyboard key, or a combination such as ⌘ K from a keys array.
+
+```astro
+---
+import Kbd from '@/components/ui/content/Kbd/Kbd.astro';
+---
+
+Press <Kbd keys={['⌘', 'K']} /> to search, or <Kbd>Esc</Kbd> to close.
+```
+
+- Use Kbd for keys and shortcuts in docs and UI hints instead of styled `<code>`.
+
+### Spinner
+
+A loading spinner that inherits the text colour, with a screen-reader label; stops with reduced motion.
+
+```astro
+---
+import Spinner from '@/components/ui/feedback/Spinner/Spinner.astro';
+---
+
+<Spinner size="sm" label="Loading results" />
+```
+
+- Use Spinner for a loading state outside a button; Button has its own loading prop.
 
 ## Interactive Components
 
@@ -174,6 +243,42 @@ Vertical tab navigation (mobile dropdown):
 />
 ```
 
+### Sheet
+
+A panel that slides in from the left, right or bottom (filters, cart, menu), on the native `<dialog>`: focus stays inside and Escape closes it. Opened by any button with data-sheet-open.
+
+```astro
+---
+import Sheet from '@/components/ui/overlay/Sheet/Sheet.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
+
+<Button data-sheet-open="filters">Filters</Button>
+<Sheet id="filters" title="Filters" side="right">
+  <p>Filter controls go here.</p>
+  <Button slot="footer" data-sheet-close fullWidth>Show results</Button>
+</Sheet>
+```
+
+- Use Sheet for a side panel or bottom drawer; use Dialog for a centered modal.
+
+### Popover
+
+A small panel anchored to its button (details, a few actions), on the native popover attribute: Escape and outside clicks close it with no script.
+
+```astro
+---
+import Popover from '@/components/ui/overlay/Popover/Popover.astro';
+---
+
+<Popover label="Plan details">
+  <Fragment slot="trigger">Details</Fragment>
+  <p>Billed yearly. Cancel any time.</p>
+</Popover>
+```
+
+- Use Popover for interactive content next to a button; use Tooltip for a short read-only hint and Dropdown for a menu of actions.
+
 ## Specialized Components
 
 ### CodeBlock
@@ -220,3 +325,33 @@ Animated terminal demo (React component):
   output={['Installing...', 'Server running at localhost:4321']}
 />
 ```
+
+### VideoEmbed
+
+A YouTube or Vimeo video that loads only on play: until then a poster and no third-party request or cookies (youtube-nocookie, Vimeo dnt).
+
+```astro
+---
+import VideoEmbed from '@/components/ui/marketing/VideoEmbed/VideoEmbed.astro';
+---
+
+<VideoEmbed provider="youtube" videoId="dQw4w9WgXcQ" title="Product tour" />
+```
+
+- Use VideoEmbed for any YouTube or Vimeo video instead of a raw `<iframe>`, which loads third-party scripts and cookies on page load.
+
+### AnnouncementBar
+
+A strip above the header for a launch or notice: message, optional link and close button; a dismissed bar stays closed per id.
+
+```astro
+---
+import AnnouncementBar from '@/components/ui/marketing/AnnouncementBar/AnnouncementBar.astro';
+---
+
+<AnnouncementBar id="launch-2-6" href="/blog/velocity-2-6" linkLabel="Read the post" tone="brand">
+  Velocity 2.6 is out.
+</AnnouncementBar>
+```
+
+- Use AnnouncementBar for site-wide notices instead of an Alert at the top of a page; change its id for each new announcement.

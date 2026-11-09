@@ -5,6 +5,58 @@ sidebar:
   order: 2
 ---
 
+## v2.6.2 (2026-11-09)
+
+### More sections
+
+Eight more page sections join Faq, Steps and the rest in `src/components/blocks/`: **FeatureGrid**, **FeatureSplit**, **Pricing**, **LogoCloud**, **StatsBand**, **ContactSection**, **Timeline** and **Team**. That makes 15. See [Sections](/components/sections/).
+
+### New components
+
+- **Sheet:** a side panel or bottom drawer on the native `<dialog>`.
+- **Popover:** a small panel anchored to its button, using the native `popover` attribute.
+- **Carousel:** scroll-snap slides with previous and next buttons.
+- **ToggleGroup:** a segmented control built from radio inputs.
+- **Kbd:** keys and shortcuts.
+- **Spinner:** a loading spinner with a screen-reader label.
+- **VideoEmbed:** a YouTube or Vimeo player that loads nothing from the provider until someone presses play.
+- **AnnouncementBar:** a dismissible strip above the header.
+
+See [Other UI components](/components/ui/other-components/). Velocity now has 70 components: 41 UI, 10 patterns, 15 sections, Breadcrumbs, 2 layout and 1 hero.
+
+### Fixes
+
+- **Breadcrumbs:** the JSON-LD for the current page now uses its own URL.
+
+### Upgrading
+
+Nothing breaks. The new files arrive with the upgrade.
+
+## v2.6.1 (2026-11-09)
+
+- **`blogFields`:** add your own frontmatter fields to the blog from `src/config/collections.ts`, typed, without editing `content.config.ts`. See [Adding fields to the blog](/customization/adding-collections/#adding-fields-to-the-blog).
+
+## v2.6.0 (2026-11-09)
+
+### Page sections
+
+A new free tier of full-width page sections in `src/components/blocks/`: **Band**, **PageHero**, **CtaBand**, **Faq** (with FAQ JSON-LD), **Steps**, **Testimonials** and **Hours**. Each one takes its copy as props and a `tone` (`default`, `secondary`, `invert` or `brand`). `src/components/blocks/` belongs to Velocity and upgrades replace it. Put sections you write yourself in `src/components/sections/`.
+
+### Every Lucide icon
+
+`<Icon name="…" />` now accepts any [Lucide](https://lucide.dev/icons) name and draws it at build time. Brand marks such as `github` are still built in.
+
+### Also new
+
+- **Button:** a `brand` variant.
+- **Brand tokens:** `--brand-fill`, `--brand-fill-hover` and `--brand-ink`, plus a `.brand-section` class.
+- **`patterns/Section`:** now wraps Band, so it accepts the same tones.
+- **Breadcrumbs:** now listed in the component registry.
+
+### Upgrading
+
+Nothing breaks. `lucide` is added to your dependencies.
+
 ## v2.5.1 (2026-11-08)
 
 ### Set up your site with your agent

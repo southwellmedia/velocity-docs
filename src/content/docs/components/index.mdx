@@ -1,13 +1,13 @@
 ---
 title: Components Overview
-description: 46 production-ready components for building modern websites
+description: 70 production-ready components for building modern websites
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Velocity includes 46 components, listed in its component registry (`component-registry.json`). `.agents/components.md` describes all of them for [AI coding agents](/getting-started/ai-agents/), and the [CLI](/cli/components/) lets you choose which UI, pattern and hero components a new project includes.
+Velocity includes 70 components, listed in its component registry (`component-registry.json`). `.agents/components.md` describes all of them for [AI coding agents](/getting-started/ai-agents/), and the [CLI](/cli/components/) lets you choose which UI, pattern and hero components a new project includes.
 
 ## Component Philosophy
 
@@ -21,10 +21,13 @@ Velocity includes 46 components, listed in its component registry (`component-re
 
 <CardGrid>
   <Card title="UI Components" icon="puzzle">
-    33 components in 8 subcategories: form, data display, feedback, overlay, layout, primitives, content and marketing.
+    41 components in 8 subcategories: form, data display, feedback, overlay, layout, primitives, content and marketing.
   </Card>
   <Card title="Pattern Components" icon="document">
     10 compositions: ContactForm, NewsletterForm, FormField, SearchInput, PasswordInput, StatCard, EmptyState, Section, PageHeader and MediaSlot.
+  </Card>
+  <Card title="Sections" icon="list-format">
+    15 page sections: Band, PageHero, CtaBand, Faq, Steps, Testimonials, Hours, FeatureGrid, FeatureSplit, Pricing, LogoCloud, StatsBand, ContactSection, Timeline, Team. See [Sections](/components/sections/).
   </Card>
   <Card title="Layout Components" icon="setting">
     2 components: Header and Footer.
@@ -38,18 +41,20 @@ Velocity includes 46 components, listed in its component registry (`component-re
 
 | Category | Count | Components |
 |----------|-------|------------|
-| UI: Form | 7 | Button, Input, Textarea, Select, Checkbox, Radio, Switch |
-| UI: Data Display | 9 | Card, Badge, Avatar, AvatarGroup, Table, Pagination, Progress, Skeleton, GoogleMap |
-| UI: Feedback | 3 | Alert, Toast, Tooltip |
-| UI: Overlay | 6 | Dialog, Dropdown, Tabs, VerticalTabs, Accordion, ConsentBanner |
+| UI: Form | 8 | Button, Input, Textarea, Select, Checkbox, Radio, Switch, ToggleGroup |
+| UI: Data Display | 10 | Card, Badge, Avatar, AvatarGroup, Table, Pagination, Progress, Skeleton, Carousel, GoogleMap |
+| UI: Feedback | 4 | Alert, Toast, Tooltip, Spinner |
+| UI: Overlay | 8 | Dialog, Sheet, Dropdown, Popover, Tabs, VerticalTabs, Accordion, ConsentBanner |
 | UI: Layout | 1 | Separator |
 | UI: Primitives | 1 | Icon |
-| UI: Content | 1 | CodeBlock |
-| UI: Marketing | 5 | Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo |
+| UI: Content | 2 | CodeBlock, Kbd |
+| UI: Marketing | 7 | Logo, CTA, NpmCopyButton, SocialProof, TerminalDemo, VideoEmbed, AnnouncementBar |
 | Patterns | 10 | ContactForm, NewsletterForm, FormField, SearchInput, PasswordInput, StatCard, EmptyState, Section, PageHeader, MediaSlot |
+| Sections | 15 | Band, PageHero, CtaBand, Faq, Steps, Testimonials, Hours, FeatureGrid, FeatureSplit, Pricing, LogoCloud, StatsBand, ContactSection, Timeline, Team |
+| SEO | 1 | Breadcrumbs |
 | Layout | 2 | Header, Footer |
 | Hero | 1 | Hero |
-| **Total** | **46** | 33 UI, 10 patterns, 2 layout, 1 hero |
+| **Total** | **70** | 41 UI, 10 patterns, 15 sections, 1 SEO, 2 layout, 1 hero |
 
 ## Also in Your Project
 
@@ -59,7 +64,7 @@ Velocity's layouts and pages also use these building blocks. They aren't in the 
 |--------|----------|
 | `src/components/site/` | `SiteHeader` and `SiteFooter`, which every layout renders. These are yours, and upgrades leave them alone |
 | `src/components/layout/` | `ThemeToggle`, `LanguageSwitcher` and `Analytics`, alongside `Header` and `Footer` |
-| `src/components/seo/` | `SEO`, `JsonLd`, `Breadcrumbs` and `InlineScript` |
+| `src/components/seo/` | `SEO`, `JsonLd` and `InlineScript` (`Breadcrumbs` is in the registry) |
 | `src/components/blog/` | `ArticleHero`, `BlogCard`, `ShareButtons` and `RelatedPosts` |
 | `src/components/landing/` | `CTA`, `Credibility`, `FeatureTabs`, `LighthouseScores` and `TechStack`, used by the demo pages |
 

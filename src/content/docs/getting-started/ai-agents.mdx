@@ -11,7 +11,7 @@ Velocity isn't an agent, and it doesn't decide what your site looks like. It giv
 
 - **Rules:** `AGENTS.md` and `.agents/velocity.md` describe the stack, the commands and which files upgrades replace.
 - **Skills:** seven step-by-step guides, from setting up the whole site to adding a page or connecting the forms.
-- **Component reference:** `.agents/components.md` lists all 46 components, so agents reuse them instead of writing new ones.
+- **Component reference:** `.agents/components.md` lists all 70 components, so agents reuse them instead of writing new ones.
 - **A check:** `npm run check:agent` finds the mistakes agents make that the build lets through, and tells the agent how to fix each one.
 
 ## What's in your project
@@ -73,7 +73,7 @@ Each skill is in both `.agents/skills/` and `.claude/skills/`, and the two copie
 
 ## Component reference
 
-`.agents/components.md` is generated from Velocity's component registry. For each of the 46 components it gives the import path, what it's for, its props and variants, an example, and what to use instead when another component fits better. `.agents/velocity.md` tells agents to read it before building a component.
+`.agents/components.md` is generated from Velocity's component registry. For each of the 70 components it gives the import path, what it's for, its props and variants, an example, and what to use instead when another component fits better. `.agents/velocity.md` tells agents to read it before building a component.
 
 A project scaffolded with only some components still has the full reference. The reference tells the agent to check that the import path exists, and the `velocity-add-component` skill restores a missing component with its dependencies.
 
