@@ -84,6 +84,7 @@ export default defineConfig({
               collapsed: true,
               autogenerate: { directory: "components/layout" },
             },
+            { label: "Sections", slug: "components/sections" },
             { label: "Pattern Components", slug: "components/patterns" },
             { label: "Blog Components", slug: "components/blog" },
             { label: "Landing Components", slug: "components/landing" },

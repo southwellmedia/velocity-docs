@@ -9,6 +9,25 @@ import { Steps } from '@astrojs/starlight/components';
 
 Add custom content collections to your project.
 
+## Adding Fields to the Blog
+
+To add frontmatter fields to Velocity's blog, export `blogFields` from `src/config/collections.ts` (Velocity 2.6.1+). Velocity merges them into the blog schema and keeps their types, so you never edit `src/content.config.ts`, which upgrades replace:
+
+```typescript
+// src/config/collections.ts
+import { z } from 'astro/zod';
+import type { SchemaContext } from 'astro:content';
+
+export const siteCollections = {};
+
+export const blogFields = ({ image }: SchemaContext) => ({
+  category: z.enum(['guide', 'news', 'release']).default('news'),
+  cover: image().optional(),
+});
+```
+
+Then `post.data.category` is typed wherever you read posts.
+
 ## Creating a Collection
 
 <Steps>
