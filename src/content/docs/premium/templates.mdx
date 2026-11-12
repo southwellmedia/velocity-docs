@@ -1,0 +1,39 @@
+---
+title: The Templates
+description: Every Velocity Premium template, with its live demo
+sidebar:
+  order: 4
+---
+
+Every template is a complete site for a fictional business, in English and Spanish, light and dark, with sample
+content you replace. Open the demos before you buy: what you see is what you get, minus the photos.
+
+| Template | Sample business | Demo | Highlights |
+|---|---|---|---|
+| Auto Detail | Clearcoat, a detailing studio | [autodetail.deployvelocity.com](https://autodetail.deployvelocity.com) | Live estimate card, packages priced by vehicle size, a booking form that adds up, drag-to-compare before and afters |
+| Restaurant | Vesper, a wood-fire dining room | [restaurant.deployvelocity.com](https://restaurant.deployvelocity.com) | Booking bar, menus as printed cards, ticketed evenings, step-by-step reservations |
+| Travel | Elsewhere, a journey planner | [travel.deployvelocity.com](https://travel.deployvelocity.com) | Journeys you filter and save, day-by-day itineraries, a trip planner |
+| Agency | Marquee, a brand studio | [agency.deployvelocity.com](https://agency.deployvelocity.com) | Before-and-after case-study viewer, services explorer, project enquiry form |
+| SaaS | Plinth, a release platform | [saas.deployvelocity.com](https://saas.deployvelocity.com) | Playable product demo, ⌘K palette, pricing with a seat calculator, docs and changelog |
+| Real Estate | Oakhaven Realty, a local brokerage | [realestate.deployvelocity.com](https://realestate.deployvelocity.com) | Listings with search and filters, neighborhoods, agents, a residents area |
+| E-commerce Store | Northline, an outdoor brand | [store.deployvelocity.com](https://store.deployvelocity.com) | Lookbook with shoppable pins, wishlist, maker stories, store locator |
+| Medical Practice | Velocity Health, a family clinic | [medical.deployvelocity.com](https://medical.deployvelocity.com) | Booking on the home page, provider profiles, insurance details |
+
+Every template ships with its theme presets in `src/styles/themes/` (three for most; Medical Practice has one), its
+own `README.md` with what to change first, and an `AGENTS.md` for AI coding agents.
+
+## Moving a site to another template's look
+
+Inside one template, new colours and fonts are a theme change. Another template's whole look is more than that:
+it's also the template's stylesheet, layouts and sections. So you start from the other template and bring the
+content across:
+
+- **Blog posts, FAQs and pages** use Velocity's own collections in every template. Copy `src/content/blog/`,
+  `src/content/faqs/` and `src/content/pages/`.
+- **`src/config/site.config.ts`**: the name, URL, contact details and social links use the same fields everywhere.
+- **Photos** in `src/assets/`.
+- **Anything you built on Velocity or the Premium Kit**, since both are shared by every template. If the site is on
+  an older Velocity, [upgrade](/cli/upgrade/) it first.
+
+The business-specific content and config (menus, listings, journeys, products) and the template's own sections
+are what make templates different, so those you redo.

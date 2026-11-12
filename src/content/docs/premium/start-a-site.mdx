@@ -1,0 +1,53 @@
+---
+title: Start a Site
+description: Turn a Velocity Premium template into your own project
+sidebar:
+  order: 3
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+<Steps>
+1. **Copy a template out of the repository** and make it its own git project:
+
+   ```bash
+   cp -r templates/restaurant my-site
+   cd my-site
+   git init
+   pnpm install
+   pnpm dev
+   ```
+
+2. **Read the template's `README.md`.** It covers what to change first: the business details, prices or listings,
+   opening hours, forms, legal pages and the photos it expects.
+
+3. **Set your identity** in `src/config/site.config.ts` (name, URL, contact details) and the template's own config
+   file in `src/config/`, such as `restaurant.config.ts`.
+
+4. **Pick a theme.** `src/styles/theme.css` imports one preset from `src/styles/themes/`; change the import to
+   switch. To make your own, copy a preset and change its brand hue. Fonts are an entry in `astro.config.mjs` and a
+   token in the theme file. The colour and font switcher on the hosted demos only shows these presets; your site
+   doesn't include it.
+
+5. **Add your photos** with the file names the README lists. Until a photo exists, its slot shows a labelled
+   placeholder.
+
+6. **Connect the forms** before launch. Forms submit to Astro Actions and send nothing until you configure where
+   they go. See [Forms & Actions](/api/).
+
+7. **Check and deploy.** `pnpm validate` runs lint, type checks, tests, a build and the agent-ready check. Then
+   deploy like any Velocity site: see [Deployment](/deployment/).
+</Steps>
+
+<Aside type="tip" title="AI coding agents">
+Every template includes `AGENTS.md` with its own design and content rules, on top of Velocity's. Ask your agent to
+add a page or restyle a section, and it follows the template's conventions.
+</Aside>
+
+## What's yours to change
+
+A template is a normal Velocity project, so the same [file ownership](/cli/upgrade/) applies: Velocity upgrades
+replace Velocity's own files and leave yours alone. The template's pages, views, content, config, theme and its
+own components are yours. The Premium Kit in `src/components/premium/` is updated by `pnpm kit:update`, which
+leaves any kit file you edit alone, so restyle the kit with tokens and skin classes rather than editing it. See
+[The Premium Kit](/premium/premium-kit/#restyling-it).

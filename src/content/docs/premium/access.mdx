@@ -1,0 +1,59 @@
+---
+title: Get Access
+description: From checkout to cloning the Velocity Premium repository
+sidebar:
+  order: 2
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Velocity Premium is delivered as a private GitHub repository, `Velocity-Astro/templates`. You need a free
+GitHub account.
+
+<Steps>
+1. **Buy on [deployvelocity.com/premium](https://deployvelocity.com/premium).** Checkout runs on Polar, which asks
+   for your GitHub account.
+
+2. **Accept the invitation.** Polar adds your account to the repository. GitHub emails you and shows the
+   invitation in your notifications; you can also open
+   [github.com/Velocity-Astro/templates](https://github.com/Velocity-Astro/templates) while signed in.
+
+3. **Clone the repository.**
+
+   ```bash
+   git clone https://github.com/Velocity-Astro/templates.git
+   ```
+
+   If git asks for a password or says the repository doesn't exist, it isn't signed in as the account you bought
+   with. The simplest fix is the GitHub CLI:
+
+   ```bash
+   gh auth login
+   gh auth setup-git
+   ```
+</Steps>
+
+## What's in the repository
+
+```
+templates/
+├── agency/              a complete Velocity project per template
+├── auto-detail/
+├── ecommerce-store/
+├── medical-practice/
+├── real-estate/
+├── restaurant/
+├── saas/
+├── travel/
+├── kit/                 the latest Premium Kit, with its changelog
+└── README.md
+```
+
+Each template folder is a whole project, with its own README, LICENSE, and the kit inside it at
+`src/components/premium/`. The top-level `kit/` is the same kit, kept there so it's easy to find and so sites can
+update from it.
+
+<Aside>
+Keep this clone. `git pull` in it gets new templates and kit updates, and `pnpm kit:update` can read from it
+with `--from`.
+</Aside>

@@ -1,0 +1,85 @@
+---
+title: The Premium Kit
+description: The 29 shared components every Velocity Premium template is built from
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The Premium Kit is the set of components every template is built from. It sits on top of Velocity's free
+components: its cards, fields, buttons and sections are Velocity's own, restyled, so the kit follows your theme,
+both colour modes and every language you add.
+
+## Where it lives
+
+The whole kit ships inside every template, whichever one you start from:
+
+| Path in a site | What it is |
+|---|---|
+| `src/components/premium/` | The components, and a `README.md` describing each one |
+| `src/styles/premium.css` | Shared kit styles and skins |
+| `src/components/premium/kit.json` | The kit version, used by `pnpm kit:update` |
+| `scripts/kit-update.mjs` | The `kit:update` command |
+
+The same kit is at the top of the Premium repository in `kit/`, with its changelog.
+
+## The components
+
+| Component | What it is |
+|---|---|
+| `Band` | Velocity's Band with a skin: tone, width, padding, background, photo with scrim |
+| `PageHero` | Inner-page opening band with the page's h1 and an aside photo slot |
+| `CtaPanel` | Velocity's CtaBand as a panel: brand, slate or photo |
+| `NewsletterBand` | Newsletter strip above the footer |
+| `Testimonials` | Reviews as a spotlight, cards, wall, people or marquee |
+| `Faq` | Velocity's Faq, one open at a time, with FAQPage structured data |
+| `Steps` | Velocity's Steps as a list, a row or large numbers |
+| `HoursTable` | Opening hours with live open/closed status and today highlighted |
+| `OpenStatus` | The live "open now" line |
+| `PricingTable` | Plans with a monthly/annual switch and a seat calculator |
+| `CompareTable` | Plan comparison with grouped rows and a sticky header |
+| `FeatureBento` | Bento grid of feature cards with demos that play on scroll, hover and focus |
+| `Showcase` | Gallery of work with pointer zoom, a featured item and captions |
+| `Rating` | Stars with half values |
+| `CommandPalette` | ⌘K palette with grouped links and actions |
+| `FilterGrid` | A floating filter and sort bar over a grid |
+| `Lookup` | Search lookup for long lists |
+| Saved lists | Wishlists and saved items kept in the browser, with heart buttons |
+| `Lightbox` | Photo viewer |
+| `Hotspots` | Pins over a photo |
+| `StepForm` | Multi-step forms for bookings, quotes and enquiries |
+| `Counter` | A number field with minus and plus buttons |
+| `ActionBar` | Mobile bottom action bar |
+| `CodeBlock`, `CodeTabs` | Highlighted code with a copy button; code in tabs |
+| `Motion` | Scroll reveals and numbers that count up |
+| `Marquee` | Self-scrolling row with pause |
+| `Spotlight` | A glow and lit border that follow the pointer |
+| `SocialLinks` | Social icons |
+
+Each component's props are typed and documented at the top of its file. The quickest example of one in use is a
+template that uses it: search the Premium repository, for example `grep -rn "premium/PricingTable" .`.
+
+## Restyling it
+
+Restyle the kit the way you restyle Velocity. Don't edit kit files to change how they look: `pnpm kit:update`
+leaves edited files alone, so they stop getting fixes.
+
+- **Theme tokens.** Kit components read Velocity's `--color-*` tokens, so they follow your theme and light, dark
+  and inverted sections automatically. See [Design System](/design-system/).
+- **Kit tokens.** Set these on `:root` in your stylesheet: `--kit-heading-font`, `--kit-heading-weight`,
+  `--kit-heading-tracking`, `--kit-accent-text`, `--kit-radius`, `--kit-band-max`, `--kit-band-wide-max`,
+  `--kit-band-gutter`, `--kit-ease`, `--kit-spotlight-color`. Component tokens (newsletter, bento, showcase,
+  marquee, reveal motion) are listed in `src/styles/premium.css`.
+- **Skins.** `Band`, `PageHero` and `NewsletterBand` take a `skin` prop, a class prefix your stylesheet styles:
+  `skin="site"` makes a brand band use `.site-band-brand` and a background `.site-bg-<name>`.
+- **Class props.** `eyebrowClass`, `titleClass`, `legendClass` and similar props put your own type classes on
+  headings.
+- **Shared skins for Velocity components** live in `src/styles/premium.css`: `kit-choice` turns
+  `Radio variant="card"` into an option card, and `kit-newsletter` puts the button inside the field of Velocity's
+  `NewsletterForm`.
+
+<Aside>
+`DemoSwitcher`, the colour and font switcher on the hosted demos, is in the kit too, but only demo builds render
+it.
+</Aside>
