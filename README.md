@@ -23,6 +23,7 @@ Documentation site for [Velocity](https://github.com/southwellmedia/velocity), b
 | Section | Description |
 |---------|-------------|
 | **Getting Started** | Installation, prerequisites, project structure, scripts, AI coding agents and the agent-ready check |
+| **Velocity Premium** | What Premium includes, getting access, starting a site from a template, the templates, the Premium Kit and keeping it updated |
 | **Components** | 70 components: 41 UI, 10 patterns, 15 sections, breadcrumbs, 2 layout and 1 hero |
 | **Design System** | Three-tier token architecture, colors, dark mode, Tailwind utilities |
 | **Customization** | Brand colors, themes, adding components/routes/collections |

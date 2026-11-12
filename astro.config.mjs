@@ -49,6 +49,12 @@ export default defineConfig({
           ],
         },
         {
+          label: "Velocity Premium",
+          badge: { text: "New", variant: "success" },
+          collapsed: false,
+          autogenerate: { directory: "premium" },
+        },
+        {
           label: "CLI Tool",
           badge: { text: "New", variant: "success" },
           collapsed: false,

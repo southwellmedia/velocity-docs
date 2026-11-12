@@ -1,0 +1,63 @@
+---
+title: Updates
+description: New templates, kit updates and Velocity upgrades for Premium sites
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A Premium site has three things that update on their own schedules.
+
+| What | How |
+|---|---|
+| New templates | `git pull` in your clone of the Premium repository |
+| The Premium Kit | `pnpm kit:update` inside your site |
+| Velocity | `pnpm create velocity-astro@latest upgrade` inside your site |
+
+## Update the Premium Kit
+
+Kit fixes and new components land in `kit/` in the Premium repository, and `kit/CHANGELOG.md` says what changed.
+Run this inside your site:
+
+```bash
+pnpm kit:update --check   # see what would change
+pnpm kit:update           # update
+```
+
+The command fetches the latest kit with your own GitHub access, the account your purchase invited. It holds no
+token, so it only works for an account with access to the repository. Then it:
+
+- replaces kit files you haven't touched,
+- adds new kit files and removes ones the kit dropped,
+- leaves any kit file you edited alone and lists it,
+- prints the changelog entries newer than your kit,
+- records the new version in `src/components/premium/kit.json`.
+
+Review the result with `git diff` and run `pnpm validate`.
+
+| Flag | Description |
+|---|---|
+| `--check` | Show what would change, change nothing |
+| `--force` | Also replace kit files you edited |
+| `--from=<path>` | Use a local clone of the Premium repository instead of fetching |
+
+If git can't reach the repository, see [Get Access](/premium/access/) for signing git in, or clone it yourself and
+use `--from`:
+
+```bash
+pnpm kit:update --from=../templates
+```
+
+<Aside type="caution" title="Sites started before kit 1.0.0">
+They have no `kit.json`, so the first update treats every kit file that differs as edited and leaves it alone. If
+you haven't changed the kit yourself, run `pnpm kit:update --force` once. Copy `scripts/kit-update.mjs` from `kit/`
+in the Premium repository and add `"kit:update": "node scripts/kit-update.mjs"` to `package.json` if your site
+doesn't have the command yet.
+</Aside>
+
+## Upgrade Velocity
+
+Templates are normal Velocity projects with a `.velocity.json`, so the [`upgrade` command](/cli/upgrade/) works
+from day one. It updates Velocity's own files and leaves your content, theme, header, footer, the template's files
+and the Premium Kit alone.
