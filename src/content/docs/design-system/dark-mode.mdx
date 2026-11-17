@@ -50,9 +50,21 @@ import ThemeToggle from '@/components/layout/ThemeToggle.astro';
 ```
 
 The toggle:
-- Switches between light and dark
-- Saves the choice in `localStorage`, so it overrides `defaultTheme` on later visits
-- Updates immediately without a flash
+- Switches between light and dark, without a flash
+- Saves the choice in `localStorage` only when it differs from what `defaultTheme` would show. Switching back to the default clears it, so the site follows the visitor's system again instead of staying pinned (2.7+)
+- Follows operating-system changes live while nothing is saved, and stays in sync across tabs
+- Still works for the current page when the browser blocks site data
+
+### Native controls follow the theme
+
+Since 2.7, `global.css` sets `color-scheme` from the `.dark` class, so scrollbars, form controls, date pickers, `<select>` popups and autofill match the rendered theme:
+
+```css
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+```
+
+It follows the class rather than using `light dark`, because Velocity's colours switch on `.dark`, not on the media query. A site that overrides a dark OS with `defaultTheme: 'light'` would otherwise get dark scrollbars on a light page.
 
 ## Token Switching
 
@@ -92,9 +104,9 @@ localStorage.setItem('theme', 'dark');
 document.documentElement.classList.remove('dark');
 localStorage.setItem('theme', 'light');
 
-// Follow system
+// Follow system again
 localStorage.removeItem('theme');
-// Then check prefers-color-scheme
+document.documentElement.classList.toggle('dark', matchMedia('(prefers-color-scheme: dark)').matches);
 ```
 
 ### CSS Targeting

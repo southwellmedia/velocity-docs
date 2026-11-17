@@ -5,6 +5,8 @@ sidebar:
   order: 8
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 Quick reference for additional UI components.
 
 ## Form Components
@@ -22,6 +24,9 @@ Multi-line text input:
 />
 ```
 
+- Since 2.7, Textarea grows with what you type (CSS `field-sizing: content`, where supported), up to 60% of the viewport height. `rows` still sets the starting height. Pass `autoResize={false}` for a fixed height.
+- Like Input and Select, it shows a message after a visitor leaves it invalid (`required`, `minlength`, `maxlength`). See [Errors after interaction](/components/ui/input/#errors-after-interaction).
+
 ### Select
 
 Dropdown select menu:
@@ -37,6 +42,8 @@ Dropdown select menu:
   ]}
 />
 ```
+
+- With `required`, Select shows a message after the visitor leaves it without a choice. See [Errors after interaction](/components/ui/input/#errors-after-interaction).
 
 ### Checkbox
 
@@ -120,7 +127,13 @@ In a React island that needs the icon in its first paint, import it from `lucide
 
 ### Carousel
 
-A sideways-scrolling row of slides on CSS scroll snap (swipe, trackpad, keyboard) with previous / next buttons; 1-4 slides in view.
+A sideways-scrolling row of slides on CSS scroll snap (swipe, trackpad, keyboard); 1-4 slides in view. Since 2.7:
+
+- Previous and next move one slide at a time to the next snap point, and stop at the ends.
+- A marker button per position jumps straight to it. The current marker is wider, so it doesn't rely on colour alone.
+- Each slide is a group named "2 of 4", and a hidden status line announces "Slide 2 of 4" once scrolling settles. "Carousel" and "slide" are translated.
+- A slide that is a link, button or image, or already has its own role or label, is wrapped instead of renamed, so it keeps its name.
+- With `hideControls`, a thin scrollbar stays visible as the cue that the row scrolls.
 
 ```astro
 ---
@@ -170,34 +183,61 @@ import Spinner from '@/components/ui/feedback/Spinner/Spinner.astro';
 
 ### Dialog
 
-Modal dialog:
+A modal on the native `<dialog>` element, opened with `showModal()` (2.7+). The browser contains focus, makes the rest of the page inert, closes it on Escape and the back gesture, and returns focus to the button that opened it. The page doesn't shift sideways when it opens, and the dialog animates in and out.
 
 ```astro
-<Button data-dialog="confirm-modal">Open Dialog</Button>
+---
+import Dialog from '@/components/ui/overlay/Dialog/Dialog.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
 
-<Dialog id="confirm-modal" title="Confirm Action">
-  <p>Are you sure you want to continue?</p>
-  <div class="flex gap-2 mt-4">
+<Button variant="destructive" data-dialog-open="delete-dialog">Delete project</Button>
+
+<Dialog id="delete-dialog" title="Delete project?" description="This can't be undone." size="sm">
+  <p class="text-sm text-foreground-muted">All deployments will be removed.</p>
+  <div slot="footer" class="flex justify-end gap-3 px-6 pb-6">
     <Button variant="outline" data-dialog-close>Cancel</Button>
-    <Button variant="destructive">Delete</Button>
+    <Button variant="destructive" data-dialog-close>Delete</Button>
   </div>
 </Dialog>
 ```
 
+- **Open:** any button with `data-dialog-open="<id>"` (no script needed), `window.openDialog(id)`, or the element's own `showModal()`.
+- **Close:** buttons with `data-dialog-close` (inside the dialog, or `data-dialog-close="<id>"` anywhere), Escape, a click on the backdrop, `window.closeDialog(id)`, or `close()`. Listen for the element's `close` event to react however it closed.
+- **Props:** `id`, `title`, `description`, `label` (accessible name when there's no title), `size` (`sm`, `md`, `lg`, `xl`) and `closedby`: `'any'` (Escape and backdrop click, the default), `'closerequest'` (Escape only) or `'none'` (only your code closes it). Safari doesn't support `closedby` yet; Velocity adds the backdrop click and the `'none'` behaviour there.
+- **React island:** `import { Dialog } from '@/components/ui/overlay/Dialog/Dialog'`, with `open` and `onClose`, plus optional `label`, `closeLabel` and `closedby`.
+
+<Aside type="caution" title="Upgrading from 2.6">
+  `dialogElement.open()` no longer works: on a `<dialog>`, `open` is a built-in property. Call `window.openDialog(id)` or `showModal()` instead. `close()` still works.
+</Aside>
+
 ### Dropdown
 
-Dropdown menu:
+A menu of links opened from the button in its `trigger` slot. Since 2.7 the menu is a native `popover` in the browser's top layer, so a parent with `overflow: hidden` or a lower `z-index` can't clip it. Escape and outside clicks close it.
 
 ```astro
+---
+import Dropdown from '@/components/ui/overlay/Dropdown/Dropdown.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+---
+
 <Dropdown
-  trigger="Options"
+  align="end"
   items={[
-    { label: 'Edit', href: '/edit' },
-    { label: 'Duplicate', onClick: 'duplicate()' },
-    { label: 'Delete', variant: 'destructive' },
+    { label: 'Edit', href: '/settings', icon: 'edit' },
+    { label: 'Duplicate', href: '/duplicate', icon: 'copy' },
+    { label: '', separator: true },
+    { label: 'Archive', href: '/archive', icon: 'archive', disabled: true },
   ]}
-/>
+>
+  <Button slot="trigger" variant="outline">Actions</Button>
+</Dropdown>
 ```
+
+- The trigger is announced as a menu button (`aria-haspopup="menu"`, `aria-expanded`). Arrow keys, Home and End move between items, and the menu is one Tab stop; Tab moves past it.
+- Opening from the keyboard or a screen reader moves focus to the first item. A mouse or touch click leaves focus on the trigger, as native menus do, and ArrowDown enters the menu.
+- It sits next to its button with CSS anchor positioning, flipping when there's no room, and falls back to a few lines of script in browsers without it.
+- The trigger can be a `<button>` or a link-styled `Button`.
 
 ### Tooltip
 
@@ -245,7 +285,7 @@ Vertical tab navigation (mobile dropdown):
 
 ### Sheet
 
-A panel that slides in from the left, right or bottom (filters, cart, menu), on the native `<dialog>`: focus stays inside and Escape closes it. Opened by any button with data-sheet-open.
+A panel that slides in and out from the left, right or bottom (filters, cart, menu), on the native `<dialog>`: focus stays inside, and Escape or a click on the backdrop closes it. Scrolling inside it doesn't scroll the page behind. Opened by any button with `data-sheet-open`; buttons with `data-sheet-close` close it.
 
 ```astro
 ---
@@ -264,7 +304,7 @@ import Button from '@/components/ui/form/Button/Button.astro';
 
 ### Popover
 
-A small panel anchored to its button (details, a few actions), on the native popover attribute: Escape and outside clicks close it with no script.
+A small panel anchored to its button (details, a few actions), on the native popover attribute: Escape and outside clicks close it with no script. Since 2.7 it's placed with CSS anchor positioning (`placement="bottom" | "top"`, `align="start" | "end"`), flipping at the viewport edge, with a script fallback that keeps it on screen in browsers without anchor positioning.
 
 ```astro
 ---

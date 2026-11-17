@@ -1,0 +1,104 @@
+---
+title: Helpers
+description: Data attributes, global functions and utilities you can use from your own pages and components
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity's components expose a few hooks for your own markup and scripts. Everything here works under the strict [Content Security Policy](/configuration/security/): no inline handlers, just attributes and bundled scripts.
+
+## Data attributes
+
+| Attribute | On | What it does |
+|---|---|---|
+| `data-dialog-open="<id>"` | Any button | Opens the [Dialog](/components/ui/other-components/#dialog) with that id as a modal. 2.7+ |
+| `data-dialog-close` | A button inside a Dialog | Closes that dialog. Give it a value (`data-dialog-close="<id>"`) to close a dialog from anywhere |
+| `data-sheet-open="<id>"` | Any button | Opens the [Sheet](/components/ui/other-components/#sheet) with that id |
+| `data-sheet-close` | A button inside a Sheet | Closes that sheet |
+| `data-no-prerender` | A link | Leaves the link out of [prerendering](/layouts/base-layout/#prerendering-links), when `speculation: 'prerender'` is on. 2.7+ |
+
+## Global functions
+
+```ts
+window.openDialog('delete-dialog');   // opens it with showModal(), if it isn't open already
+window.closeDialog('delete-dialog');
+window.openConsentSettings();         // opens the cookie settings (when consent is enabled)
+```
+
+Dialog and Sheet are native `<dialog>` elements, so you can also call `showModal()` and `close()` on them directly, and listen for their `close` event:
+
+```ts
+const dialog = document.getElementById('delete-dialog') as HTMLDialogElement;
+dialog.addEventListener('close', () => {
+  console.log('closed with', dialog.returnValue || 'no button');
+});
+```
+
+## Utilities
+
+These live in `src/lib/`, which upgrades replace, so import them rather than copying them.
+
+### `cn()`
+
+`src/lib/cn.ts`. Merges Tailwind classes, resolving conflicts (`clsx` plus `tailwind-merge`):
+
+```ts
+import { cn } from '@/lib/cn';
+cn('px-4 py-2', isActive && 'bg-secondary', className);
+```
+
+### `anchorPopover()` (2.7+)
+
+`src/lib/anchor.ts`. Places a top-layer `popover` next to the element that opened it. Popover and Dropdown use it. Where CSS anchor positioning is supported, the browser places the panel and flips it at the viewport edge (the rules are under `[data-anchored]` in `global.css`). Elsewhere it measures the trigger, keeps the panel on screen and follows scrolling and resizing.
+
+```ts
+import { anchorPopover } from '@/lib/anchor';
+
+let stop = () => {};
+panel.addEventListener('toggle', (event) => {
+  if ((event as ToggleEvent).newState === 'open') {
+    stop = anchorPopover(panel, trigger, { placement: 'bottom', align: 'end' });
+  } else {
+    stop();
+  }
+});
+```
+
+Options: `placement` (`'bottom'` or `'top'`), `align` (`'start'` or `'end'`) and `gap` (pixels, for the script fallback; the CSS path uses `0.5rem`). The returned function stops the fallback's listeners; call it when the panel closes.
+
+### `initFieldErrors()` and `fieldMessages()` (2.7+)
+
+`src/lib/field-errors.ts`. Shows a field's error after interaction. Input, Textarea and Select already use it, so you only need it for fields you build yourself:
+
+```astro
+---
+import { getLocale, useTranslations } from '@/i18n';
+import { fieldMessages } from '@/lib/field-errors';
+const t = useTranslations(getLocale(Astro));
+---
+
+<input id="code" name="code" required minlength="6" data-error-id="code-error" aria-describedby="code-help" />
+<p id="code-help">The 6-digit code from the email.</p>
+<p id="code-error" data-field-error data-messages={fieldMessages(t)} hidden>
+  <span data-field-error-text></span>
+</p>
+
+<script>
+  import { initFieldErrors } from '@/lib/field-errors';
+  initFieldErrors();
+</script>
+```
+
+- `data-error-id` on the field points at its message element. Once the field matches `:user-invalid`, the script fills `[data-field-error-text]`, shows the message, sets `aria-invalid` and adds the message id to `aria-describedby`. When the value is valid again, it reverses that and leaves your own ids (`code-help`) in place.
+- `fieldMessages(t)` serializes the `form.validation.*` strings for the page's language. Without it, the browser's own message is used, which follows the visitor's browser language, not the site's.
+- `initFieldErrors()` is safe to call more than once.
+
+### `InlineScript`
+
+`src/components/seo/InlineScript.astro`. Renders an inline script and adds its hash to the page's CSP. Since 2.7 it takes a `type`, such as `speculationrules`. See [Inline scripts](/configuration/security/#inline-scripts).
+
+<Aside type="tip">
+  The full list of components, with props and examples, is in `.agents/components.md` in every project.
+</Aside>

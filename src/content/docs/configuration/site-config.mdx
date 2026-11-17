@@ -36,6 +36,7 @@ interface SiteConfig {
     bing?: string;
   };
   defaultTheme?: 'system' | 'light' | 'dark';
+  speculation?: 'off' | 'prerender'; // 2.7+
   branding: {
     logo: {
       alt: string;
@@ -118,6 +119,7 @@ export default siteConfig;
 | `twitter` | `object` | Twitter card configuration |
 | `verification` | `object` | Search engine verification codes |
 | `defaultTheme` | `'system' \| 'light' \| 'dark'` | Theme for visitors who haven't used the toggle. `'system'`, the default, follows their operating system. See [Dark Mode](/design-system/dark-mode/#default-theme) |
+| `speculation` | `'off' \| 'prerender'` | 2.7+. `'prerender'` makes Chromium browsers render a same-site page in the background when a visitor hovers a link to it. Off when unset. Check your analytics and ad tags first. See [Prerendering links](/layouts/base-layout/#prerendering-links) |
 
 ### Branding
 

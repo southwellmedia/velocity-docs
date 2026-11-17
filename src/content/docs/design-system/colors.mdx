@@ -115,6 +115,23 @@ The default brand color is International Orange (`#F94C10`):
 }
 ```
 
+### Destructive
+
+Destructive buttons, `text-destructive` and field error borders use `--destructive` and `--destructive-foreground`, which themes define. Before 2.7 these were never mapped into Tailwind's theme, so every `*-destructive` class did nothing. In 2.7 the default and Midnight themes use values that pass WCAG AA both as a button and as text:
+
+```css
+:root {
+  --destructive: oklch(52% 0.2 27);            /* 6.1:1 with white */
+  --destructive-foreground: var(--gray-0);
+}
+.dark {
+  --destructive: oklch(72% 0.17 25);           /* light red with dark text: 7.1:1 */
+  --destructive-foreground: oklch(18% 0.03 25);
+}
+```
+
+If you write your own theme, give `--destructive` at least 4.5:1 contrast with `--destructive-foreground` and with your background.
+
 ## Inverted Section Tokens
 
 For dark sections on light pages:

@@ -108,4 +108,6 @@ import code from './my-script.js?raw';
 <InlineScript code={code} />
 ```
 
+Since 2.7, `InlineScript` also takes a `type` for other script types the CSP governs, such as speculation rules: `<InlineScript type="speculationrules" code={rules} />`.
+
 Inline event handlers such as `onclick="..."` are blocked. Use `addEventListener` in a script, with `data-` attributes to pass values.

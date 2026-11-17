@@ -134,6 +134,20 @@ Velocity uses native cross-document view transitions, set in `global.css`, and A
 
 Supporting browsers cross-fade between pages. Everyone else gets a normal page load. Animations finish instantly for visitors who prefer reduced motion.
 
+### Prerendering Links
+
+Since 2.7, setting `speculation: 'prerender'` in `src/config/site.config.ts` adds speculation rules (`src/layouts/speculation-rules.json`). Chromium browsers then render a same-site page in the background when a visitor hovers or presses a link to it, so it opens instantly. Other browsers ignore the rules and keep Astro's hover prefetch, which stays on either way. The rules are rendered with `InlineScript`, so their hash is in the CSP.
+
+<Aside type="caution" title="Off by default">
+  A prerendered page runs its scripts before anyone sees it. Google Analytics and Tag Manager wait until the page is shown, but other analytics, ad pixels and call-tracking tags may not, and could count visits that never happened. Check the tags your site loads before you turn this on. Your own scripts that count views or conversions on load should check `document.prerendering`.
+</Aside>
+
+The rules leave out Actions (`/_actions/`), assets, feeds, OG images, links that open in a new tab, downloads, `rel="nofollow"` links and logout or sign-out URLs. To leave out any other link, for example one whose page changes something when it loads, add `data-no-prerender`:
+
+```astro
+<a href="/unsubscribe" data-no-prerender>Unsubscribe</a>
+```
+
 <Aside type="note">
   Most pages should use `PageLayout`, `BlogLayout`, or `LandingLayout` instead of `BaseLayout` directly.
 </Aside>

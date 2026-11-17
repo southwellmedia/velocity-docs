@@ -5,6 +5,65 @@ sidebar:
   order: 2
 ---
 
+## v2.7.0 (2026-11-17)
+
+### Overlays on the native platform
+
+- **Dialog** is a native `<dialog>` opened with `showModal()`. The browser contains focus, makes the page inert, closes it on Escape and the back gesture, and returns focus to the opener. The `overflow: hidden` scroll lock that shifted the page sideways is gone. It closes on a backdrop click (`closedby`, with a Safari fallback), animates in and out, and opens from any button with `data-dialog-open="<id>"`. The React island is a native `<dialog>` too.
+- **Dropdown** is a native `popover` in the top layer, so `overflow` and `z-index` on a parent can't clip it. It's announced as a menu button with its expanded state, has arrow-key navigation and is a single Tab stop. Link-styled triggers work.
+- **Dropdown and Popover** are placed with CSS anchor positioning, flipping at the viewport edge, with a script fallback that keeps them on screen.
+- **Sheet** animates out as well as in, closes on a backdrop click and keeps scrolling out of the page behind it.
+
+### Forms
+
+- **Input, Textarea and Select** show a message after a visitor leaves an invalid field (`:user-invalid`), linked with `aria-describedby` and `aria-invalid`, in the site's language (`form.validation.*` in `ui.ts`, en/es/fr). Your own `aria-describedby` ids are kept. See [Errors after interaction](/components/ui/input/#errors-after-interaction).
+- **ContactForm** adds `minlength` and `maxlength` that match its schema.
+- **Textarea** grows with its content (`autoResize`, on by default).
+
+### Dark mode
+
+- `color-scheme` follows the theme, so scrollbars, form controls and `<select>` popups match.
+- The toggle stops saving a choice that matches the default, follows OS changes live, syncs across tabs and works when storage is blocked.
+
+### Navigation and performance
+
+- **Opt-in prerendering:** `speculation: 'prerender'` in `site.config.ts` prerenders same-site links on hover in Chromium. It's off by default because some analytics and ad tags count prerendered pages. See [Prerendering links](/layouts/base-layout/#prerendering-links).
+- **Mobile menu:** the page behind it is inert, Escape returns focus to the toggle, and it closes when the window widens past the breakpoint.
+- **Floating header:** an IntersectionObserver replaces the scroll listener.
+- **Carousel:** steps one slide at a time, adds a marker per position and a screen-reader status line, translates "carousel" and "slide", and keeps the names of link and image slides.
+
+### New demo home page
+
+Projects created with `--demo` get a redesigned home page: a build receipt whose versions and counts are read from the project and measured after the build, a What's new section, a wall of live components and the CLI flags. The demo's sample author and contact details are now placeholders. (This shipped on `main` as 2.6.5 but wasn't released on its own.)
+
+### Fixes
+
+- **Destructive colour:** `--color-destructive` was never mapped into Tailwind's theme, so every `*-destructive` class did nothing. It now renders, and the default and Midnight themes use reds that pass WCAG AA (6.1:1 light, 7.1:1 dark).
+
+### New helpers
+
+`anchorPopover()` (`src/lib/anchor.ts`), `initFieldErrors()` and `fieldMessages()` (`src/lib/field-errors.ts`), a `type` prop on `InlineScript`, and the `data-dialog-open` and `data-no-prerender` attributes. See [Helpers](/reference/helpers/).
+
+### Upgrading
+
+One API change: if your code called `dialogElement.open()`, use `window.openDialog(id)` or `showModal()`. Destructive styling now shows. See [v2.5 to v2.7](/upgrade-guides/v2-5-to-v2-7/).
+
+## v2.6.4 (2026-11-09)
+
+Components take more of your own styling and content. All additive:
+
+- **Button:** `unstyled` drops Button's own colour, size, radius and hover, so `class` decides the whole look, while link handling, the focus ring and the disabled state stay.
+- **Checkbox:** a label with links or emphasis goes in the default slot.
+- **Switch:** passes other attributes to its input, so a switch without a visible label can take `aria-label`.
+- **Table:** a `caption` for screen readers, row headers (`rowHeader` on a column) and icon cells (`{ icon, label }`).
+- **ToggleGroup:** options can be `disabled` or carry their own attributes, and `inputAttrs` go to every input.
+
+## v2.6.3 (2026-11-09)
+
+- **Fix:** entries from your own collections (`siteCollections` in `src/config/collections.ts`) were typed as `unknown` in 2.6.1 and 2.6.2, so typed code that read them failed `astro check`. They keep their schema's types again.
+- **Radio:** the card variant gains a media slot (a photo or icon between the mark and the text) and a default slot for extra content under the description.
+- **BlogCard** accepts `class`.
+
 ## v2.6.2 (2026-11-09)
 
 ### More sections
