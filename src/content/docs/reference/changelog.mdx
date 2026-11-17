@@ -5,6 +5,11 @@ sidebar:
   order: 2
 ---
 
+## v2.7.1 (2026-11-17)
+
+- **Fix:** on a site with more than one language, the 404 page (rendered on demand) blocked the theme script, and the analytics scripts when GA or GTM is set, with a CSP violation. Its policy is sent before the layout renders, so `integrations/layout-csp.mjs` now puts the hashes of every script `BaseLayout` renders inline into the policy in your config. That covers the theme script, the opt-in speculation rules and the analytics scripts, and any page you mark `prerender = false`. Nothing needs doing; `astro.config.mjs` doesn't change.
+- **Upgrade note:** the 2.7.0 note now says field errors use the site's language.
+
 ## v2.7.0 (2026-11-17)
 
 ### Overlays on the native platform

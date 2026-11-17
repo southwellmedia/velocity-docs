@@ -108,6 +108,8 @@ import code from './my-script.js?raw';
 <InlineScript code={code} />
 ```
 
+A page rendered on demand (the 404 on a multi-language site, or a page you mark `prerender = false`) gets its policy as a header, sent before the page renders, so a hash `InlineScript` adds is too late for it. Since 2.7.1, `integrations/layout-csp.mjs` lists the hashes of the scripts `BaseLayout` renders inline in the config, so those always work. For your own inline script on such a page, add its hash to `security.csp.scriptDirective.hashes` in `astro.config.mjs`.
+
 Since 2.7, `InlineScript` also takes a `type` for other script types the CSP governs, such as speculation rules: `<InlineScript type="speculationrules" code={rules} />`.
 
 Inline event handlers such as `onclick="..."` are blocked. Use `addEventListener` in a script, with `data-` attributes to pass values.
