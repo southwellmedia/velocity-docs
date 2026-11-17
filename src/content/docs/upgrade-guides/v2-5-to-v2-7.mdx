@@ -1,0 +1,69 @@
+---
+title: "Upgrade: v2.5 to v2.7"
+description: Upgrade a Velocity 2.5 or 2.6 project to 2.7, with native dialogs and menus, form errors after interaction, color-scheme, opt-in prerendering and the destructive colour fix
+sidebar:
+  order: 9
+  badge:
+    text: Latest
+    variant: note
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This guide takes a project from **Velocity 2.5.1** or any **2.6.x** release to **Velocity 2.7.0**. Nothing in your pages has to change. There's one small API change and a few visible ones, all listed below. Coming from 2.4 or earlier? Follow [v2.4 to v2.5.1](/upgrade-guides/v2-4-to-v2-5/) first; the upgrade itself goes straight to 2.7.0.
+
+## What's new
+
+| | 2.6 | 2.7 |
+|---|---|---|
+| **Dialog** | `<div role="dialog">`, a script focus trap, `overflow: hidden` on `<body>` | Native `<dialog>` with `showModal()`, `data-dialog-open` |
+| **Dropdown** | Absolutely positioned, clipped by `overflow` parents | Native `popover` in the top layer, anchored to its button |
+| **Form errors** | Only when the server rejects a submission | After a visitor leaves an invalid field, in the site's language |
+| **Dark mode** | Native controls and scrollbars stay light | `color-scheme` follows the theme |
+| **Prerendering** | | Opt-in with `speculation: 'prerender'` |
+| **Destructive colour** | Never applied | Applied, and passes WCAG AA |
+
+See the [changelog](/reference/changelog/#v270-2026-11-17) for everything, and [Helpers](/reference/helpers/) for the new attributes and utilities.
+
+<Aside type="caution" title="Before you start">
+  Commit your work, so you can review the upgrade as a diff.
+</Aside>
+
+## Run the upgrade
+
+```bash
+npm create velocity-astro@latest upgrade
+```
+
+## After the upgrade
+
+1. **`dialogElement.open()`**: if your own code called it, change it to `window.openDialog(id)` or `showModal()`. On a `<dialog>`, `open` is a built-in boolean property, not a method. `close()` still works, and `window.openDialog` / `window.closeDialog` are unchanged.
+2. **Destructive styling now renders.** `bg-destructive`, `text-destructive` and `border-destructive` did nothing before 2.7 because the token was never mapped. Destructive buttons and error text now show in red: a deeper red in light mode, and light red with dark text in dark mode.
+3. **Custom themes.** If you wrote your own theme file instead of using `default` or `midnight`, check that `--destructive` has at least 4.5:1 contrast with `--destructive-foreground` and with your background. See [Destructive](/design-system/colors/#destructive).
+4. **Forms show errors after interaction.** Fields with `required`, `type="email"`, `minlength` or `maxlength` now show a message under them once a visitor leaves them invalid. If your project overrides UI strings for another language, translate the new `form.validation.*` keys in `src/i18n/translations/<locale>.ts`. See [Errors after interaction](/components/ui/input/#errors-after-interaction).
+5. **Dropdown and Carousel markup.** Dropdown's menu is now a `popover`, and Carousel wraps slides that are links, buttons or images. If you have CSS that targets either component's internals, check it still applies.
+
+## Prerendering is opt-in
+
+2.7 can make Chromium browsers render a page in the background when a visitor hovers a link to it, so the page opens instantly. It's **off** unless you add this to `src/config/site.config.ts`:
+
+```ts
+const siteConfig: SiteConfig = {
+  // ...
+  speculation: 'prerender',
+};
+```
+
+Add `speculation?: 'off' | 'prerender';` to the `SiteConfig` interface in the same file. Upgrades don't change `site.config.ts`, so your copy won't have it yet.
+
+<Aside type="caution">
+  Prerendered pages run their scripts before anyone sees them. Google Analytics and Tag Manager wait until the page is shown, but other analytics, ad pixels and call-tracking tags may count visits that never happened. Check what your site loads first, and add `data-no-prerender` to links whose pages change something when they load. See [Prerendering links](/layouts/base-layout/#prerendering-links).
+</Aside>
+
+## Verify
+
+```bash
+npm install
+npm run validate
+npm run build && npm run test:e2e
+```

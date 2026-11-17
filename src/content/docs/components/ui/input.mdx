@@ -39,6 +39,21 @@ import { Input } from '@/components/ui';
 />
 ```
 
+## Errors After Interaction
+
+Since 2.7, Input, Textarea and Select check themselves with the browser's own constraints (`required`, `type="email"`, `minlength`, `maxlength`, `min`, `max`). Nothing shows on page load or while someone is typing. Once a visitor leaves a field that isn't valid (the `:user-invalid` state), the field turns red and a message appears under it:
+
+- The message is in the site's language, from `form.validation.*` in `src/i18n/ui.ts` (en, es, fr), and says how to fix the problem: "Use at least 10 characters (you have 9)." Override the keys in `src/i18n/translations/<locale>.ts`.
+- It's linked to the field with `aria-describedby`, and the field gets `aria-invalid`, so screen readers read it with the field. Your own `aria-describedby` ids, for example external help text, are kept.
+- It clears as soon as the value is valid.
+- A message set with `setCustomValidity()`, and rarer states such as `pattern`, use the browser's own wording.
+
+```astro
+<Input label="Name" name="name" required minlength={2} maxlength={100} autocomplete="name" />
+```
+
+An `error` passed from the server still renders as before and takes precedence.
+
 ## With Icons
 
 ```astro
@@ -109,7 +124,7 @@ For inputs on dark backgrounds:
 ## Accessibility
 
 - Label is properly associated with input
-- Error messages are announced
+- Error messages are linked with `aria-describedby` and the field gets `aria-invalid`, both for server errors and for errors after interaction
 - Required fields are marked
 - Focus states are visible
 
