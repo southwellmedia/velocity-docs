@@ -32,6 +32,7 @@ Documentation site for [Velocity](https://github.com/southwellmedia/velocity), b
 | **Layouts** | Base, Page, Blog, and Landing layouts |
 | **SEO** | Meta tags, OG images, structured data, sitemap |
 | **CLI** | create-velocity-astro usage, flags, i18n |
+| **Velocity CMS** | The open source CMS: install, content types, showing content, the page builder, forms, CRM, people, plugins, known limits |
 | **API** | Contact and newsletter endpoints |
 | **Deployment** | Vercel, Netlify, Cloudflare Pages |
 | **Reference** | Changelog, quick reference |

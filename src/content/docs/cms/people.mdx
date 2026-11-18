@@ -1,0 +1,89 @@
+---
+title: People and sign-in
+description: Roles, invitations, sign-in by email link and passkey, and how a site delivers its email
+sidebar:
+  order: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+There are no passwords and there is no sign-up page. People are invited by an owner and sign in with a link sent
+to their email, or with a passkey once they have added one.
+
+## Roles
+
+| | Owner | Editor | Author |
+|---|---|---|---|
+| Write and save entries | ✓ | ✓ | ✓ |
+| Publish, unpublish, trash and delete entries | ✓ | ✓ | |
+| Build and change forms, read what was sent | ✓ | ✓ | |
+| Contacts and deals | ✓ | ✓ | |
+| Content types | ✓ | | |
+| People and invitations | ✓ | | |
+| Plugins and their settings | ✓ | | |
+
+Only an owner changes a role.
+
+## The first owner
+
+The first owner is made from the command line, once. It refuses when anyone already has access.
+
+```sh
+npx velocity-cms owner you@example.com "Your Name"
+```
+
+It prints a link that signs them in. It works once, for ten minutes. For someone who already has access and cannot
+get an email, `npx velocity-cms link <email>` prints a new one. Whoever holds a link is that person, so run these
+only where you trust the screen.
+
+## Inviting people
+
+An owner opens **People**, adds a name, an email and a role, and the person is emailed. They then ask for a sign-in
+link at `/admin` like everyone else.
+
+## Signing in
+
+- **Email link.** Type your email at `/admin`. If it belongs to someone with access, a link arrives.
+- **Passkey.** Once signed in, add a passkey from the account menu and use your fingerprint, face or device PIN
+  from then on.
+
+The sign-in page answers the same way whoever an address belongs to, and takes the same time, so it never tells a
+stranger who has an account. One address is sent at most three links in ten minutes.
+
+## Email delivery
+
+Without any setup, links and invitations are printed to the server's log. That is enough to develop with, and
+`velocity-cms link` covers a small site. A deployed site should send real email, in one of two ways.
+
+### Resend
+
+Set two variables and the CMS sends through [Resend](https://resend.com):
+
+```sh
+VELOCITY_CMS_RESEND_API_KEY=re_...
+VELOCITY_CMS_EMAIL_FROM="My site <hello@example.com>"
+```
+
+### Your own provider
+
+Name a file in the integration, `velocityCms({ mailer: './src/cms-mailer.ts' })`, whose default export has two
+methods:
+
+```ts
+// src/cms-mailer.ts
+export default {
+  async sendSignInLink({ email, name, url, expiresInMinutes, siteName }) {
+    // Send `url` to `email` with your provider. Throw if it cannot be sent.
+  },
+  async sendInvitation({ email, name, url, siteName }) {
+    // Tell them they were let in. `url` is the editor's address.
+  },
+};
+```
+
+It is only ever called for someone who has an account.
+
+<Aside type="caution">
+Links are made for the site's configured address: `site` in the Astro config, or `VELOCITY_CMS_ORIGIN`. Passkeys
+are tied to that address too, so a passkey made on one domain does not work on another.
+</Aside>

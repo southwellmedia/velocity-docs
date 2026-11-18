@@ -1,0 +1,65 @@
+---
+title: CRM
+description: Contacts, a pipeline, deals and custom fields inside the CMS, and how personal data is exported and erased
+sidebar:
+  order: 7
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The CMS has a small CRM built in, so a site's forms lead somewhere. It needs no setup: the first person to send a
+form becomes the first contact.
+
+## What it holds
+
+| | |
+|---|---|
+| **Contacts** | One per email address. Details, the team's notes and a timeline of everything the person sent and every stage they moved through. |
+| **Pipeline** | The stages a contact moves through, as a board. A site renames, reorders, adds and removes stages. Each contact can have someone on the team who looks after it and a day to follow up. |
+| **Deals** | What a contact may buy: an amount in the pipeline's currency, in a stage of the same pipeline. The Deals screen adds them up as open, forecast and won. |
+| **Custom fields** | Fields a site adds to its contacts and its deals, such as "Membership type". |
+| **Import** | Contacts from a CSV file. Someone already there only gains what they lack. |
+
+Owners and editors can see and change contacts and deals. Authors cannot.
+
+## How contacts are made
+
+- **By a form.** A form that names its name and email fields makes a contact from each submission that is not
+  spam. A form never overwrites what the team typed about a person: it only fills what is missing.
+- **By hand**, under Contacts.
+- **By import.** The editor reads the CSV in the browser and reports any row it could not take by its place in the
+  file.
+
+New contacts from forms can be given in turn to the people an owner names, to whoever of them looks after the fewest.
+
+## Deals about something on the site
+
+A content type can say that deals may be about its entries: listings, memberships, services. Set **Deals can be
+about these** in the type builder, or `forDeals: true` in code. A deal then points at the entry itself, so it keeps
+its subject when the entry is renamed, and the entry's screen lists the deals about it.
+
+The forecast counts each open deal by its stage's chance of closing, which an owner sets per stage.
+
+## Personal data
+
+A contact is personal data, and the CMS treats it that way throughout.
+
+- **Who can read it.** Only people whose role allows it. A plugin hears of contacts and submissions only if it
+  declared that permission, which the owner sees before switching it on.
+- **Where it never goes.** Not to a page, a cache, the search index or a log.
+- **Export.** From a contact's screen, an owner or editor downloads a file of everything held about that person:
+  details, notes, what they sent, their deals.
+- **Erase.** Forgetting a person removes the contact, the notes, the deals and everything they sent. It cannot be
+  undone.
+- **Retention.** Each form can say how many days its submissions are kept.
+
+<Aside type="caution" title="Not in the beta">
+One pipeline per site. No reminder emails for follow-up days: what is due shows on the editor's home screen. No
+email is sent from a contact's page. The words "Contacts" and "Deals" cannot be renamed.
+</Aside>
+
+## Sending contacts elsewhere
+
+The **Webhooks** plugin posts what happens (a form sent, a contact or a deal changed) to addresses an owner lists.
+The **Mailchimp**, **Slack** and **HubSpot** plugins are marked experimental: they pass their tests but have not
+run against the real services. See [Writing a plugin](/cms/plugins/) for the ones that come with the CMS.

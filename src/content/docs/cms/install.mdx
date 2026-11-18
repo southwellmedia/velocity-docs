@@ -1,0 +1,150 @@
+---
+title: Install
+description: Run the starter site, add Velocity CMS to an Astro site and deploy it on a server or on Vercel
+sidebar:
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+You need Node 22.23.4 or newer.
+
+<Aside type="caution" title="Not on npm yet">
+Until the first beta is published, the packages are run from the repository, as the starter below does.
+</Aside>
+
+## Try the starter
+
+The repository has a small site that is plain Astro: pages built from sections, a blog, a contact form and a menu.
+It is the fastest way to see the CMS, and the best thing to copy from. It needs pnpm 10.
+
+```sh
+git clone https://github.com/Velocity-Astro/velocity-cms.git
+cd velocity-cms
+pnpm install
+pnpm build
+
+cd examples/starter
+npx velocity-cms init you@example.com "Your Name"
+npm run seed
+npm run dev
+```
+
+`init` prints a link that signs you in. Open it once the site is running, then open **Pages** and change something.
+
+## Add it to a site
+
+In an Astro site that has a server adapter:
+
+<Steps>
+
+1. Set the site up.
+
+   ```sh
+   npx velocity-cms init you@example.com "Your Name"
+   ```
+
+   This writes a secret and the local address to `.env`, keeps `.env` and the database's folder out of git, adds
+   `velocityCms()` to the Astro config and makes you the site's owner. It can be run again: it adds only what is
+   missing and never changes a value that is there.
+
+2. Describe your content. See [Content types and fields](/cms/content-types/).
+
+3. Draw it. See [Showing content](/cms/showing-content/) and [The page builder](/cms/page-builder/).
+
+</Steps>
+
+Without an email and a name, `init` stops after the setup. Make the owner later with
+`npx velocity-cms owner <email> <name>`. `npx velocity-cms link <email>` prints a new sign-in link for someone who
+already has access.
+
+### What the config looks like
+
+```js
+// astro.config.mjs
+import { defineConfig, memoryCache } from 'astro/config';
+import node from '@astrojs/node';
+import velocityCms from '@velocity-astro/cms-astro';
+
+export default defineConfig({
+  site: process.env.SITE_URL || 'http://localhost:4321',
+  adapter: node({ mode: 'standalone' }),
+  integrations: [velocityCms({ siteName: 'My site', entryPages: ['pages'] })],
+  // A page drawn from the CMS is kept until a publish clears it. A day is the backstop.
+  cache: { provider: memoryCache() },
+  routeRules: { '/[...path]': { maxAge: 86400, tags: ['cms'] } },
+});
+```
+
+| Option | What it is for |
+|---|---|
+| `siteName` | Shown in the editor, in sign-in emails and in the passkey prompt. |
+| `entryPages` | The content types whose entries are pages one route draws, such as `['pages']`. Their addresses join the sitemap and search. |
+| `plugins` | The site's own plugins: package names or files. See [Writing a plugin](/cms/plugins/). |
+| `mailer` | A file that delivers sign-in links by email. See [People and sign-in](/cms/people/). |
+| `images` | A folder of images that image fields can choose from, such as `'./src/assets/photos'`. |
+| `unlisted` | Addresses to leave out of the sitemap, such as `['/search/']`. |
+
+## Settings
+
+The CMS reads its settings from the environment, and from `.env` while you develop and build.
+
+| Variable | |
+|---|---|
+| `VELOCITY_CMS_SECRET` | Required. At least 32 characters. Signs sessions and preview links and seals plugin secrets. `init` makes one. |
+| `VELOCITY_CMS_ORIGIN` | The site's address, such as `https://example.com`. Not needed when `site` is set in the Astro config. |
+| `VELOCITY_CMS_DATABASE_URL` | Where the database is. Left out, a file at `cms/data.db`. |
+| `VELOCITY_CMS_DATABASE_TOKEN` | The token of a hosted libSQL database. |
+| `VELOCITY_CMS_RESEND_API_KEY`, `VELOCITY_CMS_EMAIL_FROM` | Send sign-in links and invitations through Resend. |
+| `VELOCITY_CMS_MEDIA_DIR` | A folder for uploaded images. |
+| `VELOCITY_CMS_S3_BUCKET`, `VELOCITY_CMS_S3_ENDPOINT`, `VELOCITY_CMS_S3_ACCESS_KEY_ID`, `VELOCITY_CMS_S3_SECRET_ACCESS_KEY` | A bucket for uploaded images. All four, or none. `VELOCITY_CMS_S3_REGION` is optional. |
+
+<Aside type="caution">
+Sign-in links are made for the configured address, never for the address a request claims to come from. A deployed
+site with neither `site` nor `VELOCITY_CMS_ORIGIN` cannot send a working link.
+</Aside>
+
+## Deploy on a server
+
+Any machine that runs Node and keeps its disk.
+
+<Steps>
+
+1. Set `VELOCITY_CMS_SECRET` and the site's address on the machine.
+2. Build and start the site as you would any Astro site on the Node adapter.
+3. Make the owner once, on the machine: `npx velocity-cms owner you@example.com "Your Name"`.
+
+</Steps>
+
+The database is the file `cms/data.db` and uploads go in `cms/media`, beside it. Back that folder up.
+
+## Deploy on Vercel
+
+A serverless host has no disk to keep, so the database and the uploads live elsewhere.
+
+<Steps>
+
+1. Create a libSQL database, for example on [Turso](https://turso.tech), and set `VELOCITY_CMS_DATABASE_URL` and
+   `VELOCITY_CMS_DATABASE_TOKEN` in the project's settings.
+2. Set `VELOCITY_CMS_SECRET`, and `site` in the Astro config (or `VELOCITY_CMS_ORIGIN`).
+3. Use the Vercel adapter in place of the Node one, and deploy.
+4. Make the owner from your own machine, with the same four variables in your shell or `.env`:
+   `npx velocity-cms owner you@example.com "Your Name"`.
+
+</Steps>
+
+For uploads, set the four `VELOCITY_CMS_S3_*` variables to any S3-compatible bucket, such as Cloudflare R2. Without
+them a site on a hosted database takes no uploads, and the editor does not offer any.
+
+<Aside>
+Node on a server and Vercel are the hosts the CMS has been run on. Netlify and Cloudflare are untried.
+</Aside>
+
+## A timer, if you want one
+
+Scheduled publishing needs no timer: the site looks for what is due whenever a page is asked for. On a quiet site
+that can be late. A scheduled job (cron, or your host's own) that calls one address makes it exact:
+
+```sh
+curl -H "Authorization: Bearer $VELOCITY_CMS_SECRET" https://example.com/api/cms/schedule
+```

@@ -1,0 +1,117 @@
+---
+title: Content types and fields
+description: Describe a site's content in the editor's builder or in code, and what each kind of field holds
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A **content type** is a kind of content: pages, posts, listings, the site's navigation. It has **fields**, and each
+thing made from it is an **entry**. There are two ways to make one, and they can be mixed.
+
+## In the editor
+
+An owner opens **Content types** and builds a type by adding fields, naming them and putting them in order. Nothing
+is deployed: the type is in use at once. This suits content a site's owner thinks of after launch.
+
+## In code
+
+A template or a developer describes the types as data and applies them with `schema.define`. This is what a
+Premium template does, and what the starter does in `cms/model.mjs`:
+
+```js
+// cms/model.mjs
+const en = (text) => ({ en: text });
+
+export const posts = {
+  key: 'posts',
+  kind: 'collection',
+  label: en('Posts'),
+  urlPattern: '/blog/[slug]',
+  titleField: 'title',
+  fields: [
+    { key: 'title', type: 'text', label: en('Title'), required: true },
+    { key: 'date', type: 'date', label: en('Date'), required: true },
+    { key: 'excerpt', type: 'text', label: en('Summary'), options: { multiline: true } },
+    { key: 'body', type: 'richtext', label: en('Text'), required: true },
+  ],
+};
+```
+
+```js
+// cms/seed.mjs
+import { sharedConnection } from '@velocity-astro/cms-astro';
+import { posts } from './model.mjs';
+
+const SEED = { kind: 'cli', id: 'seed', role: 'owner' };
+const connection = await sharedConnection({});
+try {
+  await connection.cms.schema.define(SEED, posts);
+} finally {
+  connection.close();
+}
+```
+
+`schema.define` is safe to run on every deploy:
+
+- A field keeps its identity by its `key`, so content stays when a label, a help text or the order changes.
+- A field the description leaves out is kept. Fields an owner added in the editor survive a deploy.
+- Nothing is deleted. A removed field is marked as removed and what it held stays in the database.
+
+<Aside type="tip">
+Content is stored by a field's permanent id, not by its key. Renaming a key in the editor changes the name your
+components read and nothing else.
+</Aside>
+
+### What a type says
+
+| | |
+|---|---|
+| `key` | The name code uses, such as `posts`. |
+| `kind` | `collection` for many entries, `single` for one, such as the navigation or a settings page. |
+| `label` | Its name in the editor, by language: `{ en: 'Posts' }`. |
+| `urlPattern` | Where an entry's page is: `/blog/[slug]`. A type with no page of its own leaves it out. |
+| `localizedUrlPatterns` | The same for other languages: `{ es: '/es/blog/[slug]' }`. |
+| `titleField` | The field an entry is called by in lists. |
+| `sections` | How the editor groups the fields on the entry's screen. |
+| `forDeals` | `true` when a deal in the CRM can be about one of its entries, such as a listing. |
+
+A pattern that says `[...slug]`, as in `/[...slug]`, lets a slug have several parts, such as `services/roofing`, so
+pages can sit under pages. The entry whose slug is `index` is the page at the top: with `/[...slug]`, the home page.
+
+## Kinds of field
+
+| Type | Holds | Options |
+|---|---|---|
+| `text` | A line of text, or several lines | `multiline`, `maxLength` |
+| `richtext` | Text a person shapes: paragraphs, headings, lists, bold, links | |
+| `number` | A number | |
+| `boolean` | Yes or no | |
+| `date` | A day | |
+| `url`, `email`, `phone` | An address of that kind, checked | |
+| `select` | One of a list | `choices`, `labels` |
+| `image` | An image from the library | |
+| `reference` | Another entry | `to`: the other type's key |
+| `link` | A page of the site or a typed address. See [Showing content](/cms/showing-content/#links). | |
+| `form` | One of the site's forms. See [Forms](/cms/forms/). | |
+| `group` | Several fields together | `fields` |
+| `list` | Many of one kind, in order | `of`: the kind of item |
+| `blocks` | The sections of a page. See [The page builder](/cms/page-builder/). | `blocks` |
+
+Every field also takes `label`, `help`, `required` and `translated`.
+
+## Drafts, published versions and history
+
+- An entry has two versions: the one being worked on and the one visitors see. Saving never changes the site.
+  Only **Publish** does.
+- Every save is kept. An earlier version can be brought back as a new save, and it waits for a publish like any other.
+- **Schedule** sets a time to publish. What goes out is what the entry holds when the time comes.
+- **Preview** makes a link that shows the working version to whoever holds it, without signing in.
+- **Trash** takes an entry off the site and frees its slug. It can be restored as a draft, or deleted for good from
+  the trash.
+
+## Languages
+
+An entry is in one language. Its translations are entries of their own, joined as one group, each with its own
+slug, drafts and publish. A link to an entry follows the reader to the version in their language.

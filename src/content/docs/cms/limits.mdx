@@ -1,0 +1,61 @@
+---
+title: Known limits
+description: What the Velocity CMS beta does not do yet, and how to report a bug or a security problem
+sidebar:
+  order: 10
+---
+
+The beta is for developers and agencies who build Astro sites and can live with rough edges. This page says plainly
+what is missing, so nobody finds out the hard way.
+
+## Not stable yet
+
+- Versions are `0.x`. The plugin API and the way a site describes its content may change between releases. Each
+  change comes with a note on how to move.
+- There has been no outside security review yet. The project's own review, and what it covered, is in
+  [SECURITY.md](https://github.com/Velocity-Astro/velocity-cms/blob/main/SECURITY.md).
+
+## Database and hosts
+
+- SQLite and libSQL only. No Postgres or MySQL.
+- Tried on Node on a server and on Vercel. Netlify and Cloudflare are untried.
+- A site on a hosted database takes uploads only when an S3-compatible bucket is set up.
+- With the in-memory page cache, a site running several servers clears a published page on the server that took
+  the publish. The others follow when their copy runs out. Use a cache the servers share, such as your host's own.
+
+## Editor
+
+- The editor is in English. The site itself can be in any language.
+- History has no side-by-side comparison of two versions.
+- Scheduled times are on the half hour. There is no scheduled unpublish.
+
+## Forms
+
+- No file uploads.
+- No challenge such as Turnstile. Spam is caught by a hidden field and a timing mark.
+- Nothing is emailed to the visitor.
+- On a host with many short-lived servers, the limit on posts per address is counted per server.
+- The limit on sign-in links per address is counted per server too.
+
+## CRM
+
+- One pipeline per site.
+- No reminder emails. No email sent from a contact's page.
+- The Mailchimp, Slack and HubSpot plugins pass their tests but have not run against the real services.
+
+## Content in and out
+
+- No importers for WordPress or other systems. Contacts come in by CSV. Entries do not.
+- No marketplace for plugins. A developer can write one for their own site.
+
+## Reporting a bug
+
+Open an issue at [github.com/Velocity-Astro/velocity-cms/issues](https://github.com/Velocity-Astro/velocity-cms/issues).
+The form asks for what you did, what you expected, what happened and your versions. A small site that shows the
+problem, such as a change to the starter, gets the fastest answer.
+
+## Reporting a security problem
+
+Please do not open a public issue. Use **Report a vulnerability** on the repository's
+[Security tab](https://github.com/Velocity-Astro/velocity-cms/security). You will get a first answer within three
+working days.
