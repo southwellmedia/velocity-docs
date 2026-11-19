@@ -1,0 +1,172 @@
+---
+title: Writing a plugin
+description: The plugins that come with Velocity CMS, and how to write one for your own site
+sidebar:
+  order: 9
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A plugin adds to the CMS without changing it: it listens to what happens, adds rules, keeps settings and secrets,
+does work in the background, and can add screens to the editor. Owners switch plugins on and off under **Plugins**
+in the editor. No rebuild is needed.
+
+## The ones that come with it
+
+All five are off until an owner activates them.
+
+| Plugin | What it does |
+|---|---|
+| **SEO** | A title and description per entry, a check of each entry, and whether a page is listed by search engines. |
+| **Webhooks** | Posts what happens (a form sent, a contact or deal changed, a page published) to addresses an owner lists, signed when a signing secret is saved. |
+| **Mailchimp** *(experimental)* | Adds whoever sends a form to an audience. |
+| **Slack** *(experimental)* | Posts to a channel when a form is sent or a contact is made. |
+| **HubSpot** *(experimental)* | Copies contacts to HubSpot, one way. |
+
+Experimental means tested, but not yet tried against the real service.
+
+## A plugin of your own
+
+A plugin is a file whose default export is `definePlugin(...)`.
+
+```ts
+// src/cms/publish-log.ts
+import { definePlugin } from '@velocity-astro/cms-astro';
+
+const KEPT = 50;
+
+export default definePlugin({
+  name: 'publish-log',
+  apiVersion: 1,
+  label: { en: 'Publish log' },
+  description: { en: 'Keeps a list of what was published and when.' },
+  version: '1.0.0',
+  setup(cms) {
+    cms.events.on('entry.published', async ({ entry }) => {
+      const before = await cms.store.get('log');
+      const line = { slug: entry.slug, locale: entry.locale, at: new Date().toISOString() };
+      await cms.store.set('log', [line, ...(Array.isArray(before) ? before : [])].slice(0, KEPT));
+    });
+
+    cms.routes.add('GET', '/log', async () => ({ items: (await cms.store.get('log')) ?? [] }));
+  },
+});
+```
+
+Name it in the integration:
+
+```js
+velocityCms({ plugins: ['./src/cms/publish-log.ts'] })
+```
+
+A plugin a site names this way runs from the start. An owner can still switch it off in the editor. A plugin that
+cannot start is switched off and listed under Plugins with the reason. It never stops the site.
+
+## What `setup` receives
+
+| | |
+|---|---|
+| `cms.events.on(event, listener)` | Hear what happens: `entry.published`, `entry.saved`, `form.saved`, `submission.received`, `contact.saved`, `deal.saved`, `media.uploaded` and more. A listener that fails is caught and noted. The change it heard of stands. |
+| `cms.checks.add('publish', check)` | A rule an entry must pass before it is published. It answers with what is wrong, by field key, and the editor shows each on its field. |
+| `cms.settings.get()` | What the owner set, by field key. |
+| `cms.secrets.get(key)` | A key or password the owner saved. |
+| `cms.store` | `get`, `set`, `remove`, `list`: small values of the plugin's own, in the site's database. |
+| `cms.tasks` | Work that must not be lost when it fails once. See below. |
+| `cms.routes.add(method, path, handler)` | Answer at `/api/cms/plugins/<name><path>`, for signed-in people. |
+| `cms.pages.head(rule)` | Change a page's title, description and whether it is listed. |
+| `cms.fields.register(type)` | Add a kind of field. |
+| `cms.net.isPublic(host)` | Whether a host's name leads only to public addresses. |
+| `cms.schema`, `cms.content` | The same services the editor uses, as the plugin, with only the permissions it declared. |
+
+### Permissions
+
+A plugin says what it needs, and gets nothing else:
+
+```ts
+definePlugin({
+  // ...
+  permissions: ['entry:read', 'submission:read'],
+});
+```
+
+It hears of submissions and contacts only if it declared the permission to read them. Declare the fewest you can:
+the owner sees the list before switching the plugin on.
+
+### Settings and secrets
+
+Settings are fields, described the way a content type's are. The editor draws the form.
+
+```ts
+definePlugin({
+  // ...
+  settings: [{ key: 'channel', type: 'text', label: { en: 'Channel' } }],
+  secrets: [{ key: 'apiKey', label: { en: 'API key' } }],
+});
+```
+
+A key or a password is a **secret**, never a setting. It is sealed with the site's secret before it is stored and
+is never sent back to the editor: the settings screen says only that one is saved.
+
+### Work that reaches another service
+
+Anything sent to another service goes through `cms.tasks`, so one failure does not lose it.
+
+```ts
+setup(cms) {
+  cms.tasks.define('send', async ({ payload }) => {
+    // Throw to have it tried again.
+  });
+
+  cms.events.on('submission.received', async ({ form }) => {
+    await cms.tasks.add('send', { form: form.key }, { label: 'Tell the other service' });
+  });
+}
+```
+
+A piece of work is tried at once, again after a minute, then at longer waits for about a day. An owner sees each
+piece under Plugins and can have a failed one tried again. A piece may run twice, so give the other side its id to
+tell.
+
+<Aside type="caution">
+What a task carries may be personal data. Give it a label that says where it goes, never what or who. Send only to
+public `https` addresses, and ask `cms.net.isPublic(host)` before sending to an address a person typed.
+</Aside>
+
+## Adding to the editor
+
+A plugin's part of the editor is one prebuilt JavaScript file, handed over as text. It brings no React of its own:
+it uses the one it is given, and builds from the editor's own parts.
+
+```ts
+import editor from './publish-log-editor.js?raw';
+
+export default definePlugin({ /* ... */ editor });
+```
+
+```js
+// src/cms/publish-log-editor.js
+export default function publishLog({ React, ui, client, register }) {
+  const h = React.createElement;
+  const { Card, Text } = ui;
+
+  function Screen() {
+    const [items, setItems] = React.useState([]);
+    React.useEffect(() => void client.get('/log').then((answer) => setItems(answer.items)), []);
+    return h(Card, null, items.map((item) => h(Text, { key: item.at }, `${item.slug} (${item.locale})`)));
+  }
+
+  register.screen({ id: 'log', label: 'Publish log', Component: Screen });
+}
+```
+
+- `register.screen` adds a screen to the sidebar, `register.entryPanel` a panel on an entry, and
+  `register.control` the control for a kind of field.
+- `client` reaches only the plugin's own addresses.
+- `ui` holds the parts a plugin may build from, such as `Button`, `Card`, `Table`, `Stack`, `Text` and `EmptyState`.
+- Whatever a plugin draws is fenced in: a fault shows in its own part of the screen and the editor keeps running.
+
+## Stability
+
+The surface above is version `1` (`apiVersion: 1`). During the beta it may still change between releases, each
+change with a note on how to move. There is no marketplace yet: a plugin lives in the site that uses it, or in a
+package that site installs.

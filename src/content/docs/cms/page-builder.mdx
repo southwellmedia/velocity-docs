@@ -1,0 +1,134 @@
+---
+title: The page builder
+description: How pages built from sections work, and how to write a block and the component that draws it
+sidebar:
+  order: 5
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+In the editor a page is a list of **sections**: a hero, some text, a grid of features, a form. An editor adds,
+moves, hides and removes them, with the live page beside the form, and a click on a section of the page opens it in
+the form.
+
+A page is sections of **data**, never markup. A section says which **block** it is and holds that block's values.
+Your component draws it. So editors cannot break the design, and a redesign does not touch the content.
+
+## The three parts
+
+<Steps>
+
+1. **Describe the block** in the site's model: its key, its fields and how the editor names it.
+
+   ```js
+   // cms/model.mjs
+   const en = (text) => ({ en: text });
+
+   const hero = {
+     key: 'hero',
+     label: en('Hero'),
+     description: en('A large heading with a line under it and a button. Usually first.'),
+     icon: 'layout-template',
+     group: 'Sections',
+     fields: [
+       { key: 'title', type: 'text', label: en('Title'), required: true },
+       { key: 'lead', type: 'text', label: en('Lead'), options: { multiline: true } },
+       { key: 'buttonLabel', type: 'text', label: en('Button words') },
+       { key: 'buttonTo', type: 'link', label: en('Button goes to') },
+     ],
+   };
+
+   export const pages = {
+     key: 'pages',
+     kind: 'collection',
+     label: en('Pages'),
+     urlPattern: '/[...slug]',
+     titleField: 'title',
+     fields: [
+       { key: 'title', type: 'text', label: en('Title'), required: true },
+       { key: 'body', type: 'blocks', label: en('Sections'), options: { blocks: [hero] } },
+     ],
+   };
+   ```
+
+2. **Write its component.** It takes the block's values as props, by field key.
+
+   ```astro
+   ---
+   // src/components/blocks/Hero.astro
+   import { linkTo } from '@velocity-astro/cms-astro';
+
+   const { title, lead, buttonLabel, buttonTo } = Astro.props;
+   const button = buttonLabel ? await linkTo(Astro, buttonTo) : undefined;
+   ---
+
+   <section class="hero">
+     <h1>{title}</h1>
+     {lead && <p>{lead}</p>}
+     {button && <a href={button.href}>{buttonLabel}</a>}
+   </section>
+   ```
+
+3. **Name it** in the map from block key to component.
+
+   ```ts
+   // src/components/blocks.ts
+   import Hero from './blocks/Hero.astro';
+
+   export const blocks = { hero: Hero };
+   ```
+
+</Steps>
+
+Apply the model (`npm run seed` in the starter) and the block is offered under **Add section**.
+
+## Drawing a page
+
+One route draws every page built in the editor, the home page among them.
+
+```astro
+---
+// src/pages/[...slug].astro
+import { entryPage, isEditorPreview } from '@velocity-astro/cms-astro';
+import { blocks } from '@/components/blocks';
+import Layout from '@/layouts/Layout.astro';
+
+export const prerender = false;
+
+const found = await entryPage(Astro, { types: ['pages'] });
+if (!found) return new Response('There is no page here.', { status: 404 });
+const page = found.entry.data;
+const marked = isEditorPreview();
+---
+
+<Layout title={page.title}>
+  {(page.body ?? []).map((section) => {
+    const Block = blocks[section.block];
+    if (!Block) return null;
+    return marked ? <div data-cms-section={section.id}><Block {...section.data} /></div> : <Block {...section.data} />;
+  })}
+</Layout>
+```
+
+Each section arrives as `{ id, block, data }`: the block's key and its values by field key. The
+`data-cms-section` mark, added only beside the editor's form, is what lets a click on the page find the section in
+the form.
+
+List the type under `entryPages` in the integration so these pages join the sitemap and search:
+`velocityCms({ entryPages: ['pages'] })`.
+
+## Rules worth knowing
+
+- **A block's look is a choice among named values.** Offer a `select` such as "Background: plain, tinted, dark".
+  Don't offer a free colour or size.
+- **Blocks are never deleted.** A block the model no longer describes is retired: sections made from it are kept
+  and left off the site, and they come back if the block does.
+- **A section with no component is left out**, so a page is never lost over one.
+- **Icons** are named from a short list the editor knows: `layout-template`, `align-left`, `layout-grid`,
+  `panel-top`, `message-circle` and others. An unknown name falls back to a plain icon.
+- **Pages under pages.** With `urlPattern: '/[...slug]'` a slug may be `services/roofing`. The slug `index` is the
+  home page.
+
+<Aside type="tip">
+The starter's `src/components/blocks/` has five blocks to copy from, a form among them.
+</Aside>

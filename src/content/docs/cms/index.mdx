@@ -1,0 +1,59 @@
+---
+title: Velocity CMS
+description: A content management system for Astro sites, with an editor at /admin and pages that change about a second after a publish
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+**Velocity CMS** is a content management system for Astro sites. People edit at `/admin`, the content lives in a
+small SQLite database beside the site, and a change is on the site about a second after it is published, with no
+rebuild. It is open source under MIT: [github.com/Velocity-Astro/velocity-cms](https://github.com/Velocity-Astro/velocity-cms).
+
+<Aside type="caution" title="Beta">
+Versions are `0.x`. The plugin API and the way a site describes its content may change between releases, each
+change with a note on how to move. Read [Known limits](/cms/limits/) before you build a client's site on it.
+</Aside>
+
+## Try it
+
+There is a [demo you can edit](https://velocity-cms-real-estate-demo.vercel.app/demo/): a real estate site on the CMS, with one click into its editor as an editor. Everyone shares it, it sends no email and takes no uploads, and it starts over every night.
+
+## What it does
+
+| | |
+|---|---|
+| **Content** | Content types made in a visual builder or described in code. Drafts and published versions, trash, duplicate, history with restore, scheduled publishing, preview links, several languages. |
+| **Pages** | A page builder of sections, with the live page beside the form. Pages under pages, a home page, menus edited in the CMS. |
+| **Media** | An image library with uploads, kept in a folder or any S3-compatible bucket. |
+| **Forms** | A form builder, forms as page sections, spam marking, notices by email, export and erase of what a person sent. |
+| **CRM** | Contacts with a timeline and notes, a pipeline board, owners and follow-up days, deals with a forecast, custom fields, CSV import. |
+| **Plugins** | A plugin API with settings, secrets and retried background work. Five come with it, off until an owner switches one on. |
+| **People** | Sign-in by email link or passkey, no passwords. Owner, editor and author roles. Invitations. |
+
+## How it fits a site
+
+- **The editor is part of your site.** One Astro integration adds `/admin`, the API behind it and the address forms
+  post to. There is no second service to host.
+- **Your components draw the content.** The CMS hands a page its content as plain data. The markup, the styles and
+  the design stay in your Astro components. See [Showing content](/cms/showing-content/).
+- **Pages are live.** A page that shows CMS content is rendered on a server and kept in a cache. A publish clears
+  what changed. A fully static build is still an option.
+- **The database is a file.** SQLite on a server that keeps its disk, or a hosted libSQL database such as Turso on
+  serverless hosts.
+
+## Velocity CMS and Velocity Premium
+
+The CMS is free. [Velocity Premium](/premium/) sells complete sites that come already wired to it: content types,
+sample content and a component for every section. You can use the CMS on any Astro site without Premium.
+
+## Start here
+
+<CardGrid>
+  <LinkCard title="Install" description="Run the starter, add the CMS to a site, deploy." href="/cms/install/" />
+  <LinkCard title="Content types and fields" description="In the builder and in code." href="/cms/content-types/" />
+  <LinkCard title="Showing content" description="Live collections, entry pages, menus and links." href="/cms/showing-content/" />
+  <LinkCard title="The page builder" description="Write a block and the component that draws it." href="/cms/page-builder/" />
+</CardGrid>

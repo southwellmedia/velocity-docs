@@ -1,0 +1,99 @@
+---
+title: Forms
+description: Build forms in the editor, draw them on the site, and what happens to what visitors send
+sidebar:
+  order: 6
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Forms are built in the editor under **Forms**: fields, the words on the button, what a visitor is told afterwards,
+and who is emailed. What visitors send arrives there too, new first, with spam set apart.
+
+## Drawing a form
+
+`siteForm` gives a page one of the site's forms as it is today: its fields, where it posts and the hidden values to
+send along. Your component writes the markup.
+
+```astro
+---
+// src/components/ContactForm.astro
+import { FORM_SCRIPT, siteForm } from '@velocity-astro/cms-astro';
+
+const form = await siteForm(Astro, 'contact');
+---
+
+{form && (
+  <form action={form.action} method="post" data-cms-form data-cms-form-failed="That could not be sent. Please try again.">
+    {Object.entries(form.hidden).map(([name, value]) => <input type="hidden" name={name} value={value} />)}
+
+    {form.fields.map((field) => (
+      <div>
+        <label for={field.key}>{field.label.en}</label>
+        <input id={field.key} name={field.key} required={field.required} />
+        <p data-cms-form-error={field.key} role="alert" hidden />
+      </div>
+    ))}
+
+    <!-- Hide this from people with CSS. A post that fills it is kept as spam. -->
+    <div class="trap" aria-hidden="true">
+      <input type="text" name={form.trap} tabindex="-1" autocomplete="off" />
+    </div>
+
+    <button type="submit" data-cms-form-sending="Sending…">{form.submitLabel?.en ?? 'Send'}</button>
+    <p role="status" data-cms-form-status hidden />
+  </form>
+)}
+<script is:inline type="module" src={FORM_SCRIPT}></script>
+```
+
+- `siteForm(Astro, 'contact')` finds a form by its key. `siteForm(Astro, { id })` finds one by its id, which is
+  what a `form` field stores when an editor chooses a form for a section.
+- It answers `null` for a form that is closed or gone, so the section is left out. It never throws.
+- The form works as a plain HTML form. With scripts on, `FORM_SCRIPT` sends it in place and writes each problem
+  under its field, in the elements marked `data-cms-form-error`.
+- The example draws every field as a text input to stay short. The starter's `Form.astro` draws each kind:
+  multi-line text, email, phone, dates, choices and checkboxes.
+
+A field added under **Forms** is on the page at once: a page that draws a form is cleared from the cache when the
+form changes.
+
+## Where a form posts
+
+Every form posts to one address, `/api/cms/submit/<form key>`. It is the only thing on the site anyone may write to
+without signing in, so it trusts nothing it is sent:
+
+- It checks where the post came from, how large it is and how many one address has sent.
+- It keeps only the form's own fields, each checked by its kind.
+- A post that filled the hidden field, or carries no true mark of when its form was drawn, is kept as **spam** and
+  answered like any other.
+- Nothing a visitor typed is written back into the page that answers them.
+
+## Notices
+
+A form names the addresses to email about each submission. Notices go out through the same mail settings as
+sign-in links (see [People and sign-in](/cms/people/)). A notice that cannot be sent never loses the submission.
+
+The visitor is never emailed. There is no confirmation email in the beta.
+
+## Forms and the CRM
+
+A form says which of its fields hold the sender's name, email and phone. Whoever sends it, and is not marked as
+spam, becomes a **contact**, or adds to the one with that email. See [CRM](/cms/crm/).
+
+- A form can fill a contact's custom fields from its answers, only where the contact holds nothing yet.
+- A form set to start a deal does so when it is sent from an entry's own page, for a type that takes deals: an
+  enquiry on a listing's page becomes a deal about that listing. A page can also say which entry a form is about:
+  `siteForm(Astro, 'enquiry', { about: { type: 'listings', slug } })`.
+
+## What visitors send is personal data
+
+- Submissions are read only by owners and editors.
+- Nothing from a submission reaches a page, a cache, the search index or a log.
+- Everything one person sent can be exported as a file or erased, from **Forms** or from their contact.
+- A form can say how many days submissions are kept, after which they are removed.
+
+<Aside type="caution" title="Not in the beta">
+File uploads, a challenge such as Turnstile, and a confirmation email to the visitor. On a host with many
+short-lived servers, the limit on posts per address is counted per server.
+</Aside>

@@ -55,6 +55,12 @@ export default defineConfig({
           autogenerate: { directory: "premium" },
         },
         {
+          label: "Velocity CMS",
+          badge: { text: "Beta", variant: "caution" },
+          collapsed: false,
+          autogenerate: { directory: "cms" },
+        },
+        {
           label: "CLI Tool",
           badge: { text: "New", variant: "success" },
           collapsed: false,

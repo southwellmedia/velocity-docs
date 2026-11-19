@@ -1,0 +1,164 @@
+---
+title: Showing content
+description: Read Velocity CMS content in Astro pages with live collections, entry pages, menus and links
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The CMS hands a page its content as plain data, by field key. Your Astro components draw it. Everything on this
+page is imported from `@velocity-astro/cms-astro`.
+
+## Live pages
+
+A page that shows CMS content is rendered on demand and kept in Astro's cache. When someone publishes, the CMS
+clears the pages that changed, so the next visitor gets the new one. This is why a publish needs no rebuild.
+
+Two things make it work, both in `astro.config.mjs`: a cache provider, and a rule that keeps pages.
+
+```js
+cache: { provider: memoryCache() },
+routeRules: { '/[...path]': { maxAge: 86400, tags: ['cms'] } },
+```
+
+Every page that reads the CMS says `export const prerender = false`.
+
+## Lists: a live collection
+
+For a list of entries, such as posts, define a live collection.
+
+```ts
+// src/live.config.ts
+import { defineLiveCollection } from 'astro:content';
+import { cmsLiveLoader } from '@velocity-astro/cms-astro';
+
+export const collections = {
+  posts: defineLiveCollection({ loader: cmsLiveLoader({ type: 'posts' }) }),
+};
+```
+
+```astro
+---
+// src/pages/blog/index.astro
+import { getLiveCollection } from 'astro:content';
+export const prerender = false;
+
+const { entries = [], error, cacheHint } = await getLiveCollection('posts');
+if (error) throw error;
+// Kept until a post is published, then drawn again.
+if (cacheHint) Astro.cache.set(cacheHint);
+---
+
+<ul>
+  {entries.map((entry) => <li><a href={`/blog/${entry.data.slug}/`}>{entry.data.title}</a></li>)}
+</ul>
+```
+
+Only published entries are read.
+
+<Aside type="caution">
+`src/live.config.ts` must not import anything that imports `astro:content` collections from `content.config.ts`.
+The build then stops at "prerendering static routes" with no error. Keep schemas shared between the two in a file
+that imports only Zod.
+</Aside>
+
+## One entry: `entryPage`
+
+`entryPage` finds the published entry whose own page is at the address being drawn, from the type's `urlPattern`.
+One route can draw every entry of a type.
+
+```astro
+---
+// src/pages/blog/[slug].astro
+import { entryPage } from '@velocity-astro/cms-astro';
+export const prerender = false;
+
+const found = await entryPage(Astro, { types: ['posts'] });
+if (!found) return new Response('There is no post here.', { status: 404 });
+const post = found.entry.data;
+---
+
+<h1>{post.title}</h1>
+<div set:html={post.body?.html ?? ''} />
+```
+
+A rich text field arrives as `{ html }`: HTML the CMS made, with every word escaped. A preview link shows the
+working version through the same code, and that answer is never cached.
+
+Name the types that work this way in the integration, `velocityCms({ entryPages: ['pages', 'posts'] })`, so their
+addresses join the sitemap and search.
+
+## Menus
+
+A menu people can edit is a list field on an entry: each item a group with a label and a link. `menuLinks` turns
+it into links for the page being drawn.
+
+```astro
+---
+import { menuLinks } from '@velocity-astro/cms-astro';
+
+const edited = await menuLinks(Astro, { type: 'navigation', field: 'header' });
+const links = edited.length > 0 ? edited : [{ label: 'Home', href: '/', external: false }];
+---
+
+<nav>
+  {links.map((link) => <a href={link.href}>{link.label}</a>)}
+</nav>
+```
+
+It never throws, and it answers with an empty list when the page's language has no menu, so the template can show
+links of its own. A link may hold `columns` of links, which a template can draw as a large menu.
+
+## Links
+
+A `link` field stores a page of the site as the entry itself, never its address, so a link keeps working when a
+slug changes. `linkTo` says where it leads today, in the page's language.
+
+```astro
+---
+import { linkTo } from '@velocity-astro/cms-astro';
+
+const { buttonLabel, buttonTo } = Astro.props;
+const button = await linkTo(Astro, buttonTo);
+---
+
+{button && <a href={button.href}>{buttonLabel}</a>}
+```
+
+It answers with nothing for a link whose entry is not published, so the button is left out and never leads to a
+missing page.
+
+## The head
+
+`pageHead` gives a page's title and description after the plugins have had their say. The SEO plugin, for one,
+lets editors set them per entry.
+
+```astro
+---
+import { pageHead } from '@velocity-astro/cms-astro';
+
+const head = await pageHead(Astro, { title: Astro.props.title, description: Astro.props.description ?? '' });
+---
+
+<title>{head.title}</title>
+{head.description && <meta name="description" content={head.description} />}
+{head.noindex && <meta name="robots" content="noindex" />}
+```
+
+## A fully static build
+
+A site that would sooner rebuild than run a server can load a type with the Content Layer loader. Nothing else
+about the collection changes.
+
+```ts
+// src/content.config.ts
+import { defineCollection } from 'astro:content';
+import { cmsLoader } from '@velocity-astro/cms-astro';
+
+const posts = defineCollection({ loader: cmsLoader({ type: 'posts' }) });
+export const collections = { posts };
+```
+
+Each entry gets the id `<locale>/<slug>`. A change then shows after the next build, and the editor still needs a
+server to run on.
