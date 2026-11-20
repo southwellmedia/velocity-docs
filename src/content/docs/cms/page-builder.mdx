@@ -141,6 +141,21 @@ A field in a list is the list's key, the item's place and the field's own key. A
 what the page finds by itself, and a click that finds no field still opens the section. Choices that show no words
 of their own, such as a background or a layout, are edited in the form.
 
+### Typing on the page
+
+Where a field holds plain words and the page shows them exactly as they are held, the editor types straight on the
+page: a click puts the caret in the heading, and what is typed goes into the form as it is typed. Enter ends it and
+Escape puts back what was there. Nothing is saved until the editor saves, as with the form.
+
+It needs nothing more from your blocks, and it is careful with them. Only the words change: an icon in a button, a
+heading's second line in another colour and the space between them stay as your component drew them. Three things
+keep a field in the form only:
+
+- **A mark you wrote with `fieldMark`.** You marked it because the page shows something other than what is held.
+- **Words inside a `<button>`.** Put a button's label in a link or a `<span>` beside the button if it should be typed
+  on the page.
+- **Anything but plain text**: text shaped in the editor, pictures, links and choices.
+
 <Aside>
 `sectionMark` and `fieldMark` arrive with the release after `0.1.0-beta.4`. On that version and before, wrap the
 section in `<div data-cms-section={section.id}>` when `isEditorPreview()` is true: a click then finds the section.
