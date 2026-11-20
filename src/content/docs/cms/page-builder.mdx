@@ -89,7 +89,7 @@ One route draws every page built in the editor, the home page among them.
 ```astro
 ---
 // src/pages/[...slug].astro
-import { entryPage, isEditorPreview } from '@velocity-astro/cms-astro';
+import { entryPage, sectionMark } from '@velocity-astro/cms-astro';
 import { blocks } from '@/components/blocks';
 import Layout from '@/layouts/Layout.astro';
 
@@ -98,21 +98,68 @@ export const prerender = false;
 const found = await entryPage(Astro, { types: ['pages'] });
 if (!found) return new Response('There is no page here.', { status: 404 });
 const page = found.entry.data;
-const marked = isEditorPreview();
 ---
 
 <Layout title={page.title}>
   {(page.body ?? []).map((section) => {
     const Block = blocks[section.block];
     if (!Block) return null;
-    return marked ? <div data-cms-section={section.id}><Block {...section.data} /></div> : <Block {...section.data} />;
+    const mark = sectionMark(section.id, section.data);
+    return 'data-cms-section' in mark ? <div {...mark}><Block {...section.data} /></div> : <Block {...section.data} />;
   })}
 </Layout>
 ```
 
-Each section arrives as `{ id, block, data }`: the block's key and its values by field key. The
-`data-cms-section` mark, added only beside the editor's form, is what lets a click on the page find the section in
-the form.
+Each section arrives as `{ id, block, data }`: the block's key and its values by field key.
+
+### Clicks on the page
+
+Beside the editor's form, a click on the page opens what was clicked in the form. `sectionMark(section.id,
+section.data)` is the one line that makes it work. It returns attributes only for the page beside the form, so a
+visitor's page gets nothing and no wrapper.
+
+- **The section** is found by its id.
+- **The field** is found by what it shows. The mark tells the page which words and pictures the section holds, and
+  the page matches them to its elements: a click on a heading opens the heading's field, a click on the third
+  card's text opens the third item of the list, and a click on a photo opens the photo's field. Your block
+  components need no change, and it works when a block hands its values to components of your own.
+
+Some values cannot be found that way, because the block changes them before showing them: a price it formats, a
+date, words it joins from two fields. Mark those yourself with `fieldMark`, by field key:
+
+```astro
+---
+import { fieldMark } from '@velocity-astro/cms-astro';
+const { price, items = [] } = Astro.props;
+---
+
+<p {...fieldMark('price')}>{formatPrice(price)}</p>
+{items.map((item, at) => <li {...fieldMark('items', at, 'date')}>{formatDate(item.date)}</li>)}
+```
+
+A field in a list is the list's key, the item's place and the field's own key. A mark you write always comes before
+what the page finds by itself, and a click that finds no field still opens the section. Choices that show no words
+of their own, such as a background or a layout, are edited in the form.
+
+### Typing on the page
+
+Where a field holds plain words and the page shows them exactly as they are held, the editor types straight on the
+page: a click puts the caret in the heading, and what is typed goes into the form as it is typed. Enter ends it and
+Escape puts back what was there. Nothing is saved until the editor saves, as with the form.
+
+It needs nothing more from your blocks, and it is careful with them. Only the words change: an icon in a button, a
+heading's second line in another colour and the space between them stay as your component drew them. Three things
+keep a field in the form only:
+
+- **A mark you wrote with `fieldMark`.** You marked it because the page shows something other than what is held.
+- **Words inside a `<button>`.** Put a button's label in a link or a `<span>` beside the button if it should be typed
+  on the page.
+- **Anything but plain text**: text shaped in the editor, pictures, links and choices.
+
+<Aside>
+`sectionMark` and `fieldMark` arrive with the release after `0.1.0-beta.4`. On that version and before, wrap the
+section in `<div data-cms-section={section.id}>` when `isEditorPreview()` is true: a click then finds the section.
+</Aside>
 
 List the type under `entryPages` in the integration so these pages join the sitemap and search:
 `velocityCms({ entryPages: ['pages'] })`.
