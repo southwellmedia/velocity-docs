@@ -69,6 +69,16 @@ without signing in, so it trusts nothing it is sent:
   answered like any other.
 - Nothing a visitor typed is written back into the page that answers them.
 
+## A spam check
+
+An owner can add [Cloudflare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/)
+to every form on the site: under **Settings**, **Forms and spam**, paste the widget's site key and secret key and
+press **Check the keys**. `/cms-form.js` then draws the check above the submit button, or inside an element marked
+`data-cms-form-challenge` if the form has one, with no change to a template. A post that does not pass is kept
+under **Spam**, never lost, and the visitor is answered like any other.
+
+A site with a content security policy allows `https://challenges.cloudflare.com` for scripts and frames.
+
 ## Notices
 
 A form names the addresses to email about each submission. Notices go out through the same mail settings as
@@ -94,6 +104,6 @@ spam, becomes a **contact**, or adds to the one with that email. See [CRM](/cms/
 - A form can say how many days submissions are kept, after which they are removed.
 
 <Aside type="caution" title="Not in the beta">
-File uploads, a challenge such as Turnstile, and a confirmation email to the visitor. On a host with many
+File uploads and a confirmation email to the visitor. On a host with many
 short-lived servers, the limit on posts per address is counted per server.
 </Aside>

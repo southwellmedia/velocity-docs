@@ -53,11 +53,16 @@ stranger who has an account. One address is sent at most three links in ten minu
 ## Email delivery
 
 Without any setup, links and invitations are printed to the server's log. That is enough to develop with, and
-`velocity-cms link` covers a small site. A deployed site should send real email, in one of two ways.
+`velocity-cms link` covers a small site. A deployed site should send real email, in one of three ways.
 
-### Resend
+### In the editor
 
-Set two variables and the CMS sends through [Resend](https://resend.com):
+An owner opens **Settings**, **Email**, chooses [Resend](https://resend.com), pastes its API key, says who email
+comes from, and sends a test. Nothing on the server changes. The key is sealed and never shown again.
+
+### Resend, from the server
+
+Set two variables and the CMS sends through Resend. They win over what the editor holds:
 
 ```sh
 VELOCITY_CMS_RESEND_API_KEY=re_...

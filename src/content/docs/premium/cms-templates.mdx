@@ -1,0 +1,110 @@
+---
+title: Templates on Velocity CMS
+description: Start a site your client can edit, from a Premium template already wired to Velocity CMS
+sidebar:
+  order: 4.5
+  label: On Velocity CMS
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Lifetime access includes a second version of some templates, already wired to [Velocity CMS](/cms/). Every page,
+menu, form and word a visitor sees is edited at `/admin`, and a change is on the site about a second after it is
+published. It is the same design as the static template.
+
+You choose per site. Nobody has to use the CMS: the static template keeps content in files, needs no database and
+no sign-in, and deploys anywhere. Pick the CMS version when someone who does not write code will edit the site.
+
+| Template | Static | On Velocity CMS | Demo of the CMS version |
+|---|---|---|---|
+| Real Estate | `real-estate/` | `real-estate-cms/` | [realestate.deployvelocity.com](https://realestate.deployvelocity.com) |
+| Restaurant | `restaurant/` | `restaurant-cms/` | [restaurant.deployvelocity.com](https://restaurant.deployvelocity.com) |
+
+<Aside type="caution" title="Velocity CMS is in beta">
+Read its [known limits](/cms/limits/) before you build a client's site on it.
+</Aside>
+
+## Start a site
+
+You need Node 22.23.4 or newer and pnpm 10.
+
+<Steps>
+1. **Copy the folder out of the repository** and make it its own git project:
+
+   ```bash
+   cp -r templates/restaurant-cms my-site
+   cd my-site
+   git init
+   pnpm install
+   ```
+
+2. **Set it up** with your own email and name:
+
+   ```bash
+   pnpm cms:setup you@example.com "Your Name"
+   ```
+
+   This copies the template's content into the site's own database (`cms/data.db`), writes a secret to `.env`,
+   makes you the owner and prints a sign-in link. Both files are kept out of git.
+
+3. **Start the site, then open the link:**
+
+   ```bash
+   pnpm dev
+   ```
+
+   The link signs you in at `http://localhost:4321/admin`. It works once, for ten minutes.
+   `pnpm exec velocity-cms link you@example.com` prints a new one.
+
+4. **Press "Edit the home page"** and change something. Publish, and the site shows it.
+</Steps>
+
+## What you get
+
+| | |
+|---|---|
+| `cms/seed.db` | The template's content as a new site starts with it: content types, pages, forms, menus and sample content. Nobody can sign in to it. |
+| `cms/data.db` | Your site's database, made from the seed by `cms:setup`. Not in git. **Back this file up.** |
+| `cms/media/` | Images uploaded in the editor. Not in git. Back it up with the database. |
+| `src/cms/blocks.ts`, `src/components/cms/blocks/` | The sections a page can be built from: one component each, drawn with the template's own design. |
+| `.env` | The site's secret and its address. Not in git. |
+
+The CMS comes from npm (`@velocity-astro/cms-astro`), at the version the folder was made with. There is no demo
+bar and no demo sign-in.
+
+Photos are not included, as with the static templates. A photo's place shows a labelled placeholder until you add
+yours in the editor under **Media**.
+
+## Deploy
+
+A site on the CMS draws its pages on a server, so it needs a host that runs Node. The folder's `README.md` has the
+steps for both of these:
+
+- **A server that keeps its disk** (a VPS, Railway or Fly with a volume, Render with a disk): build, start, and
+  put `cms/data.db` on the disk that is kept.
+- **Vercel:** the database lives on [Turso](https://turso.tech), made from your own file with
+  `turso db create my-site --from-file cms/data.db`, and uploads go to a bucket you name under **Settings**.
+
+On either, set `VELOCITY_CMS_SECRET` to the value in your `.env`, and both `SITE_URL` and `VELOCITY_CMS_ORIGIN`
+to the site's address. All three must be set when the site is built as well as when it runs. Netlify and
+Cloudflare are not tried yet.
+
+See [Install](/cms/install/) for every setting.
+
+## Before you launch
+
+- **Email:** until it is set up under **Settings**, sign-in links and notices from forms are only written to the
+  server's log.
+- **Forms:** open each form under **Forms** and say who is emailed when one is sent.
+- **Spam:** under **Settings**, you can add a Cloudflare Turnstile check.
+- **Business details:** the name, address, hours and phone number are under **Settings**.
+
+## Checks and updates
+
+`pnpm validate` runs lint, type checks, the unit tests and a build. Two checks of the static template do not apply
+to this version yet: `pnpm check:agent` and `pnpm test:e2e`.
+
+Update the CMS with `pnpm update "@velocity-astro/*"`, and read its
+[changelog](https://github.com/Velocity-Astro/velocity-cms/blob/main/CHANGELOG.md) first while versions are `0.x`.
+When a template's CMS version changes in the repository, your site does not: it is your project from the moment
+you copy it.
