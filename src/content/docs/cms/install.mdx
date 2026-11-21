@@ -10,7 +10,9 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 You need Node 22.23.4 or newer.
 
 <Aside title="Beta">
-The packages are on npm as `@velocity-astro/cms-*`, at `0.1.0-beta.2`. Versions are `0.x`, so pin the one you install.
+The packages are on npm as `@velocity-astro/cms-*`. Versions are `0.x`, so pin the one you install.
+`npm view @velocity-astro/cms-astro version` says which is the latest, and the
+[changelog](https://github.com/Velocity-Astro/velocity-cms/blob/main/CHANGELOG.md) says what each one changed.
 </Aside>
 
 ## Try the starter
@@ -54,9 +56,29 @@ In an Astro site that has a server adapter:
 
 </Steps>
 
+`init` prints a link that signs you in. Start the site (`npm run dev` or `pnpm dev`), then open the link. It works
+once, for ten minutes; `npx velocity-cms link you@example.com` prints a new one.
+
+The editor you land in is empty: no content types, no pages. That is expected. The CMS never guesses what your
+site holds, so steps 2 and 3 are where it meets your pages. The quickest way to see both done is the
+[starter](#try-the-starter): its `cms/model.mjs`, its one route and its section components are small enough to
+read in a sitting and copy from.
+
 Without an email and a name, `init` stops after the setup. Make the owner later with
 `npx velocity-cms owner <email> <name>`. `npx velocity-cms link <email>` prints a new sign-in link for someone who
 already has access.
+
+### On a Velocity site
+
+The free Velocity starter (`npm create velocity-astro`) does not include the CMS. It is a static site whose
+content lives in files, and it stays one until you add the CMS with the command above. The starter already has a
+server adapter, so `init` needs nothing else, and the site builds and runs as before.
+
+After `init`, the starter's own pages are still drawn from its files. A page becomes editable when you describe
+its content and read it from the CMS, as steps 2 and 3 say. Pages you do not move stay static.
+
+[Velocity Premium](/premium/) templates are the other way to start: a template on the CMS has its content types,
+sections and sample content already made.
 
 ### What the config looks like
 
@@ -99,6 +121,21 @@ The CMS reads its settings from the environment, and from `.env` while you devel
 | `VELOCITY_CMS_MEDIA_DIR` | A folder for uploaded images. |
 | `VELOCITY_CMS_S3_BUCKET`, `VELOCITY_CMS_S3_ENDPOINT`, `VELOCITY_CMS_S3_ACCESS_KEY_ID`, `VELOCITY_CMS_S3_SECRET_ACCESS_KEY` | A bucket for uploaded images. All four, or none. `VELOCITY_CMS_S3_REGION` is optional. |
 
+### Set up in the editor
+
+An owner sets these under **Settings** in the editor, with no change to the server and no redeploy:
+
+| Tab | What it sets |
+|---|---|
+| **General** | What the site is called in the editor and in its emails. |
+| **Email** | The email service (Resend), its API key and who email comes from, with a test email to yourself. |
+| **Storage** | The S3-compatible bucket uploads are kept in, with a test that writes a file and reads it back. |
+| **Forms and spam** | The two keys of a Cloudflare Turnstile widget, and how many messages one address may send. |
+
+Keys are sealed with `VELOCITY_CMS_SECRET` and never sent back to the browser. Where the server's environment
+already sets one of these (`VELOCITY_CMS_RESEND_API_KEY`, `VELOCITY_CMS_S3_*`), the environment wins and the tab
+says so. The secret, the database and the site's address are always settings of the server.
+
 <Aside type="caution">
 Sign-in links are made for the configured address, never for the address a request claims to come from. A deployed
 site with neither `site` nor `VELOCITY_CMS_ORIGIN` cannot send a working link.
@@ -133,8 +170,13 @@ A serverless host has no disk to keep, so the database and the uploads live else
 
 </Steps>
 
-For uploads, set the four `VELOCITY_CMS_S3_*` variables to any S3-compatible bucket, such as Cloudflare R2. Without
-them a site on a hosted database takes no uploads, and the editor does not offer any.
+For uploads, name an S3-compatible bucket, such as Cloudflare R2: in the editor under **Settings**, **Storage**,
+or with the four `VELOCITY_CMS_S3_*` variables. Until one is named, a site on a hosted database takes no uploads,
+and the editor does not offer any.
+
+For email, add a Resend key under **Settings**, **Email**, or set `VELOCITY_CMS_RESEND_API_KEY` and
+`VELOCITY_CMS_EMAIL_FROM`. Until then, nobody you invite can be emailed a sign-in link: print one with
+`npx velocity-cms link <email>` from your own machine.
 
 <Aside>
 Node on a server and Vercel are the hosts the CMS has been run on. Netlify and Cloudflare are untried.
