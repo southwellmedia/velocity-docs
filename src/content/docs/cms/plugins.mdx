@@ -161,6 +161,14 @@ export default function publishLog({ React, ui, client, register }) {
 
 - `register.screen` adds a screen to the sidebar, `register.entryPanel` a panel on an entry, and
   `register.control` the control for a kind of field.
+- A panel shows on every entry unless it says where. `types` names the content types it shows on, by key, and
+  `pagesOnly: true` keeps it to entries that have a page of their own on the site (their type has an address
+  pattern), so a menu or a page of the settings never gets it. Use `pagesOnly` for anything about a page, such as
+  how it reads in search results; the SEO plugin's search preview does. `pagesOnly` came after `0.1.0-beta.9`.
+
+  ```js
+  register.entryPanel({ id: 'preview', title: 'Search preview', pagesOnly: true, Component: SearchPreview });
+  ```
 - `client` reaches only the plugin's own addresses.
 - `ui` holds the parts a plugin may build from, such as `Button`, `Card`, `Table`, `Stack`, `Text` and `EmptyState`.
 - Whatever a plugin draws is fenced in: a fault shows in its own part of the screen and the editor keeps running.
