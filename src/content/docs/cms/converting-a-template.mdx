@@ -1,0 +1,1014 @@
+---
+title: Converting a template
+description: Move an existing Astro site onto Velocity CMS step by step, for a person or a coding agent, from install to a theme people set in the editor
+sidebar:
+  order: 2.5
+---
+
+This guide takes an Astro site whose words, pictures and pages live in its files and moves them
+into the CMS, so people edit them at `/admin` and see a change on the site about a second after
+they publish. It is written to be followed step by step, by a person or by a coding agent.
+
+The working example is [`examples/starter`](https://github.com/Velocity-Astro/velocity-cms/tree/main/examples/starter). Every snippet below is taken
+from it or from the public exports of `@velocity-astro/cms-astro` and `@velocity-astro/cms-core`.
+When this guide and the starter disagree, the starter is what CI runs.
+
+## 1. What you get
+
+A converted site has three parts.
+
+| Part | Where | What it is |
+|---|---|---|
+| The model | `cms/model.mjs` | The kinds of content and the sections a page can be built from, as plain data. |
+| The seed | `cms/seed.mjs` | Applies the model with `schema.define` on every deploy and, in an empty database, adds the first content. |
+| The site | `src/` | One catch-all route that draws every page built in the editor, one component per kind of section, and a layout that reads menus and settings from the CMS. |
+
+Pages stop being `.astro` files with words in them. A page becomes an entry: a title, a
+description and a list of sections. Each section is a block (a hero, a feature grid, a form) with
+its values. The template keeps every component; it only stops owning the words.
+
+What the template still owns: markup, styles, layout, and how each named look is drawn. What the
+CMS owns: content, the order of sections, menus, forms, and the site's settings.
+
+## 2. Install
+
+You need an Astro site with a server adapter. The editor, previews and live pages run on a
+server. If the site has none, add one first:
+
+```sh
+npx astro add node
+```
+
+Then, in the site's folder:
+
+```sh
+npx velocity-cms init you@example.com "Your Name"
+```
+
+`init` does this, and only adds what is missing:
+
+- installs `@velocity-astro/cms-astro` with the site's package manager;
+- writes `VELOCITY_CMS_SECRET` and `VELOCITY_CMS_ORIGIN=http://localhost:4321` to `.env`;
+- adds `.env`, `/cms/data.db*` and `/cms/media/` to `.gitignore` (the rest of `cms/` stays in git,
+  so your model and seed are kept);
+- adds `velocityCms()` to the Astro config, if it has exactly one `integrations: [` list
+  (otherwise it prints the two lines for you to add);
+- with an email and a name, makes you the first owner and prints a sign-in link.
+
+It never changes a value that is there and never prints the secret. Run it again at any time.
+
+To make the owner later, or to get a fresh sign-in link:
+
+```sh
+npx velocity-cms owner <email> <name>   # the first owner; refused once anyone exists
+npx velocity-cms link <email>           # a new link for someone who has access
+```
+
+The database is `cms/data.db` unless `VELOCITY_CMS_DATABASE_URL` says otherwise.
+
+### The integration's options
+
+```js
+// astro.config.mjs
+import { defineConfig, memoryCache } from 'astro/config';
+import node from '@astrojs/node';
+import velocityCms from '@velocity-astro/cms-astro';
+
+export default defineConfig({
+  site: process.env.SITE_URL || 'http://localhost:4321',
+  adapter: node({ mode: 'standalone' }),
+  integrations: [velocityCms({ siteName: 'Starter', entryPages: ['pages'] })],
+  // A page drawn from the CMS is kept until a publish clears it. A day is the backstop.
+  cache: { provider: memoryCache() },
+  routeRules: { '/[...path]': { maxAge: 86400, tags: ['cms'] } },
+});
+```
+
+These are all the options `velocityCms()` takes:
+
+| Option | What it does |
+|---|---|
+| `siteName` | The name the site starts with, in the editor and sign-in emails. A name an owner saves, or a settings page's name field (step 4), replaces it. |
+| `entryPages` | Content types whose entries are pages drawn by one route, such as `['pages']`. Their addresses join the sitemap, search and share images. Set it for every type your catch-all route draws. |
+| `plugins` | The site's own plugins: package names or files whose default export is `definePlugin(...)`. The plugins that ship with the CMS are loaded anyway, switched off. |
+| `images` | A folder of the template's own images that image fields can choose from, such as `'./src/assets/photos'`. |
+| `mailer` | A file whose default export delivers sign-in links. Without one, links go to the server's log. |
+| `unlisted` | Addresses to leave out of the sitemap, such as `['/search/']`. |
+| `sites` | Only for a host that runs many sites from one copy (step 10). Leave it out. |
+
+`site` matters: sign-in links are made for it (or for `VELOCITY_CMS_ORIGIN`), never for the
+request's `Host` header. Set it before you deploy.
+
+The `routeRules` line is what makes the site live. Every page is kept in Astro's cache under the
+tag `cms`, and a publish clears that tag. Keep it.
+
+## 3. Audit the template
+
+Before writing any code, list what the template holds. Write the list down; it becomes the model.
+
+1. **Pages.** Every route under `src/pages`. Note which are "built" pages (home, about, services,
+   contact) and which are generated from a collection (`/blog/[slug]`).
+2. **Collections.** Anything repeated with the same shape: posts, listings, team members,
+   testimonials, services. Each becomes a content type of kind `collection`.
+3. **Site-wide settings.** The site's name, logo, phone, email, address, social links, footer
+   words. These become one single page in the settings (kind `single`, `inSettings: true`).
+4. **Menus.** The header, the footer, any large menu. Each becomes a list field of label and link
+   on a single page.
+5. **Forms.** Contact, quote, newsletter. Each becomes a CMS form.
+6. **Sections.** Go through the built pages top to bottom and name every distinct section: hero,
+   feature grid, text, testimonials, call to action, form, gallery. Two sections that differ only
+   in colour or alignment are one block with a named look (a `select` field), not two blocks.
+7. **Looks.** Every choice a section offers (background, alignment, image side) becomes a `select`
+   field. The site-wide theme (the brand colour, the fonts, a colour scheme) becomes fields of a
+   settings page: `color` for a colour people set, `font` for a font, `select` with `swatches` for
+   a choice among the template's named looks.
+
+For each section and each collection, list its fields: which words, which pictures, which links,
+which repeated items.
+
+## 4. Model the content in code
+
+The model is plain data in `cms/model.mjs`. The starter writes small helpers so the model reads
+like a list:
+
+```js
+// cms/model.mjs
+const en = (text) => ({ en: text });
+const field = (type) => (key, label, { help, ...extra } = {}) => ({ key, type, label: en(label), ...(help && { help: en(help) }), ...extra });
+const text = field('text');
+const long = (key, label, extra = {}) => text(key, label, { ...extra, options: { multiline: true } });
+const rich = field('richtext');
+const link = field('link');
+const group = (key, label, fields) => field('group')(key, label, { options: { fields } });
+const list = (key, label, of, extra = {}) => field('list')(key, label, { ...extra, options: { of: { type: of.type, options: of.options ?? {} } } });
+const section = (key, label, fields, aside = false) => ({ key, label: en(label), fields, ...(aside && { aside }) });
+```
+
+A field is `{ key, type, label, help?, required?, translated?, options? }`. The CMS gives each
+field a permanent id; content is stored by that id. Keys must start with a lowercase letter and
+use letters, numbers and single hyphens.
+
+Anything not in that shape is ignored. For example, a list's `min` and `max` go in `options`
+beside `of`, not on the field itself.
+
+### Field types
+
+These are the built-in field types (`createFieldRegistry` in `cms-core`):
+
+| Type | Holds | Options |
+|---|---|---|
+| `text` | Words | `multiline`, `maxLength` |
+| `number` | A number | `min`, `max`, `integer` |
+| `boolean` | Yes or no | |
+| `date` | A day, `YYYY-MM-DD` | |
+| `url` | An address | |
+| `email` | An email address | |
+| `phone` | A phone number | |
+| `select` | One named choice | `choices` (required), `labels`, `swatches` |
+| `color` | A hex colour (`#1f3a5f`) a person sets: a theme's colour | `presets` (up to 12 hex colours to suggest) |
+| `font` | One of the fonts the template offers, by name | `choices` (required), `labels` |
+| `reference` | Another entry, by its slug | `to` (a type's key, required) |
+| `image` | An image, by its name | |
+| `richtext` | Formatted text (headings, lists, bold, italic, links) | |
+| `group` | Several fields together | `fields` |
+| `list` | Several values of one type | `of: { type, options }`, `min`, `max` |
+| `blocks` | The sections of a page | `blocks`, `min`, `max` |
+| `link` | An entry of the site or a typed address | `to` (type keys) |
+| `form` | One of the site's forms, by its id | |
+
+### Content types
+
+A content type is `{ key, kind, label, fields, ... }`. These are the properties
+`schema.define` reads:
+
+| Property | What it does |
+|---|---|
+| `kind` | `'collection'` (many entries) or `'single'` (one entry, such as the menu or the settings). |
+| `urlPattern` | Where entries live: `/blog/[slug]`. With `/[...slug]`, a slug may have several parts (`services/roofing`), and the entry whose slug is `index` is the page at `/`. |
+| `localizedUrlPatterns` | The same for other languages: `{ es: '/es/blog/[slug]' }`. |
+| `titleField` | The field entries are called by in lists, by key (`title`, or `address.street` in a group). Stored as `titlePath`. |
+| `listImage`, `listFields` | What lists show beside each entry's name, by key. |
+| `sections` | How the editor lays the fields out: `{ key, label, fields: [keys], aside? }`. |
+| `forDeals` | Whether a deal can be about an entry of this type (a listing, a service). |
+| `inSettings` | For a single page: shown as a tab of Settings and left out of the content list. |
+| `siteNameField` | For such a page: the field that holds the site's name, by key. Needs `inSettings: true`. |
+
+The starter's pages type:
+
+```js
+// cms/model.mjs
+const pages = {
+  key: 'pages',
+  // A page may sit under another: its slug can be services/roofing. The page called index is the home page.
+  urlPattern: '/[...slug]',
+  kind: 'collection',
+  label: en('Pages'),
+  titleField: 'title',
+  fields: [
+    text('title', 'Title', { required: true, help: 'The page\'s name in the browser tab and in search results.' }),
+    long('description', 'Description', { help: 'One or two sentences for search results and shared links.' }),
+    field('blocks')('body', 'Sections', { options: { blocks } }),
+  ],
+  sections: [section('sections', 'Sections', ['body']), section('page', 'About this page', ['title', 'description'], true)],
+};
+```
+
+A collection with pages of its own, such as posts:
+
+```js
+const posts = {
+  key: 'posts',
+  urlPattern: '/blog/[slug]',
+  kind: 'collection',
+  label: en('Posts'),
+  titleField: 'title',
+  fields: [
+    text('title', 'Title', { required: true }),
+    field('date')('date', 'Date', { required: true }),
+    long('excerpt', 'Summary'),
+    rich('body', 'Text', { required: true }),
+  ],
+};
+```
+
+A menu is a list of label and link on a single page:
+
+```js
+const menuLink = group('item', 'Link', [text('label', 'Label', { required: true }), link('link', 'Goes to', { required: true })]);
+const navigation = {
+  key: 'navigation',
+  kind: 'single',
+  label: en('Navigation'),
+  fields: [list('header', 'Header links', menuLink)],
+};
+```
+
+The site's settings are a single page in Settings. The starter has none; a template with a name,
+logo and phone writes one like this:
+
+```js
+const settings = {
+  key: 'settings',
+  kind: 'single',
+  label: en('Site'),
+  inSettings: true,
+  siteNameField: 'name',
+  fields: [
+    text('name', 'Site name', { required: true }),
+    field('image')('logo', 'Logo'),
+    field('phone')('phone', 'Phone'),
+    field('email')('email', 'Email'),
+    list('social', 'Social links', group('item', 'Link', [text('label', 'Label'), link('link', 'Goes to')])),
+  ],
+};
+```
+
+What is published in `name` becomes the site's name in the editor and its emails, and Settings
+then shows no second name field. A draft renames nothing.
+
+Set `forDeals: true` on a collection people enquire about (listings, services), so a form on its
+page can start a deal about the entry (step 8).
+
+### Blocks
+
+A block is one kind of section: `{ key, label, description?, icon?, group?, thumbnail?, fields }`.
+The key is what your component is looked up by. `defineBlock` from `@velocity-astro/cms-core`
+checks the key where you write it; plain objects work too, as in the starter.
+
+```js
+// cms/model.mjs
+import { defineBlock } from '@velocity-astro/cms-core';
+
+const hero = defineBlock({
+  key: 'hero',
+  label: en('Hero'),
+  description: en('A large heading with a line under it and a button. Usually first.'),
+  icon: 'layout-template',          // a Lucide icon name
+  group: 'Sections',                // what the picker files it under
+  thumbnail: '/cms/blocks/hero.webp', // optional: a file in public/, 16 by 9, small
+  fields: [
+    text('eyebrow', 'Small heading'),
+    text('title', 'Title', { required: true }),
+    long('lead', 'Lead'),
+    text('buttonLabel', 'Button words'),
+    link('buttonTo', 'Button goes to'),
+  ],
+});
+```
+
+Rules for blocks:
+
+- **Ids are permanent.** The CMS gives each block and each of its fields an id, kept by key on
+  every `schema.define`. Renaming a key is a new field; change labels freely, keys rarely.
+- **A block the model stops describing is retired, not deleted.** Its sections are kept and left
+  off the site. Describing it again brings them back.
+- **A look is a named choice.** Never a free colour or size. Use a `select`, and give each choice
+  a sample colour with `swatches` so the editor shows swatches:
+
+```js
+field('select')('background', 'Background', {
+  options: {
+    choices: ['plain', 'tinted', 'strong'],
+    labels: { plain: en('Plain'), tinted: en('Tinted'), strong: en('Strong') },
+    swatches: { plain: '#ffffff', tinted: '#f4f1ec', strong: 'oklch(45% 0.12 260)' },
+  },
+}),
+```
+
+  A swatch must be a hex colour or a CSS colour function of numbers. What is stored is the
+  choice's name (`tinted`); your component decides what it looks like.
+
+- **A block may hold sections.** A `blocks` field inside a block is a place for sections, such
+  as the columns of a row:
+
+```js
+const column = group('column', 'Column', [field('blocks')('content', 'Content', { options: { blocks: [textBlock, imageBlock] } })]);
+const row = defineBlock({
+  key: 'row',
+  label: en('Columns'),
+  fields: [
+    { key: 'columns', type: 'list', label: en('Columns'), options: { of: { type: column.type, options: column.options }, min: 1, max: 4 } },
+  ],
+});
+```
+
+  The starter's `list` helper only sets `of`, so a list with `min` or `max` is written out in full,
+  as here. A section moves between two places only when both take blocks of the same keys.
+
+Put the blocks in a `blocks` field of the pages type: `field('blocks')('body', 'Sections', { options: { blocks } })`.
+
+### Applying the model
+
+Export the types from `cms/model.mjs` and apply each with `schema.define` in `cms/seed.mjs`.
+`define` creates a type that is not there and brings one that is up to date. A field keeps its id
+by key, so content stays; fields the model leaves out are kept as they were.
+
+```js
+// cms/seed.mjs
+import { sharedConnection } from '@velocity-astro/cms-astro';
+import { model } from './model.mjs';
+
+const SEED = { kind: 'cli', id: 'seed', role: 'owner' };
+const connection = await sharedConnection({});
+const { cms } = connection;
+try {
+  for (const type of model) await cms.schema.define(SEED, type);
+} finally {
+  connection.close();
+}
+```
+
+Add it to `package.json` and run it on every deploy, before the server starts:
+
+```json
+"seed": "node --env-file-if-exists=.env cms/seed.mjs"
+```
+
+## 5. Seed and import existing content
+
+The template's current words become the first content. Write them in `cms/model.mjs` by field
+key, as the starter's `samplePages` does:
+
+```js
+export const samplePages = [
+  {
+    slug: 'index',
+    title: 'Starter',
+    description: 'A small site on Velocity CMS.',
+    body: [
+      { block: 'hero', data: { title: 'This page is yours to edit.', buttonLabel: 'Read the blog', buttonTo: { kind: 'address', href: '/blog/' } } },
+      { block: 'features', data: { title: 'What is here', items: [{ title: 'Pages from sections', text: '…' }] } },
+    ],
+  },
+];
+```
+
+`toStoredData(type.fields, values, newId)` from `@velocity-astro/cms-core` turns values by key
+into what an entry stores (by field id, each section given an id and its block named by id). It
+refuses a key no field has, so a typo fails loudly. Then create and publish:
+
+```js
+// cms/seed.mjs
+import { randomUUID } from 'node:crypto';
+import { toStoredData } from '@velocity-astro/cms-core';
+
+const publish = async (type, { slug, ...values }) => {
+  const draft = await cms.content.create(SEED, { typeId: type.id, locale: 'en', slug, data: toStoredData(type.fields, values, randomUUID) });
+  return cms.content.publish(SEED, draft.id);
+};
+```
+
+Links and forms are stored by identity, never by address or key:
+
+- A link to an entry is `{ kind: 'entry', type: 'pages', entry: <the entry's translationGroup> }`.
+  Publish the page first, then use `published.translationGroup`. A typed address is
+  `{ kind: 'address', href: '/blog/' }`.
+- A `form` field holds the form's id. Create the form first, then look its id up by key:
+
+```js
+const made = await cms.forms.list(SEED);
+const formId = made.find((form) => form.key === 'contact')?.id;
+```
+
+- A single page still has a slug; the starter uses the type's key (`slug: 'navigation'`).
+
+**Make the seed safe to run again.** The starter adds every form the model names that the site
+does not have yet, on every run, and adds sample content only when the database had no content
+types before this run:
+
+```js
+const isNew = (await cms.schema.list()).length === 0;
+for (const type of model) types.set(type.key, await cms.schema.define(SEED, type));
+// A form is the editor's once it is there, kept or in the trash: only a missing one is added.
+const held = new Set([...(await cms.forms.list(SEED)), ...(await cms.forms.listTrashed(SEED))].map((form) => form.key));
+for (const form of forms.filter((form) => !held.has(form.key))) await cms.forms.create(SEED, form);
+if (isNew) { /* pages, posts, menu */ }
+```
+
+Sample pages added to the model later are not seeded into a running site: an editor adds them,
+or a one-off script checks for each by slug and creates only what is missing. Never overwrite
+what people edited.
+
+For many entries (an existing blog), write a one-off import script with the same `publish`
+helper, reading the template's Markdown or JSON. Rich text accepts plain paragraphs: a list of
+strings, as the starter's sample post does (`body: ['First paragraph.', 'Second.']`).
+
+## 6. Routes
+
+### One route for every built page
+
+Delete the hard-coded `.astro` pages that the CMS now holds (home, about, contact) and add one
+catch-all route:
+
+```astro
+---
+// src/pages/[...slug].astro
+import { entryPage } from '@velocity-astro/cms-astro';
+import Sections from '@/components/Sections.astro';
+import type { Section } from '@/components/blocks';
+import Layout from '@/layouts/Layout.astro';
+
+export const prerender = false;
+
+const found = await entryPage(Astro, { types: ['pages'] });
+if (!found) return new Response('There is no page here.', { status: 404 });
+const page = found.entry.data as { title?: string; description?: string; body?: Section[] };
+---
+
+<Layout title={page.title} description={page.description}>
+  <Sections sections={page.body} />
+</Layout>
+```
+
+`entryPage(Astro, { types })` finds the entry whose own page is at this address. Visitors get the
+published version; a preview gets the working one. It throws on a fault rather than answering
+404, so a page that exists never looks missing. `found.entry.data` holds values by field key, and
+each section as `{ id, block, data }` with the block's key.
+
+Name the same types in `velocityCms({ entryPages })` so the sitemap and search know the pages.
+
+A collection with its own pages uses the same call with its own type, in its own route:
+
+```astro
+---
+// src/pages/blog/[slug].astro
+const found = await entryPage(Astro, { types: ['posts'] });
+if (!found) return new Response('There is no post here.', { status: 404 });
+---
+```
+
+Static routes the CMS does not hold (`/blog/` itself, a search page) stay as files. More
+specific routes win over `[...slug]`.
+
+### Map block keys to components
+
+```ts
+// src/components/blocks.ts
+import type { linkTo } from '@velocity-astro/cms-astro';
+import CallToAction from './blocks/CallToAction.astro';
+import Hero from './blocks/Hero.astro';
+
+export const blocks: Record<string, (props: any) => any> = { hero: Hero, 'call-to-action': CallToAction };
+
+export interface Section {
+  id: string;
+  block: string;
+  data: Record<string, unknown>;
+}
+
+export interface RichText {
+  html: string;
+}
+
+export type Link = Parameters<typeof linkTo>[1];
+```
+
+A section whose key has no component is left out. The starter's `Sections.astro` draws them:
+
+```astro
+---
+// src/components/Sections.astro
+import { sectionMark } from '@velocity-astro/cms-astro';
+import { blocks, type Section } from './blocks';
+
+const { sections = [] } = Astro.props;
+const known = sections.flatMap((section) => {
+  const Block = blocks[section.block];
+  return Block ? [{ Block, section }] : [];
+});
+---
+
+{
+  known.map(({ Block, section }) => {
+    const mark = sectionMark(section.id, section.data);
+    return 'data-cms-section' in mark ? <div {...mark}><Block {...section.data} /></div> : <Block {...section.data} />;
+  })
+}
+```
+
+On a visitor's page `sectionMark` returns nothing and no wrapper is drawn. Beside the editor the
+wrapper `div` is there; if your CSS selects direct children (`main > section`), check that the
+page still looks right in the visual editor.
+
+### Lists of a collection
+
+A list page (`/blog/`) reads with the live loader:
+
+```ts
+// src/live.config.ts
+import { defineLiveCollection } from 'astro:content';
+import { cmsLiveLoader } from '@velocity-astro/cms-astro';
+
+export const collections = {
+  posts: defineLiveCollection({ loader: cmsLiveLoader({ type: 'posts' }) }),
+};
+```
+
+```astro
+---
+// src/pages/blog/index.astro
+import { getLiveCollection } from 'astro:content';
+
+export const prerender = false;
+
+const { entries = [], error, cacheHint } = await getLiveCollection('posts');
+if (error) throw error;
+if (cacheHint) Astro.cache.set(cacheHint);
+---
+```
+
+Each entry's `data` holds values by key and its `slug`. For a filtered list, pass a filter as
+Astro's live collections allow; the loader's filter types are `CmsCollectionFilter` and
+`CmsEntryFilter`.
+
+### Caching and what must not be prerendered
+
+- Every page that shows CMS content says `export const prerender = false`. A prerendered page
+  cannot show a draft in a preview, cannot be edited in the visual editor, and goes stale on
+  publish.
+- Those pages are cached under the `cms` tag by the `routeRules` line in step 2. A publish
+  clears that tag. Do not add a rebuild to publishing.
+- `Astro.cache.set(cacheHint)` adds the loader's tags to the page. Every hint carries the site's
+  own tag (`cms`, or the site's own on a host for many sites), which a publish clears, so a page
+  kept through the loader is fresh at once too. The route rule is still what covers pages that
+  read the CMS another way (`entryPage`, `single`, `menuLinks`). `typeTag` and `entryTag` are
+  there for a site that clears pages of one type itself.
+- Previews are never cached: the CMS's middleware turns caching off for a request with a valid
+  preview token. Do not cache anything that calls `isPreview()` yourself.
+- Pages with no CMS content (a legal page kept as a file) may still be prerendered, except on a
+  host that runs many sites (step 10).
+
+A fully static build is possible with `cmsLoader({ type })` in a Content Layer collection, but
+you then lose live publishing and the visual editor. Prefer the live route.
+
+## 7. Components
+
+### Read values by key
+
+A block's component takes the section's values as props, by field key:
+
+```astro
+---
+// src/components/blocks/Hero.astro
+import { linkTo } from '@velocity-astro/cms-astro';
+import type { Link } from '../blocks';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  lead?: string;
+  buttonLabel?: string;
+  buttonTo?: Link;
+}
+
+const { eyebrow, title, lead, buttonLabel, buttonTo } = Astro.props;
+const button = buttonLabel ? await linkTo(Astro, buttonTo) : undefined;
+---
+
+<section class="band hero">
+  <div class="wrap">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    {button && <a class="button" href={button.href}>{buttonLabel}</a>}
+  </div>
+</section>
+```
+
+Treat every prop as optional. A field that is not required may be empty, and a section saved
+before a field existed has no value for it.
+
+### Help the visual editor find fields
+
+The visual editor shows the page beside the form. It finds each field in three ways, best first:
+
+1. **`fieldMark(...path)`** on the element that shows a field. Use it where the component changes
+   a value before showing it, or the words alone would be ambiguous:
+
+   ```astro
+   <h1 {...fieldMark('title')}>{title}</h1>
+   {items.map((item, at) => <li {...fieldMark('items', at, 'text')}>{item.text}</li>)}
+   ```
+
+2. **`sectionMark(id, data)`** on the section's wrapper (as `Sections.astro` does). Given the data,
+   the editor finds fields by the words they show, with no mark on each element.
+3. Nothing: a page with no marks still works, and every field is still edited in the form.
+
+Words can be typed straight into the page only where the component shows them exactly as held.
+`<h1>{title}</h1>` can be typed into; `<h1>{title.toUpperCase()}</h1>` cannot (use CSS
+`text-transform` instead). All marks return nothing on a visitor's page.
+
+For a block that holds sections, mark each place with `slotMark(sectionId, ...path)` and draw the
+inner sections with their own `sectionMark`:
+
+```astro
+{columns.map((column, at) => (
+  <div {...slotMark(id, 'columns', at, 'content')}>
+    {column.content.map((inner) => <div {...sectionMark(inner.id, inner.data)}>…</div>)}
+  </div>
+))}
+```
+
+Pass the section's `id` into the block as a prop for this; `Sections.astro` spreads only `data`.
+
+### Formatted text
+
+A `richtext` value reaches the site as `{ html, paragraphs }`. Every word in `html` is escaped,
+so write it with `set:html`, in one element and with nothing else in it:
+
+```astro
+<div class="prose" set:html={body?.html ?? ''} />
+```
+
+That one element is what lets people format text on the page. Use `paragraphs` where you need
+the words alone (a meta description, a card's summary).
+
+### Images
+
+An `image` field holds the image's name. An image someone uploaded is found with
+`uploadedImage(name)`, which gives its `url`, `width` and `height`. An image the template ships
+in the folder named by `velocityCms({ images })` is the template's to look up by file name:
+
+```astro
+---
+import { uploadedImage } from '@velocity-astro/cms-astro';
+const photo = Astro.props.photo ? uploadedImage(Astro.props.photo) : undefined;
+---
+{photo && <img src={photo.url} width={photo.width} height={photo.height} alt="" />}
+```
+
+Uploads are served at `/media/<file>`; add `?w=` with one of the CMS's widths for a smaller copy.
+
+### Links and menus
+
+A `link` value is never an address. Turn it into one when the page is drawn:
+
+```ts
+const button = await linkTo(Astro, buttonTo); // { href, external } or undefined
+```
+
+`linkTo` answers with nothing when the entry is not published or the address is unsafe, and
+never throws. Draw the button only when it answered.
+
+A menu edited in the CMS:
+
+```astro
+---
+// src/layouts/Layout.astro
+import { menuLinks } from '@velocity-astro/cms-astro';
+const edited = await menuLinks(Astro, { type: 'navigation', field: 'header' });
+const links = edited.length > 0 ? edited : [{ label: 'Home', href: '/', external: false }];
+---
+<nav aria-label="Main">
+  {links.map((link) => <a href={link.href} rel={link.external ? 'noopener' : undefined}>{link.label}</a>)}
+</nav>
+```
+
+It reads items of `{ label, link }` by default (`labelKey`, `linkKey` change that). An item may
+hold `columns` of links for a large menu (`columnsKey`). With no menu in the page's language it
+answers with none, so keep the template's own links as the fallback.
+
+### Site settings
+
+```ts
+const settings = await single(Astro, 'settings');
+const name = typeof settings?.name === 'string' ? settings.name : 'Starter';
+```
+
+`single(Astro, type)` gives the single page's published values by key, in the page's language or
+else the first language's. It answers with nothing until something is published, and never
+throws, so always keep a fallback.
+
+### The page's head
+
+Call `pageHead` where the layout writes the title and description, so plugins such as SEO can
+change them:
+
+```astro
+---
+import { pageHead } from '@velocity-astro/cms-astro';
+const head = await pageHead(Astro, { title: Astro.props.title ?? SITE, description: Astro.props.description ?? '' });
+---
+<title>{head.fullTitle ?? (head.title === SITE ? SITE : `${head.title} · ${SITE}`)}</title>
+{head.description && <meta name="description" content={head.description} />}
+{head.noindex && <meta name="robots" content="noindex" />}
+```
+
+It answers with `title`, `fullTitle` (a whole title that replaces yours), `description` and
+`noindex`, all plain text. It never throws.
+
+## 8. Forms
+
+Describe each form beside the model:
+
+```js
+// cms/model.mjs
+export const forms = [
+  {
+    key: 'contact',
+    label: en('Contact'),
+    fields: [
+      text('name', 'Your name', { required: true, options: { maxLength: 80 } }),
+      field('email')('email', 'Email', { required: true }),
+      text('message', 'Message', { required: true, options: { multiline: true, maxLength: 3000 } }),
+    ],
+    submitLabel: en('Send message'),
+    success: en('Thanks. We will get back to you soon.'),
+    contact: { name: 'name', email: 'email' },
+    retentionDays: 365,
+  },
+];
+```
+
+Create them in the seed with `cms.forms.create(SEED, form)`. There is no `define` for forms:
+create one only when no form, kept or in the trash, has its key (step 5 shows how). After that, people change forms under Forms. A form
+takes only fields a visitor can fill in: `text`, `number`, `boolean`, `date`, `url`, `email`,
+`phone`, `select`. `contact` names the fields that make the sender a contact. `notify` lists who
+is emailed; a visitor is never emailed. `startsDeal: true` starts a deal about the entry whose
+page the form was sent from, when that type says `forDeals`.
+
+Add a form block with a `form` field, so an editor chooses which form a section shows (`block` is
+the starter's helper for a block in the `Sections` group):
+
+```js
+block('form', 'Form', 'One of the site\'s forms.', 'message-circle', [
+  text('title', 'Title'),
+  field('form')('form', 'Form', { required: true }),
+]),
+```
+
+In the component, ask for the form with `siteForm`. It answers with `null` when the form is
+closed or gone, so leave the section out then:
+
+```astro
+---
+// src/components/blocks/Form.astro
+import { FORM_SCRIPT, fieldMark, siteForm } from '@velocity-astro/cms-astro';
+const { title, form: chosen } = Astro.props;
+const form = chosen ? await siteForm(Astro, { id: chosen }) : null;
+---
+{form && (
+  <form action={form.action} method="post" data-cms-form data-cms-form-failed="That could not be sent. Please try again.">
+    {Object.entries(form.hidden).map(([name, value]) => <input type="hidden" name={name} value={value} />)}
+    {/* one input per form.fields[i], named by field.key, with <p data-cms-form-error={field.key} hidden /> under it */}
+    <div class="trap" aria-hidden="true">
+      <input type="text" name={form.trap} tabindex="-1" autocomplete="off" />
+    </div>
+    <button type="submit" data-cms-form-sending="Sending…">Send</button>
+    <p role="status" data-cms-form-status hidden />
+  </form>
+)}
+<script is:inline type="module" src={FORM_SCRIPT}></script>
+```
+
+What each part does:
+
+- `form.action` is `/api/cms/submit/<key>`, the one address anyone may post to.
+- `form.hidden` carries the page, the language, a signed mark of when the form was drawn and,
+  when set up, the Turnstile key. Write every one, as it is.
+- `form.trap` is a field a person never fills; hide it from sight, the keyboard and screen
+  readers. A post that fills it is kept as spam.
+- `/cms-form.js` (`FORM_SCRIPT`) sends a `data-cms-form` form in place, writes each problem into
+  the element `data-cms-form-error="<key>"`, and draws the Turnstile check when an owner set one
+  up. Without scripts the form still posts.
+- `form.fields` is the form as it is today, so a field added under Forms appears at once.
+
+The starter's `Form.astro` draws every field kind; copy it rather than writing your own.
+
+A form drawn in a template outside a section (a newsletter box in the footer) asks by key:
+`siteForm(Astro, 'newsletter')`. A listing's page that knows which entry an enquiry is about says
+so with `siteForm(Astro, 'enquiry', { about: { type: 'listings', slug } })`.
+
+## 9. Theme
+
+A site's theme is fields of a page kept in the settings (`kind: 'single'`, `inSettings: true`). People
+change it under Settings, or in the visual editor's Theme card (in its menu), where every change is
+shown on the page at once and kept only when someone publishes it. Three kinds of field make a theme:
+
+- **`color`**: a colour people set, such as the brand colour. It holds a hex colour (`#1f3a5f`) and
+  nothing else, so the template can put it in a style as it is. `presets` suggests the template's own
+  palette.
+- **`font`**: one of the fonts the template offers, by the name the template knows it by. The
+  template loads its fonts and decides where each goes, so only fonts it has can be chosen.
+- **`select` with `swatches`**: a choice among the template's named looks (a colour scheme, a
+  section's background). What is stored is the name; the swatch is only its sample in the editor.
+
+```js
+// cms/model.mjs (from the starter)
+const fonts = { system: en('System'), serif: en('Serif'), rounded: en('Rounded') };
+const theme = {
+  key: 'theme',
+  kind: 'single',
+  inSettings: true,
+  label: en('Theme'),
+  fields: [
+    field('color')('brand', 'Brand colour', {
+      help: 'Buttons, links and the band of colour.',
+      translated: false,
+      options: { presets: ['#2f4bd8', '#0f766e', '#c2410c', '#7c3aed', '#be123c', '#16181d'] },
+    }),
+    field('font')('headings', 'Headings font', { translated: false, options: { choices: Object.keys(fonts), labels: fonts } }),
+  ],
+};
+```
+
+The layout reads the theme with `single` and turns it into CSS variables. Map a font's name to the
+template's own font stack, and keep the stylesheet's values for whatever was left empty:
+
+```astro
+---
+// src/layouts/Layout.astro (from the starter)
+import { single } from '@velocity-astro/cms-astro';
+
+const FONTS: Record<string, string> = {
+  system: 'system-ui, sans-serif',
+  serif: 'Georgia, "Times New Roman", serif',
+  rounded: 'ui-rounded, "SF Pro Rounded", system-ui, sans-serif',
+};
+const theme = await single(Astro, 'theme');
+const brand = typeof theme?.['brand'] === 'string' ? theme['brand'] : undefined;
+const headings = typeof theme?.['headings'] === 'string' ? FONTS[theme['headings']] : undefined;
+const themed = [brand && `--brand: ${brand};`, headings && `--headings: ${headings};`].filter(Boolean).join(' ');
+---
+<head>
+  {themed && <style set:html={`:root { ${themed} }`} />}
+</head>
+```
+
+```css
+/* src/styles/site.css */
+:root { --brand: #2f4bd8; --headings: system-ui, sans-serif; }
+h1, h2, h3 { font-family: var(--headings); }
+a, .button { color: var(--brand); }
+```
+
+A colour people choose can be any colour, so the template decides what goes with it: the text on a
+button of that colour, its lighter and darker shades (`color-mix()` works well). Put a font's name
+in the page only through your own map, never as it is.
+
+## 10. Verify
+
+Run the site and walk through it:
+
+```sh
+npm run seed
+npm run dev
+```
+
+1. Every old address still answers: the home page at `/`, each built page, each collection page.
+   An address with no page answers 404.
+2. Open the sign-in link `init` printed, then `/admin`.
+3. Open a page under Pages and choose "Visual editor". Click a heading on the page: the form
+   opens that field. Type into it on the page. Add, move and remove a section from its bar.
+4. Change something and publish. Reload the public page: the change is there within about a
+   second, with no rebuild.
+5. Check the menu, the settings and the Theme card the same way.
+6. Send the form. It appears under Forms, and the sender under Contacts.
+7. Open `/sitemap-live.xml`: the built pages are listed.
+
+Then automate it. Copy the starter's `cms/check.mjs`, which seeds a fresh database twice (to prove
+the seed is safe to repeat), builds, starts the server and asks for each page:
+
+```js
+// cms/check.mjs (abridged)
+run('node', ['cms/seed.mjs']);
+run('node', ['cms/seed.mjs']);
+run('npx', ['astro', 'build']);
+const server = spawn('node', ['dist/server/entry.mjs'], { cwd: root, env, stdio: 'inherit' });
+const home = await get('/');
+expect('the home page is drawn from its sections', home.status === 200 && home.text.includes('This page is yours to edit.'));
+expect('an address with no page answers 404', (await get('/nothing-here/')).status === 404);
+expect('the editor is served', (await get('/admin')).status === 200);
+expect('the API refuses a stranger', (await get('/api/cms/entries?type=pages')).status === 401);
+```
+
+Replace the expected words with your template's seeded content, and run it in CI.
+
+To deploy, the host needs `VELOCITY_CMS_SECRET`, the site's address (`site`, or
+`VELOCITY_CMS_ORIGIN`), and a database: `cms/data.db` on a machine that keeps its disk, or
+`VELOCITY_CMS_DATABASE_URL` and `VELOCITY_CMS_DATABASE_TOKEN` for hosted libSQL. Run the seed
+before the server starts.
+
+### Many sites from one copy
+
+Skip this unless the template will run on a host that serves many sites from one running copy,
+such as Velocity Cloud. There, `velocityCms({ sites })` names a file whose default export is a
+`SiteRegistry`, and:
+
+- no page is built ahead of time: every page is drawn for the site that asked, so `prerender`
+  is turned off everywhere;
+- the Astro config lists the host names it answers to in `security.allowedDomains`;
+- nothing about a site may be kept in a module-level value or read from the environment. Use the
+  helpers in this guide, which go through `currentSite()`, and never cache CMS content in your
+  own module.
+
+The starter's `npm run check:hosted` proves two sites stay apart. Run it if your template is
+meant for such a host.
+
+## 11. Checklist
+
+Setup
+
+- [ ] The site has a server adapter and `site` in the Astro config.
+- [ ] `npx velocity-cms init` ran; `.env` holds `VELOCITY_CMS_SECRET` and `VELOCITY_CMS_ORIGIN`, and is ignored by git.
+- [ ] `velocityCms({ siteName, entryPages })` is in `integrations`, with every type the catch-all route draws in `entryPages`.
+- [ ] `cache: { provider: … }` and `routeRules: { '/[...path]': { maxAge: 86400, tags: ['cms'] } }` are set.
+- [ ] A first owner exists and can sign in at `/admin`.
+
+Model
+
+- [ ] Every page, collection, menu, form, setting and section from the audit is in `cms/model.mjs`.
+- [ ] Each content type has `kind`, `label`, `titleField`, and `sections` for the editor's layout.
+- [ ] Built pages use `urlPattern: '/[...slug]'`, and the home page's slug is `index`.
+- [ ] Site-wide values are on a single page with `inSettings: true`, and its name field is `siteNameField`.
+- [ ] Every distinct section is a block with a stable key, an icon and a description.
+- [ ] Every look is a `select` with named choices; colour choices have `swatches`. No free colours or sizes.
+- [ ] List and blocks limits (`min`, `max`) are inside `options`.
+- [ ] Types people enquire about say `forDeals: true`.
+
+Seed
+
+- [ ] `cms/seed.mjs` applies every type with `cms.schema.define` and is in `package.json` as `seed`.
+- [ ] The template's current content is seeded with `toStoredData`, only into an empty database.
+- [ ] Links to entries are stored as `{ kind: 'entry', type, entry: translationGroup }`; form fields hold form ids.
+- [ ] Running the seed twice changes nothing the second time.
+
+Routes
+
+- [ ] Hard-coded pages the CMS now holds are deleted.
+- [ ] `src/pages/[...slug].astro` uses `entryPage(Astro, { types: ['pages'] })` and answers 404 when nothing is found.
+- [ ] Each collection with pages has its own route with `entryPage`.
+- [ ] List pages use `cmsLiveLoader` and call `Astro.cache.set(cacheHint)`.
+- [ ] Every page that shows CMS content says `export const prerender = false`.
+- [ ] `src/components/blocks.ts` maps every block key to its component.
+
+Components
+
+- [ ] Every prop is treated as optional.
+- [ ] Sections are wrapped with `sectionMark(section.id, section.data)`; `fieldMark` is used where a value is changed before it is shown.
+- [ ] Words are shown exactly as held, so they can be typed into on the page.
+- [ ] Places for inner sections have `slotMark`.
+- [ ] Rich text is written with `set:html={value.html}` in one element of its own.
+- [ ] Links go through `linkTo`; menus through `menuLinks` with the template's own links as fallback.
+- [ ] Settings come from `single(Astro, 'settings')` with fallbacks.
+- [ ] The layout's title and description come from `pageHead`, and `fullTitle` and `noindex` are honoured.
+
+Forms
+
+- [ ] The seed adds a form only when no form, kept or in the trash, has its key, on every run.
+- [ ] Each form section uses a `form` field and `siteForm(Astro, { id })`, and is left out when it answers `null`.
+- [ ] Every `form.hidden` field, the `form.trap` field and `/cms-form.js` are on the page.
+
+Theme
+
+- [ ] The theme is a settings page (`inSettings: true`): `color` fields for colours people set, `font` fields for the template's fonts, `select` with `swatches` for named looks.
+- [ ] The layout reads it with `single`, writes colours as CSS variables, maps font names through its own list, and keeps its own values for what is empty.
+
+Verify
+
+- [ ] Every old address answers as before; an unknown one answers 404.
+- [ ] The visual editor finds fields on click, takes typing, and adds, moves and removes sections.
+- [ ] A publish is visible on the public page within seconds, with no rebuild.
+- [ ] A form post appears under Forms and its sender under Contacts.
+- [ ] A `cms/check.mjs` like the starter's passes from an empty database, and runs in CI.
+- [ ] On a host for many sites: nothing is prerendered, host names are in `security.allowedDomains`, and `check:hosted` passes.

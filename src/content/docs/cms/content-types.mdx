@@ -90,7 +90,9 @@ pages can sit under pages. The entry whose slug is `index` is the page at the to
 | `boolean` | Yes or no | |
 | `date` | A day | |
 | `url`, `email`, `phone` | An address of that kind, checked | |
-| `select` | One of a list | `choices`, `labels` |
+| `select` | One of a list. With `swatches`, a choice among the template's named looks. | `choices`, `labels`, `swatches` |
+| `color` | A colour people set, such as the brand colour: a hex colour and nothing else | `presets`: up to 12 colours to suggest |
+| `font` | One of the fonts the template offers, by name | `choices`, `labels` |
 | `image` | An image from the library | |
 | `reference` | Another entry | `to`: the other type's key |
 | `link` | A page of the site or a typed address. See [Showing content](/cms/showing-content/#links). | |
@@ -100,6 +102,21 @@ pages can sit under pages. The entry whose slug is `index` is the page at the to
 | `blocks` | The sections of a page. See [Sections](/cms/page-builder/). | `blocks` |
 
 Every field also takes `label`, `help`, `required` and `translated`.
+
+## The site's theme
+
+A site's colours and fonts are fields of a page kept in the settings (a single page with `inSettings: true`).
+People change them under **Settings**, or in the visual editor's **Theme** card (in its menu), where the page shows
+each change at once and nothing is kept until it is published.
+
+- A `color` field holds a hex colour (`#1f3a5f`) and nothing else, so the template can put it in a style as it is.
+  The editor offers a colour picker with the template's own palette a press away.
+- A `font` field holds one of the template's font names. The template loads its fonts and maps each name to one,
+  so only fonts it has can be chosen.
+- A `select` with `swatches` is a choice among named looks, such as a colour scheme. What is stored is the name.
+
+The layout reads the theme with `single()` and writes it as CSS variables. [Converting a template](/cms/converting-a-template/#9-theme)
+shows the whole of it.
 
 ## Drafts, published versions and history
 
