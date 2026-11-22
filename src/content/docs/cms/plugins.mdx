@@ -13,11 +13,13 @@ in the editor. No rebuild is needed.
 
 ## The ones that come with it
 
-All five are off until an owner activates them.
+All seven are off until an owner activates them.
 
 | Plugin | What it does |
 |---|---|
-| **SEO** | A title and description per entry, a check of each entry, and whether a page is listed by search engines. |
+| **SEO** | A title and description per entry, a check of each entry, whether a page is listed by search engines, the site's share image, and its Google Search Console and Bing codes. |
+| **Analytics** | The Google Analytics measurement ID, the Tag Manager container and cookie consent, for every page at once with no deploy. The site's layout writes its tags with the ids `pageHead` hands it. |
+| **Redirects** | Old addresses and where their pages are now. A move takes over only an address that has no page. |
 | **Webhooks** | Posts what happens (a form sent, a contact or deal changed, a page published) to addresses an owner lists, signed when a signing secret is saved. |
 | **Mailchimp** *(experimental)* | Adds whoever sends a form to an audience. |
 | **Slack** *(experimental)* | Posts to a channel when a form is sent or a contact is made. |
@@ -73,7 +75,8 @@ cannot start is switched off and listed under Plugins with the reason. It never 
 | `cms.store` | `get`, `set`, `remove`, `list`: small values of the plugin's own, in the site's database. |
 | `cms.tasks` | Work that must not be lost when it fails once. See below. |
 | `cms.routes.add(method, path, handler)` | Answer at `/api/cms/plugins/<name><path>`, for signed-in people. |
-| `cms.pages.head(rule)` | Change a page's title, description and whether it is listed. |
+| `cms.pages.head(rule)` | Change what a page says about itself: its title, description, whether it is listed, its share image, verification codes and analytics ids. Only text, ids that match their pattern and safe addresses are taken. |
+| `cms.pages.redirect(rule)` | Send a visitor from an address that has no page to a path on the site or an `https` address. |
 | `cms.fields.register(type)` | Add a kind of field. |
 | `cms.net.isPublic(host)` | Whether a host's name leads only to public addresses. |
 | `cms.schema`, `cms.content` | The same services the editor uses, as the plugin, with only the permissions it declared. |
