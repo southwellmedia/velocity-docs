@@ -169,7 +169,7 @@ These are the built-in field types (`createFieldRegistry` in `cms-core`):
 | `font` | One of the fonts the template offers, by name | `choices` (required), `labels` |
 | `reference` | Another entry, by its slug | `to` (a type's key, required) |
 | `image` | An image, by its name | |
-| `richtext` | Formatted text (headings, lists, bold, italic, links) | |
+| `richtext` | Formatted text (headings, lists, bold, italic, links) | `formats` (what it may hold beyond paragraphs) |
 | `group` | Several fields together | `fields` |
 | `list` | Several values of one type | `of: { type, options }`, `min`, `max` |
 | `blocks` | The sections of a page | `blocks`, `min`, `max` |
@@ -662,6 +662,23 @@ so write it with `set:html`, in one element and with nothing else in it:
 
 That one element is what lets people format text on the page. Use `paragraphs` where you need
 the words alone (a meta description, a card's summary).
+
+Use formatted text for anything people write in paragraphs: a body, an introduction, a
+description, a biography. A list of paragraph fields is one `richtext` field instead: change the
+field's type and keep its key, and what is stored already is read as one paragraph per item.
+Keep plain `text` for what sits in a tight spot: a card's summary, a lead under a title, a
+label, an SEO title or description.
+
+Where the design has room only for some formats, name them, and the editor offers only those.
+Anything else pasted in becomes plain paragraphs, and no word is lost:
+
+```js
+// Paragraphs with bold, italics, links and lists. No headings or quotes.
+{ key: 'intro', type: 'richtext', label: { en: 'Introduction' }, options: { formats: ['bold', 'italic', 'link', 'lists'] } }
+```
+
+The formats are `bold`, `italic`, `link`, `headings`, `lists` and `quotes`. Left out, it takes
+them all.
 
 ### Images
 
