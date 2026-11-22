@@ -754,6 +754,27 @@ const head = await pageHead(Astro, { title: Astro.props.title ?? SITE, descripti
 It answers with `title`, `fullTitle` (a whole title that replaces yours), `description` and
 `noindex`, all plain text. It never throws.
 
+Call it on every page, not only the pages of entries: plugins add what belongs to the whole site.
+Write what they add too, and the site's owner sets it all in the editor with no deploy:
+
+```astro
+{head.verification?.google && <meta name="google-site-verification" content={head.verification.google} />}
+{head.verification?.bing && <meta name="msvalidate.01" content={head.verification.bing} />}
+<meta property="og:image" content={new URL(imageUrl(head.image ?? Astro.props.image ?? '/og.png'), Astro.site)} />
+```
+
+- `image` (the SEO plugin's share image, for a page with none of its own) is an image field's
+  value or an address: turn it into an address as the template does any picture.
+- `verification` holds the Search Console and Bing codes from the SEO plugin.
+- `analytics` (the Analytics plugin) holds `googleAnalytics` (`G-…`), `tagManager` (`GTM-…`),
+  `consent` (`opt_out`, `consent_mode_v2` or `strict`, or nothing for no banner) and `privacyUrl`.
+  They are ids and never scripts: write the template's own measuring tags with them, adding
+  Google's host with `Astro.csp.insertScriptResource()` and the inline part through an
+  `InlineScript` or another hashed script, never `'unsafe-inline'`.
+
+Redirects need nothing from the template: an address an owner lists under the Redirects plugin
+sends a visitor on when it has no page.
+
 ## 8. Forms
 
 Describe each form beside the model:
@@ -1008,7 +1029,7 @@ Components
 - [ ] Rich text is written with `set:html={value.html}` in one element of its own.
 - [ ] Links go through `linkTo`; menus through `menuLinks` with the template's own links as fallback.
 - [ ] Settings come from `single(Astro, 'settings')` with fallbacks.
-- [ ] The layout's title and description come from `pageHead`, and `fullTitle` and `noindex` are honoured.
+- [ ] Every page's head comes from `pageHead`, and `fullTitle`, `noindex`, `image`, `verification` and `analytics` are honoured.
 
 Forms
 
