@@ -91,7 +91,7 @@ These are all the options `velocityCms()` takes:
 | `siteName` | The name the site starts with, in the editor and sign-in emails. A name an owner saves, or a settings page's name field (step 4), replaces it. |
 | `entryPages` | Content types whose entries are pages drawn by one route, such as `['pages']`. Their addresses join the sitemap, search and share images. Set it for every type your catch-all route draws. |
 | `plugins` | The site's own plugins: package names or files whose default export is `definePlugin(...)`. The plugins that ship with the CMS are loaded anyway, switched off. |
-| `images` | A folder of the template's own images that image fields can choose from, such as `'./src/assets/photos'`. |
+| `images` | A folder of the template's own images that image fields can choose from, such as `'./src/assets/photos'`, with the folders inside it. Each image is called by its file name without the ending, so keep names unique. |
 | `mailer` | A file whose default export delivers sign-in links. Without one, links go to the server's log. |
 | `unlisted` | Addresses to leave out of the sitemap, such as `['/search/']`. |
 | `sites` | Only for a host that runs many sites from one copy (step 10). Leave it out. |
