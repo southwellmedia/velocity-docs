@@ -15,6 +15,20 @@ thing made from it is an **entry**. There are two ways to make one, and they can
 An owner opens **Content types** and builds a type by adding fields, naming them and putting them in order. Nothing
 is deployed: the type is in use at once. This suits content a site's owner thinks of after launch.
 
+### Where a type is listed
+
+A type with many entries is listed under **Content**, with the collections. A single page can be listed in one of
+three places, chosen when it is made and changed later in its **Settings**:
+
+| | |
+|---|---|
+| **With the content** | Under **Content**, beside the collections. |
+| **Across the site** | Under **Content**, "Across the site": for something every page shows, like a banner, menus or prices. |
+| **In Settings** | A tab of **Settings**, beside the site's details: for something that is part of how the site is set up. |
+
+The editor lists it in its new place as soon as it is saved. A type the site's template describes is listed where the
+template says (`sitePart` or `inSettings`, below), and its Settings say so instead of offering the choice.
+
 ## In code
 
 A template or a developer describes the types as data and applies them with `schema.define`. This is what a
@@ -76,6 +90,8 @@ components read and nothing else.
 | `titleField` | The field an entry is called by in lists. |
 | `sections` | How the editor groups the fields on the entry's screen. |
 | `forDeals` | `true` when a deal in the CRM can be about one of its entries, such as a listing. |
+| `sitePart` | For a single page every page shows (header, footer, menus, prices): listed under Content, "Across the site". |
+| `inSettings` | For a single page that says what the site is (its name, logo, contact details, theme): a tab of Settings. |
 
 A pattern that says `[...slug]`, as in `/[...slug]`, lets a slug have several parts, such as `services/roofing`, so
 pages can sit under pages. The entry whose slug is `index` is the page at the top: with `/[...slug]`, the home page.
