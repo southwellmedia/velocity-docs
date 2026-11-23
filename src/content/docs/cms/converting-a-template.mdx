@@ -110,10 +110,12 @@ Before writing any code, list what the template holds. Write the list down; it b
    contact) and which are generated from a collection (`/blog/[slug]`).
 2. **Collections.** Anything repeated with the same shape: posts, listings, team members,
    testimonials, services. Each becomes a content type of kind `collection`.
-3. **Site-wide settings.** The site's name, logo, phone, email, address, social links, footer
-   words. These become one single page in the settings (kind `single`, `inSettings: true`).
-4. **Menus.** The header, the footer, any large menu. Each becomes a list field of label and link
-   on a single page.
+3. **Site-wide settings.** The site's name, logo, favicon, phone, email, address, social links.
+   These become one single page in the settings (kind `single`, `inSettings: true`).
+4. **Parts every page shows.** The header, the footer, an announcement bar, menus. Each becomes a
+   single page with `sitePart: true` (a menu is a list field of label and link on it), listed
+   under Content and opened by a click on the part in the visual editor. Keep Settings for what
+   the site *is*; what it *says* on every page is a part of the site.
 5. **Forms.** Contact, quote, newsletter. Each becomes a CMS form.
 6. **Sections.** Go through the built pages top to bottom and name every distinct section: hero,
    feature grid, text, testimonials, call to action, form, gallery. Two sections that differ only
@@ -190,8 +192,15 @@ A content type is `{ key, kind, label, fields, ... }`. These are the properties
 | `listImage`, `listFields` | What lists show beside each entry's name, by key. |
 | `sections` | How the editor lays the fields out: `{ key, label, fields: [keys], aside? }`. |
 | `forDeals` | Whether a deal can be about an entry of this type (a listing, a service). |
-| `inSettings` | For a single page: shown as a tab of Settings and left out of the content list. |
+| `inSettings` | For a single page that says what the site is (its name, logo, favicon, contact details, theme): shown as a tab of Settings and left out of the content list. |
+| `sitePart` | For a single page that holds a part every page shows (header, footer, announcement bar, menus, prices): listed under Content, "Across the site", apart from the rest. Not with `inSettings`. |
 | `siteNameField` | For such a page: the field that holds the site's name, by key. Needs `inSettings: true`. |
+| `brandFields` | For such a page: the fields that hold the site's look, by key: `{ logo, logoDark, favicon, color }` (image, image, image and colour fields). The site's emails wear the logo and colour; write the favicon into the layout's `<link rel="icon">`. Needs `inSettings: true`. |
+
+The fields a description names are the template's: the editor's builder shows them as "From the
+template" and can't change or remove them, since the next `schema.define` would put them back.
+People add fields of their own beside them. A field the description stops naming becomes the
+site's own.
 
 The starter's pages type:
 
@@ -253,9 +262,12 @@ const settings = {
   label: en('Site'),
   inSettings: true,
   siteNameField: 'name',
+  brandFields: { logo: 'logo', favicon: 'favicon', color: 'brand' },
   fields: [
     text('name', 'Site name', { required: true }),
     field('image')('logo', 'Logo'),
+    field('image')('favicon', 'Favicon', { help: 'The small square picture in the browser tab.' }),
+    field('color')('brand', 'Brand colour'),
     field('phone')('phone', 'Phone'),
     field('email')('email', 'Email'),
     list('social', 'Social links', group('item', 'Link', [text('label', 'Label'), link('link', 'Goes to')])),
@@ -651,6 +663,27 @@ inner sections with their own `sectionMark`:
 
 Pass the section's `id` into the block as a prop for this; `Sections.astro` spreads only `data`.
 
+### Parts every page shows
+
+The header, the footer and an announcement bar are drawn from single pages (`sitePart: true`), not
+sections. Wrap each with `partMark`, naming the pages it shows and what it reads of them:
+
+```astro
+---
+import { partMark, single } from '@velocity-astro/cms-astro';
+const bar = (await single(Astro, 'site-header-footer')) ?? {};
+const menus = (await single(Astro, 'navigation')) ?? {};
+---
+<aside {...partMark({ 'site-header-footer': bar })}>…</aside>
+<header {...partMark({ navigation: menus, 'site-header-footer': bar })}>…</header>
+```
+
+In the visual editor a click on it opens that page's fields (the section of the field clicked)
+beside the page, tried there as they are typed, and published from there for the whole site. A
+click on words finds their field among the pages named; where a value is changed before it is
+shown, mark it with `fieldMark('navigation:header', 0, 'label')`, the page's key first. Like the
+other marks, it adds nothing to a visitor's page.
+
 ### Formatted text
 
 A `richtext` value reaches the site as `{ html, paragraphs }`. Every word in `html` is escaped,
@@ -998,7 +1031,8 @@ Model
 - [ ] Every page, collection, menu, form, setting and section from the audit is in `cms/model.mjs`.
 - [ ] Each content type has `kind`, `label`, `titleField`, and `sections` for the editor's layout.
 - [ ] Built pages use `urlPattern: '/[...slug]'`, and the home page's slug is `index`.
-- [ ] Site-wide values are on a single page with `inSettings: true`, and its name field is `siteNameField`.
+- [ ] Site-wide values are on a single page with `inSettings: true`, its name field is `siteNameField`, and its logo, favicon and brand colour are `brandFields`.
+- [ ] The header, footer, announcement bar and menus are single pages with `sitePart: true`, and each part is wrapped with `partMark`.
 - [ ] Every distinct section is a block with a stable key, an icon and a description.
 - [ ] Every look is a `select` with named choices; colour choices have `swatches`. No free colours or sizes.
 - [ ] List and blocks limits (`min`, `max`) are inside `options`.
