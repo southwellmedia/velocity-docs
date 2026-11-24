@@ -1,6 +1,6 @@
 ---
 title: Footer
-description: Site footer with multiple layout options
+description: "Footer component for Astro: a site footer in simple, columns, minimal or stacked layouts, with social and legal links"
 sidebar:
   order: 3
 ---
@@ -61,11 +61,13 @@ The Footer component supports multiple layouts for different needs. Its links co
 <Footer
   socialLinks={[
     { platform: 'github', href: 'https://github.com/...' },
-    { platform: 'twitter', href: 'https://twitter.com/...' },
+    { platform: 'x', href: 'https://x.com/...' },
     { platform: 'linkedin', href: 'https://linkedin.com/...' },
   ]}
 />
 ```
+
+The `x` platform draws the X logo (the `brand-x` icon, since 2.7.2). `twitter` still draws the old bird.
 
 ## Legal Links
 

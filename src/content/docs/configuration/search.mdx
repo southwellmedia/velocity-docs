@@ -1,6 +1,6 @@
 ---
 title: Site Search
-description: Static site search with Pagefind
+description: "Static site search for an Astro site with Pagefind, as set up in Velocity"
 sidebar:
   order: 7
 ---
@@ -48,3 +48,8 @@ pnpm build && pnpm preview
 ## Removing Search
 
 Remove `pagefind()` from `integrations` in `astro.config.mjs`, delete `src/pages/search.astro`, `src/pages/[lang]/[...search].astro` and `src/views/SearchView.astro`, and remove the `search` route and nav item from `nav.config.ts`.
+
+## Related
+
+- [Routes & Navigation](/configuration/routes/)
+- [Structured Data](/seo/structured-data/)

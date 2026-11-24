@@ -1,6 +1,6 @@
 ---
 title: Security & CSP
-description: Velocity's Content Security Policy and how to work with it
+description: "Velocity's Content Security Policy for Astro sites and how to work with it"
 sidebar:
   order: 6
 ---
@@ -113,3 +113,9 @@ A page rendered on demand (the 404 on a multi-language site, or a page you mark 
 Since 2.7, `InlineScript` also takes a `type` for other script types the CSP governs, such as speculation rules: `<InlineScript type="speculationrules" code={rules} />`.
 
 Inline event handlers such as `onclick="..."` are blocked. Use `addEventListener` in a script, with `data-` attributes to pass values.
+
+## Related
+
+- [Analytics & Consent](/configuration/analytics/)
+- [BaseLayout](/layouts/base-layout/)
+- [Deployment](/deployment/)

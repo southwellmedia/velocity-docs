@@ -9,7 +9,7 @@ export default defineConfig({
   site: "https://docs.deployvelocity.com",
   integrations: [
     starlight({
-      title: "Velocity",
+      title: "Velocity Astro Docs",
       description: "Modern Astro Starterkit built on Astro 7 + Tailwind CSS v4",
 
       logo: {

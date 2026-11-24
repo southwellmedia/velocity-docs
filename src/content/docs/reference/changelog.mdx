@@ -1,9 +1,34 @@
 ---
 title: Changelog
-description: Version history and release notes
+description: Version history and release notes for the Velocity Astro starter kit
 sidebar:
   order: 2
 ---
+
+## v2.7.3 (2026-11-17)
+
+- **Fix:** `tests/unit/schema.test.ts` and `tests/unit/schema-search.test.ts` now pass on any project's site config and routes. In 2.7.2 one case expected a search route and another expected a phone and an address in the site config, so a project without them failed its unit tests after upgrading.
+- **Upgrade note:** only if you upgraded to 2.7.2 and one of those two tests fails. Your `tests/` folder is yours, so the upgrade doesn't replace them: copy the two files from [the v2.7.3 tag](https://github.com/southwellmedia/velocity/tree/v2.7.3/tests/unit) over your own.
+
+## v2.7.2 (2026-11-17)
+
+### Structured data
+
+- **`createLocalBusinessSchema()`** describes a business people visit or call: address, phone and opening hours, for any schema.org `LocalBusiness` type. Contact details default to the site config.
+- **`createProductSchema()`** describes a page that sells one thing at a stated price, as a `Product` with one `Offer`.
+- **Blog posts carry `BlogPosting`.** `BlogLayout` now renders `createBlogPostSchema()`, which was defined but never used.
+- **Fix:** Organization and publisher logos pointed at `/logo.png`, which Velocity doesn't ship. They now use the favicon from the site config.
+- **Fix:** `createWebsiteSchema()` offers its search action only while the project has a search route (`routes.search` in `nav.config.ts`), so a project that removed its search page no longer points search engines at a 404.
+
+See [Structured Data](/seo/structured-data/).
+
+### Icons
+
+- **`brand-x`** is the X logo. `twitter` draws the old bird and `x` is Lucide's close icon, so there was no way to show it. The Footer's `x` platform uses it.
+
+### Upgrading
+
+If you added your own `BlogPosting` JSON-LD to posts, remove it so each post has one. See [v2.5 to v2.7](/upgrade-guides/v2-5-to-v2-7/#272-and-273).
 
 ## v2.7.1 (2026-11-17)
 

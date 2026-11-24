@@ -60,6 +60,14 @@ Add `speculation?: 'off' | 'prerender';` to the `SiteConfig` interface in the sa
   Prerendered pages run their scripts before anyone sees them. Google Analytics and Tag Manager wait until the page is shown, but other analytics, ad pixels and call-tracking tags may count visits that never happened. Check what your site loads first, and add `data-no-prerender` to links whose pages change something when they load. See [Prerendering links](/layouts/base-layout/#prerendering-links).
 </Aside>
 
+## 2.7.2 and 2.7.3
+
+Two patch releases followed 2.7.1. The same upgrade command brings you to 2.7.3.
+
+- **Blog posts gain `BlogPosting` structured data**, and schema logos use your favicon instead of `/logo.png`. If you added your own `BlogPosting` JSON-LD to posts, remove it so each post has one.
+- **Two new helpers**, `createLocalBusinessSchema()` and `createProductSchema()`, are in `src/lib/schema.ts`. See [Structured Data](/seo/structured-data/).
+- **If you upgraded to 2.7.2 and `tests/unit/schema.test.ts` or `tests/unit/schema-search.test.ts` now fails:** your `tests/` folder is yours, so the upgrade doesn't replace them. Copy the two files from [the v2.7.3 tag](https://github.com/southwellmedia/velocity/tree/v2.7.3/tests/unit) over your own. Coming from 2.7.1 or earlier, nothing needs doing.
+
 ## Verify
 
 ```bash
