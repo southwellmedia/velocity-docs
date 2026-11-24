@@ -71,13 +71,23 @@ without signing in, so it trusts nothing it is sent:
 
 ## A spam check
 
-An owner can add [Cloudflare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/)
-to every form on the site: under **Settings**, **Forms and spam**, paste the widget's site key and secret key and
-press **Check the keys**. `/cms-form.js` then draws the check above the submit button, or inside an element marked
-`data-cms-form-challenge` if the form has one, with no change to a template. A post that does not pass is kept
-under **Spam**, never lost, and the visitor is answered like any other.
+An owner can add a check that a sender is a person to every form on the site:
+[Cloudflare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) or
+[Google reCAPTCHA v3](https://developers.google.com/recaptcha/docs/v3). Under **Settings**, **Forms and spam**,
+choose the service, paste its site key and secret key and press **Check the keys**. No template needs a change.
 
-A site with a content security policy allows `https://challenges.cloudflare.com` for scripts and frames.
+- **Turnstile**: `/cms-form.js` draws the check above the submit button, or inside an element marked
+  `data-cms-form-challenge` if the form has one.
+- **reCAPTCHA v3**: there is nothing to tick. It scores each sender, its badge shows in a corner of the page, and
+  a sender who scores under 0.5 does not pass. A v2 checkbox key does not work with it.
+
+A post that does not pass is kept under **Spam**, never lost, and the visitor is answered like any other. If the
+service cannot be reached, that is never held against the visitor. Keys saved for one service are never sent to
+the other: changing the service needs its own keys.
+
+A site with a content security policy allows the service's hosts for scripts and frames:
+`https://challenges.cloudflare.com` for Turnstile, `https://www.google.com` and `https://www.gstatic.com` for
+reCAPTCHA. `siteForm(...).challenge.hosts` lists the ones the saved service needs.
 
 ## Notices
 

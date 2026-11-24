@@ -50,6 +50,10 @@ In an Astro site that has a server adapter:
    `velocityCms()` to the Astro config and makes you the site's owner. It can be run again: it adds only what is
    missing and never changes a value that is there.
 
+   If you would rather use Astro's own command, `npx astro add @velocity-astro/cms-astro` installs the package and
+   adds the integration to the Astro config. Run `init` afterwards for the secret, the owner and the agent files:
+   it adds only what is missing.
+
 2. Describe your content. See [Content types and fields](/cms/content-types/).
 
 3. Draw it. See [Showing content](/cms/showing-content/) and [Sections](/cms/page-builder/).
@@ -131,7 +135,7 @@ An owner sets these under **Settings** in the editor, with no change to the serv
 | **General** | What the site is called in the editor and in its emails. |
 | **Email** | The email service (Resend), its API key and who email comes from, with a test email to yourself. |
 | **Storage** | The S3-compatible bucket uploads are kept in, with a test that writes a file and reads it back. |
-| **Forms and spam** | The two keys of a Cloudflare Turnstile widget, and how many messages one address may send. |
+| **Forms and spam** | The spam check (Cloudflare Turnstile or Google reCAPTCHA v3) and its two keys, and how many messages one address may send. |
 
 Keys are sealed with `VELOCITY_CMS_SECRET` and never sent back to the browser. Where the server's environment
 already sets one of these (`VELOCITY_CMS_RESEND_API_KEY`, `VELOCITY_CMS_S3_*`), the environment wins and the tab
