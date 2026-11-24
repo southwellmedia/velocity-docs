@@ -1,6 +1,6 @@
 ---
 title: Project Structure
-description: Understanding the Velocity codebase organization
+description: "How a Velocity Astro project is organized: folders, components, config and content"
 sidebar:
   order: 3
 ---
@@ -20,7 +20,7 @@ Velocity follows a structured organization designed for scalability and maintain
   - assets/
     - branding/ Logo files (logomark.svg, logo-full.svg, etc.)
   - components/
-    - ui/ 33 components organized by subcategory
+    - ui/ 41 components organized by subcategory
       - form/ Button, Input, Textarea, Select, Checkbox, Radio, Switch
       - data-display/ Card, Badge, Avatar, AvatarGroup, GoogleMap, Table, Pagination, Progress, Skeleton
       - feedback/ Alert, Toast, Tooltip
@@ -116,7 +116,7 @@ Pages are prerendered. Only Astro Actions, and any route you mark `export const 
 
 Components are organized by category:
 
-- **ui/** — 33 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
+- **ui/** — 41 components organized into subcategories (form, data-display, feedback, overlay, layout, primitives, content, marketing)
 - **patterns/** — 10 composed patterns (ContactForm, FormField, SearchInput, Section, PageHeader, MediaSlot, etc.)
 - **layout/** — Page structure (Header, Footer, ThemeToggle, LanguageSwitcher, Analytics)
 - **site/** — Your `SiteHeader` and `SiteFooter`. Every layout renders them, and upgrades leave them alone

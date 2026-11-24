@@ -1,0 +1,109 @@
+---
+title: Analytics & Consent
+description: "Google Analytics 4 and Tag Manager in a Velocity Astro site: Consent Mode v2, strict and opt-out cookie consent, and click tracking with data-track"
+sidebar:
+  order: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity loads Google Analytics 4 or Google Tag Manager when you set its ID, gates it behind cookie consent when you ask it to, and sends click events from plain HTML attributes. Nothing loads until you set a variable, so a new project ships with no tracking.
+
+## Turn analytics on
+
+Set one of these in `.env`:
+
+```bash
+# Google Analytics 4
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# or Google Tag Manager
+PUBLIC_GTM_ID=GTM-XXXXXXX
+```
+
+`BaseLayout` renders the scripts on every page. The Google script hosts are added to the page's Content Security Policy for you, so there is no CSP config to edit. See [Security & CSP](/configuration/security/).
+
+## Cookie consent
+
+```bash
+# Show the consent banner and gate analytics behind it (default: false)
+PUBLIC_CONSENT_ENABLED=true
+
+# Link shown in the consent banner (optional)
+PUBLIC_PRIVACY_POLICY_URL=https://yoursite.com/privacy
+```
+
+When `PUBLIC_CONSENT_ENABLED` is `false` or omitted, the consent banner renders nothing and analytics scripts load without consent gating.
+
+With consent on, `src/config/consent.config.ts` decides how it behaves. The `mode` setting has three values:
+
+| Mode | What happens before a visitor chooses |
+| --- | --- |
+| `consent_mode_v2` (default) | Opt-in. Scripts load with Google Consent Mode v2's denied defaults and send cookieless pings until the visitor accepts. |
+| `strict` | Opt-in. Scripts don't load at all until the visitor accepts. |
+| `opt_out` | Categories start as their `defaultEnabled` says and no banner is shown. A floating button lets visitors opt out. |
+
+```ts
+// src/config/consent.config.ts
+const consentConfig: ConsentConfig = {
+  version: 1,
+  mode: 'consent_mode_v2',
+  // ...
+};
+```
+
+### Opt-out mode
+
+In `opt_out` mode, set `defaultEnabled: true` on the categories you want to track by default. Three things still protect visitors who must be asked first:
+
+- **Opt-in regions.** Visitors in `optInRegions` start denied and still get the banner. It defaults to the EEA, the UK and Switzerland. Pass your own list of ISO 3166-1 alpha-2 codes, or ISO 3166-2 codes such as `'US-CA'`, to change it.
+- **Global Privacy Control.** A browser that sends the GPC signal is opted out.
+- **The opt-out button.** Everyone else can turn tracking off from the floating button.
+
+<Aside type="caution">
+  Which mode is lawful depends on where your visitors are. Check what their laws require before choosing `opt_out`.
+</Aside>
+
+### Categories and wording
+
+The same file holds the four consent categories (necessary, analytics, marketing, preferences), each with a label, a description, whether it is required, its default, and the Google Consent Mode types it controls. The `ui` block holds the banner's wording. Bump `version` when you change the categories, and every visitor is asked again.
+
+## Click tracking without code
+
+Add `data-track` to any element and a click on it sends that event:
+
+```astro
+<a href="/pricing" data-track="cta_click" data-track-link-location="hero">
+  See pricing
+</a>
+```
+
+That click sends `cta_click` with `link_location: 'hero'`. The rules:
+
+- The value of `data-track` is the event name.
+- Every `data-track-*` attribute becomes a parameter. The name loses its prefix and uses underscores, and a numeric value is sent as a number.
+- On a link, the link's address is added as `link_url`.
+- A middle-click that opens a link in a new tab counts too.
+- When an `item_id` or `item_name` is present, the item fields (`item_id`, `item_name`, `item_category`, `item_variant`, `price`, `quantity`) move into a one-item `items` list, so ecommerce events such as `begin_checkout` reach GA4's ecommerce reports.
+
+Click tracking is only rendered when GA4 or Tag Manager is configured. Without either, the attributes do nothing.
+
+## Sending events from your own code
+
+For anything a click doesn't cover, call `track()`:
+
+```ts
+import { track } from '@/lib/analytics';
+
+track('newsletter_signup', { form_location: 'footer' });
+```
+
+It sends the event to whichever of GA4 or Tag Manager is loaded, and does nothing when neither is configured, so it is safe to call anywhere.
+
+Consent stays Google Consent Mode's job. An event sent before a visitor accepts goes out as a cookieless ping, or not at all in `strict` mode.
+
+## Related
+
+- [Environment Variables](/configuration/environment/)
+- [Security & CSP](/configuration/security/)
+- [BaseLayout](/layouts/base-layout/)

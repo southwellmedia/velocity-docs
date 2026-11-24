@@ -1,6 +1,6 @@
 ---
 title: Other UI Components
-description: Additional UI components reference
+description: "Reference for the rest of Velocity's Astro UI components, including Icon, Skeleton and Carousel"
 sidebar:
   order: 8
 ---
@@ -116,7 +116,7 @@ Loading placeholder. Extends `HTMLAttributes<'div'>`.
 
 ### Icon
 
-Any [Lucide](https://lucide.dev/icons) icon by its kebab-case name, aliases included, drawn as an inline SVG at build time (no JavaScript). Sizes are presets: `xs`, `sm`, `md` (default), `lg`, `xl`. A few brand marks Lucide doesn't ship (`github`, `twitter`, `linkedin` and the `brand-*` logos) are built in. An unknown name draws an `x` and warns during the build.
+Any [Lucide](https://lucide.dev/icons) icon by its kebab-case name, aliases included, drawn as an inline SVG at build time (no JavaScript). Sizes are presets: `xs`, `sm`, `md` (default), `lg`, `xl`. A few brand marks Lucide doesn't ship (`github`, `twitter`, `linkedin` and the `brand-*` logos) are built in. For the X logo use `brand-x` (since 2.7.2): `twitter` draws the old bird, and `x` on its own is Lucide's close icon. An unknown name draws an `x` and warns during the build.
 
 ```astro
 <Icon name="search" size="sm" />

@@ -1,6 +1,6 @@
 ---
 title: UI Components Overview
-description: 33 UI components organized by subcategory for building interfaces
+description: "Velocity's 41 Astro UI components, organized by subcategory: form, data display, feedback, overlay, layout, primitives, content and marketing"
 sidebar:
   order: 1
 ---
@@ -22,6 +22,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | `Checkbox` | Checkbox input with label |
 | `Radio` | Radio button for single selection |
 | `Switch` | Toggle switch input |
+| `ToggleGroup` | Segmented control built from native radio inputs |
 
 ### Data Display (`ui/data-display/`)
 
@@ -36,6 +37,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | `Progress` | Progress bar indicator |
 | `Skeleton` | Loading placeholders |
 | `GoogleMap` | Consent-aware embedded map |
+| `Carousel` | Sideways-scrolling row of slides on CSS scroll snap |
 
 ### Feedback (`ui/feedback/`)
 
@@ -44,6 +46,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | `Alert` | Contextual feedback messages |
 | `Toast` | Temporary notification messages |
 | `Tooltip` | Hover tooltips |
+| `Spinner` | Loading spinner with a screen-reader label |
 
 ### Overlay (`ui/overlay/`)
 
@@ -55,6 +58,8 @@ Components are organized into subcategories under `src/components/ui/`.
 | `VerticalTabs` | Vertical tab navigation |
 | `Accordion` | Collapsible content sections |
 | `ConsentBanner` | Cookie consent banner |
+| `Sheet` | Panel that slides in from the left, right or bottom |
+| `Popover` | Small panel anchored to its button |
 
 ### Layout (`ui/layout/`)
 
@@ -73,6 +78,7 @@ Components are organized into subcategories under `src/components/ui/`.
 | Component | Purpose |
 |-----------|---------|
 | `CodeBlock` | Syntax-highlighted code |
+| `Kbd` | A keyboard key or key combination |
 
 ### Marketing (`ui/marketing/`)
 
@@ -83,6 +89,8 @@ Components are organized into subcategories under `src/components/ui/`.
 | `NpmCopyButton` | NPM install command copier |
 | `SocialProof` | Testimonial cards |
 | `TerminalDemo` | Animated terminal demo |
+| `VideoEmbed` | YouTube or Vimeo video that loads only on play |
+| `AnnouncementBar` | Strip above the header for a launch or notice |
 
 ## Common Props
 
@@ -133,3 +141,13 @@ import { Button, Input, Card } from '@/components/ui';
 ```
 
 The `@/components/ui` barrel exists when you install all components. After a partial install, import from the component's folder, such as `@/components/ui/form/Button/Button.astro`.
+
+## Related
+
+- [Button](/components/ui/button/)
+- [Input](/components/ui/input/)
+- [Card](/components/ui/card/)
+- [Badge](/components/ui/badge/)
+- [Alert](/components/ui/alert/)
+- [Logo](/components/ui/logo/)
+- [Other UI Components](/components/ui/other-components/)

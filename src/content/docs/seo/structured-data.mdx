@@ -1,28 +1,48 @@
 ---
 title: Structured Data
-description: JSON-LD schemas for rich search results
+description: "JSON-LD structured data helpers for Astro in Velocity: WebSite, Organization, LocalBusiness, Product, BlogPosting, breadcrumbs and FAQ"
 sidebar:
   order: 4
 ---
 
-Velocity includes helpers for common JSON-LD schemas.
+Structured data tells search engines what a page is about in a form they can read without guessing: this page is a business with these opening hours, this one sells a product at this price, this one is an article by this author. Velocity writes it as JSON-LD through helpers in `src/lib/schema.ts`, so you pass a few values and never hand-write the JSON.
 
-## Using JsonLd Component
+## What you get without doing anything
+
+- **Blog posts carry `BlogPosting`.** `BlogLayout` renders `createBlogPostSchema()` for every post (since 2.7.2). If you added your own `BlogPosting` JSON-LD to posts, remove it so each post has one.
+- **Logos point at a file that exists.** Organization and publisher logos use the favicon from your site config.
+
+Everything else is added per page, with the helpers below.
+
+## Using the JsonLd component
+
+Every helper returns a plain object. `JsonLd` writes it into the page:
 
 ```astro
 ---
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { createBlogPostSchema } from '@/lib/schema';
+import { createOrganizationSchema } from '@/lib/schema';
 ---
 
-<JsonLd schema={createBlogPostSchema(post)} />
+<JsonLd schema={createOrganizationSchema()} />
 ```
 
-## Available Schema Helpers
+## Which helper for which page
 
-### Website Schema
+| Page | Helper |
+| --- | --- |
+| Home page | `createWebsiteSchema()`, `createOrganizationSchema()` |
+| A business people visit or call | `createLocalBusinessSchema()` |
+| A page that sells one thing at a stated price | `createProductSchema()` |
+| Blog post | `createBlogPostSchema()` (already rendered by `BlogLayout`) |
+| Any page below the home page | `createBreadcrumbSchema()` |
+| FAQ page | `createFAQSchema()` |
 
-For your homepage:
+## Schema helpers
+
+### Website
+
+For your home page:
 
 ```astro
 ---
@@ -32,20 +52,11 @@ import { createWebsiteSchema } from '@/lib/schema';
 <JsonLd schema={createWebsiteSchema()} />
 ```
 
-Output:
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Site Name",
-  "url": "https://yoursite.com",
-  "description": "Site description"
-}
-```
+The name, URL and description come from your site config. It also offers a search action, but only while the project has a search route (`routes.search` in `src/config/nav.config.ts`). If you remove your search page, the action is left out, so search engines aren't pointed at a 404.
 
-### Organization Schema
+### Organization
 
-For about page and homepage:
+For the home page and the about page:
 
 ```astro
 ---
@@ -55,9 +66,83 @@ import { createOrganizationSchema } from '@/lib/schema';
 <JsonLd schema={createOrganizationSchema()} />
 ```
 
-### Blog Post Schema
+### Local business
 
-For articles:
+For a business people visit or call: a restaurant, a dentist, a contractor, a shop. Added in 2.7.2.
+
+```astro
+---
+import { createLocalBusinessSchema } from '@/lib/schema';
+
+const schema = createLocalBusinessSchema({
+  type: 'Restaurant',
+  openingHours: [
+    { days: ['Tuesday', 'Wednesday', 'Thursday'], opens: '17:00', closes: '22:00' },
+    { days: ['Friday', 'Saturday'], opens: '17:30', closes: '23:00' },
+  ],
+  priceRange: '$$',
+});
+---
+
+<JsonLd schema={schema} />
+```
+
+Contact details default to the site config, so a call with only `type` and `openingHours` is usually enough.
+
+| Option | Description |
+| --- | --- |
+| `type` | The schema.org type that fits the business, such as `'Restaurant'`, `'Dentist'`, `'GeneralContractor'`, `'AutoRepair'` or `'Store'`. [schema.org/LocalBusiness](https://schema.org/LocalBusiness) lists them. Defaults to `'LocalBusiness'`. |
+| `name` | Defaults to the site's name. |
+| `description` | Defaults to the site's description. |
+| `url` | The page about the business. Defaults to the site's home page. |
+| `image` | A photo of the place or its work: an absolute URL or a path on this site. One value or a list. |
+| `telephone` | Defaults to `phone` in the site config. |
+| `email` | Defaults to `email` in the site config. |
+| `address` | `{ street, city, state?, zip?, country }`. Defaults to `address` in the site config. Pass `null` for a business with no premises to visit. |
+| `geo` | `{ latitude, longitude }`. |
+| `openingHours` | A list of `{ days, opens, closes }` on the 24-hour clock. Leave a day out and it is closed. |
+| `priceRange` | schema.org's price range, `'$'` to `'$$$$'`. |
+| `extra` | Anything else schema.org defines for the type, added as written: `{ servesCuisine: 'Italian', acceptsReservations: true }`. |
+
+Write the opening hours once, in a config file, and render the hours table on the page from the same list, so the two never disagree.
+
+### Product
+
+For a page that sells one thing at a stated price. It produces a `Product` with one `Offer`. Added in 2.7.2.
+
+```astro
+---
+import { createProductSchema } from '@/lib/schema';
+
+const schema = createProductSchema({
+  name: 'Ceramic Coating Package',
+  description: 'Two-stage paint correction and a five-year ceramic coating.',
+  url: '/services/ceramic-coating',
+  image: '/images/ceramic-coating.jpg',
+  price: 899,
+});
+---
+
+<JsonLd schema={schema} />
+```
+
+| Option | Description |
+| --- | --- |
+| `name`, `description` | Required. |
+| `url` | Required. The page that sells it: an absolute URL or a path on this site. |
+| `image` | Required. An absolute URL or a path on this site. One value or a list. |
+| `price` | Required. The price as a number with no symbol: `49` or `'49.00'`. Use the price the page shows. |
+| `currency` | ISO 4217 code. Defaults to `'USD'`. |
+| `priceValidUntil` | The last day of this price as `YYYY-MM-DD`, when it has an end date. |
+| `availability` | `'InStock'` (default), `'OutOfStock'`, `'PreOrder'` or `'Discontinued'`. |
+| `brand` | Defaults to the site's name. |
+| `sku`, `category` | Optional. |
+
+Ratings and reviews are left out on purpose. Add them only from real reviews the page displays.
+
+### Blog post
+
+`BlogLayout` already renders this for every post. Call it yourself only on an article page that doesn't use `BlogLayout`:
 
 ```astro
 ---
@@ -77,7 +162,7 @@ const schema = createBlogPostSchema({
 <JsonLd schema={schema} />
 ```
 
-### Breadcrumb Schema
+### Breadcrumbs
 
 For page navigation:
 
@@ -95,7 +180,7 @@ const breadcrumbs = createBreadcrumbSchema([
 <JsonLd schema={breadcrumbs} />
 ```
 
-### FAQ Schema
+### FAQ
 
 For FAQ pages:
 
@@ -110,9 +195,9 @@ const faqs = await getCollection('faqs');
 <JsonLd schema={createFAQSchema(faqs)} />
 ```
 
-## Multiple Schemas
+## Multiple schemas
 
-Combine multiple schemas:
+Pass a list to put several on one page:
 
 ```astro
 <JsonLd schema={[
@@ -122,9 +207,9 @@ Combine multiple schemas:
 ]} />
 ```
 
-## Custom Schemas
+## Custom schemas
 
-Create custom schema objects:
+For a type with no helper, pass your own object:
 
 ```astro
 ---
@@ -151,9 +236,17 @@ Use Google's Rich Results Test to validate:
 2. Enter your URL or paste HTML
 3. Check for errors and warnings
 
-## Best Practices
+## Best practices
 
-- Include schema on relevant pages only
-- Keep data accurate and up-to-date
-- Use the most specific schema type
-- Test with Google's tools before deploying
+- Describe only what the page shows. A price, a rating or opening hours in the structured data must match what a visitor reads.
+- Use the most specific type that fits: `'Dentist'` rather than `'LocalBusiness'`.
+- One schema of each kind per page. Two `BlogPosting` blocks on a post confuse more than they help.
+- Test before deploying.
+
+## Related
+
+- [Meta Tags](/seo/meta-tags/)
+- [Dynamic OG Images](/seo/og-images/)
+- [SEO Components](/components/seo-components/)
+- [Site Configuration](/configuration/site-config/)
+- [BlogLayout](/layouts/blog-layout/)
