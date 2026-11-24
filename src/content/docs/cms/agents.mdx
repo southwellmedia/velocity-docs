@@ -1,0 +1,152 @@
+---
+title: Working with an AI agent
+description: The rules and skills Velocity CMS installs for coding agents, the check command, access tokens, content commands and the MCP server every site serves
+sidebar:
+  order: 9.5
+  label: AI agents
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Velocity CMS is built to be worked on by a coding agent such as Claude Code, Codex or Cursor. There are two kinds of
+work, and each has its own tools:
+
+- **Changing the site's code**: adding a content type, a section, a form or a plugin. The agent follows the rules
+  and skills the CMS installs, and `check` reviews the result.
+- **Changing the site's content**: writing entries and building pages. The agent uses an access token, with the
+  content commands or the MCP server.
+
+## Rules and skills
+
+`npx velocity-cms init` writes these into the site:
+
+| File | What it is |
+|---|---|
+| `.agents/cms.md` | The CMS's rules for an agent changing the site. |
+| `.agents/skills/cms-*/SKILL.md` | Nine skills, one per task. The same files are written to `.claude/skills/`. |
+| `AGENTS.md` | A line that points at the two above. Your own notes in it are left alone. |
+
+The nine skills:
+
+| Skill | For |
+|---|---|
+| `cms-add-to-site` | Adding the CMS to an Astro site. |
+| `cms-add-content-type` | A new content type and its fields. |
+| `cms-add-section` | A new kind of section: its block and the component that draws it. |
+| `cms-add-form` | A form and the section that shows it. |
+| `cms-connect-page` | Making an existing page read its content from the CMS. |
+| `cms-import-content` | Bringing content in from files. |
+| `cms-set-up-crm` | The pipeline, custom fields and forms that start deals. |
+| `cms-write-plugin` | A plugin for the site. |
+| `cms-deploy` | Deploying the site. |
+
+After you upgrade the CMS, bring them up to date:
+
+```sh
+npx velocity-cms agents
+```
+
+It replaces `.agents/cms.md` and the `cms-*` skills and leaves the site's own skills alone. Keep your own notes in
+`AGENTS.md`, not in `cms.md`.
+
+## Check a site
+
+```sh
+npx velocity-cms check
+```
+
+`check` looks at a site the way a reviewer would. Each finding names the rule (a heading of `cms.md`), the file and
+the fix, and an error exits with 1, so it can run in CI. `--json` prints the findings as JSON. It finds:
+
+- A page that reads the CMS but is built ahead of time, directly or through its layout.
+- A block with no component, or a component with no block.
+- A section that offers a form and never draws one.
+- Code that reads around the CMS's helpers.
+- A missing secret, adapter, address or cache tag.
+- `.env` in git.
+- Agent rules older than the CMS the site runs.
+
+## Access tokens
+
+An agent works with content through an access token. An owner makes one in the editor under **Settings**,
+**Access tokens**, or from the site's folder:
+
+```sh
+npx velocity-cms token "Claude on my laptop" --save
+```
+
+`--save` writes the token to `.env` as `VELOCITY_CMS_TOKEN` and never prints it.
+
+| Option | What it does |
+|---|---|
+| `--role editor` or `--role author` | Who the token acts as. Never an owner: people, plugins, settings and content types stay with a person. |
+| `--publish` | Lets it publish. Without it, a token writes drafts only. |
+| `--personal-data` | Lets it read contacts and submissions. Without it, it sees neither. |
+| `--days n` | How long it works, from 1 to 365 days. |
+
+A token can be taken away at once in the editor, and stops working when the person who made it is no longer an
+owner. Only a hash of it is kept.
+
+## Content from the command line
+
+With `VELOCITY_CMS_TOKEN` in `.env`, these work over the site's API. Add `--site https://example.com` to work on
+the live site instead of the one on your computer.
+
+```sh
+npx velocity-cms types                      # the content types and their fields
+npx velocity-cms type pages                 # one type in full, with the blocks its pages take
+npx velocity-cms entries pages              # a type's entries
+npx velocity-cms entry <id>                 # one entry, its values by field key
+npx velocity-cms create posts hello --data '{"title":"Hello"}'
+npx velocity-cms update <id> --data '{"title":"Hello again"}'
+npx velocity-cms publish <id>
+npx velocity-cms sections <id>              # a page's sections, in order
+npx velocity-cms upload ./photo.jpg         # prints the name an image field stores
+npx velocity-cms export posts --out posts.json
+npx velocity-cms import posts ./posts       # a JSON file, a Markdown file or a folder of them
+```
+
+`import` reads front matter by field key, puts a Markdown file's text into the formatted text field, uploads local
+pictures and keeps old slugs. `--dry-run` says what it would do. `forms`, `submissions <form>` and `pipeline` read
+the forms and the CRM when the token may read personal data.
+
+## The MCP server
+
+Every site serves an MCP server at `/api/cms/mcp`, for an agent that speaks MCP over HTTP with the token as a
+bearer:
+
+```
+https://example.com/api/cms/mcp
+Authorization: Bearer vcms_…
+```
+
+For an agent on the same computer as the site, `npx velocity-cms mcp` is the same server on standard input and
+output.
+
+Its tools call the same services as the editor, as the token:
+
+| Tools | What they do |
+|---|---|
+| `describe_site`, `get_content_type`, `list_blocks`, `list_images` | Say what the site has: its types, fields, blocks and images. |
+| `list_entries`, `get_entry`, `create_entry`, `update_entry`, `duplicate_entry`, `trash_entry`, `entry_history` | Read and write entries, by field key. |
+| `get_sections`, `add_section`, `update_section`, `move_section`, `remove_section`, `set_sections` | Build a page from sections. |
+| `publish_entry`, `unpublish_entry`, `schedule_entry`, `preview_link` | Publish, schedule and preview. A token that may not publish is refused. |
+| `list_forms`, `create_form`, `list_submissions`, and the tools for contacts, the pipeline, custom fields and deals | Forms and the CRM. The tools for contacts, deals and submissions are listed only to a token that may read personal data. |
+| `design_new_section` | Says how to add a new kind of section in code. |
+
+Formatted text can be written as `{ "markdown": "..." }`.
+
+### Pages stay on the template's rails
+
+A page is built only from the blocks its field allows today, with their own fields and named looks. A tool refuses
+a block, a field or a look the template does not have, and names what it would take. An agent cannot send markup,
+a color or a size of its own, so what it builds looks like the site and stays editable in the editor.
+
+For an idea no section can show, `design_new_section` hands the agent the site's published colors and fonts, its
+blocks, and the steps to add a new kind of section in the site's code: a block in the model and a component that
+draws it. The new section is then on the theme, and anyone can use it from the editor.
+
+<Aside type="tip">
+Start a token without `--publish`. The agent's work arrives as drafts, with a preview link from `preview_link`, and
+a person publishes.
+</Aside>

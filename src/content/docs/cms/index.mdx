@@ -26,12 +26,15 @@ There is a [demo you can edit](https://realestate.deployvelocity.com/demo/): a r
 | | |
 |---|---|
 | **Content** | Content types made in a visual builder or described in code. Drafts and published versions, trash, duplicate, history with restore, scheduled publishing, preview links, several languages. |
-| **Pages** | Pages built from sections, with the live page beside the form. Pages under pages, a home page, menus edited in the CMS. |
-| **Media** | An image library with uploads, kept in a folder or any S3-compatible bucket. |
-| **Forms** | A form builder, forms as page sections, spam marking, notices by email, export and erase of what a person sent. |
+| **Pages** | Pages built from sections, with the live page beside the form, or a visual editor that gives the page the window: words typed on the page, sections moved, added and removed there. Pages under pages, a home page, menus edited in the CMS. |
+| **Theme** | A site's colors and fonts set in the editor: a color picker with the template's palette, the template's fonts, tried on the page before they are published. |
+| **Media** | An image library with uploads, kept in a folder or any S3-compatible bucket. Each upload is made lighter and kept as WebP. |
+| **Forms** | A form builder, forms as page sections, spam marking, an optional Cloudflare Turnstile or Google reCAPTCHA v3 check, notices by email, export and erase of what a person sent. |
 | **CRM** | Contacts with a timeline and notes, a pipeline board, owners and follow-up days, deals with a forecast, custom fields, CSV import. |
-| **Plugins** | A plugin API with settings, secrets and retried background work. Five come with it, off until an owner switches one on. |
+| **Plugins** | A plugin API with settings, secrets and retried background work. Seven come with it, off until an owner switches one on: SEO, Analytics, Redirects, Webhooks, and the experimental Mailchimp, Slack and HubSpot. See [Writing a plugin](/cms/plugins/). |
 | **People** | Sign-in by email link or passkey, no passwords. Owner, editor and author roles. Invitations. |
+| **Editor** | A home that says what is waiting, search with Ctrl or Command and K, light and dark, and a layout that fits a phone. |
+| **AI agents** | Rules and skills for coding agents, a `check` command, access tokens, content commands and an MCP server that builds pages from the template's own sections. See [Working with an AI agent](/cms/agents/). |
 
 ## How it fits a site
 
@@ -57,4 +60,5 @@ sample content and a component for every section. You can use the CMS on any Ast
   <LinkCard title="Content types and fields" description="In the builder and in code." href="/cms/content-types/" />
   <LinkCard title="Showing content" description="Live collections, entry pages, menus and links." href="/cms/showing-content/" />
   <LinkCard title="Sections" description="Write a block and the component that draws it." href="/cms/page-builder/" />
+  <LinkCard title="Working with an AI agent" description="Rules, skills, check, access tokens and the MCP server." href="/cms/agents/" />
 </CardGrid>
