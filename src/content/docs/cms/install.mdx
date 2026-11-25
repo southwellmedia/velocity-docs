@@ -1,6 +1,6 @@
 ---
 title: Install
-description: Run the starter site, add Velocity CMS to an Astro site and deploy it on a server or on Vercel
+description: Run the starter site, add Velocity CMS to an Astro site and deploy it on a server, on Vercel or on Cloudflare Workers
 sidebar:
   order: 2
 ---
@@ -183,8 +183,79 @@ For email, add a Resend key under **Settings**, **Email**, or set `VELOCITY_CMS_
 `VELOCITY_CMS_EMAIL_FROM`. Until then, nobody you invite can be emailed a sign-in link: print one with
 `npx velocity-cms link <email>` from your own machine.
 
+## Deploy on Cloudflare Workers
+
+<Aside type="caution" title="Experimental">
+On Workers the CMS has run in the Workers runtime on a computer and in the project's own tests, and not yet on a
+deployed site. Try it on a site you can afford to set up twice.
+</Aside>
+
+With the Cloudflare adapter the CMS is a Worker. The content lives in a D1 database and uploads in an R2 bucket,
+both reached by binding, so there is no address and no key to keep.
+
+<Steps>
+
+1. Use the Cloudflare adapter: `npx astro add cloudflare`.
+2. Make the database and the bucket, and bind them in the Wrangler config:
+
+   ```sh
+   npx wrangler d1 create my-site
+   npx wrangler r2 bucket create my-site-media
+   ```
+
+   ```jsonc
+   // wrangler.jsonc
+   {
+     "compatibility_date": "2026-11-01",
+     "compatibility_flags": ["nodejs_compat"],
+     "d1_databases": [{ "binding": "DB", "database_name": "my-site", "database_id": "<the id d1 create printed>" }],
+     "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "my-site-media" }]
+   }
+   ```
+
+3. Run `npx velocity-cms init`. It reads the two bindings and writes them to `.env`, which a Worker reads while
+   you develop:
+
+   ```sh
+   VELOCITY_CMS_DATABASE_URL=d1:DB
+   VELOCITY_CMS_R2_BUCKET=MEDIA
+   ```
+
+4. Keep pages in Cloudflare's cache, which every copy of the Worker shares and a publish clears:
+
+   ```js
+   // astro.config.mjs
+   import { cacheCloudflare } from '@astrojs/cloudflare/cache';
+
+   export default defineConfig({
+     cache: { provider: cacheCloudflare() },
+     routeRules: { '/[...path]': { maxAge: 86400, tags: ['cms'] } },
+   });
+   ```
+
+5. For the deployed Worker, set the secret with `npx wrangler secret put VELOCITY_CMS_SECRET`, and put
+   `VELOCITY_CMS_ORIGIN`, `VELOCITY_CMS_DATABASE_URL` and `VELOCITY_CMS_R2_BUCKET` under `vars` in the Wrangler
+   config. Then deploy.
+
+</Steps>
+
+The commands work as they do elsewhere. `owner`, `link`, `token` and a seed script reach the D1 database through
+Wrangler, which the site installs. That is the local database `astro dev` and `wrangler dev` use. To reach the
+real one, mark the binding `"remote": true` in the Wrangler config, in an environment of its own if you like
+(`CLOUDFLARE_ENV` names it).
+
+Three things differ from a server:
+
+- **A save is kept whole or not at all.** D1 holds no transaction open, so each save is sent as one batch. When
+  what it was decided from changed meanwhile, it is refused as a conflict, which the editor already handles.
+- **Images are made lighter by Cloudflare's Images binding** (`IMAGES`, which the adapter adds), since the library
+  used elsewhere does not run in a Worker.
+- **A page built ahead of time with a library a Worker cannot load**, such as `sharp`, needs
+  `cloudflare({ prerenderEnvironment: 'node' })`, so that it is built in Node.
+
 <Aside>
-Node on a server and Vercel are the hosts the CMS has been run on. Netlify and Cloudflare are untried.
+Node on a server and Vercel are the hosts the CMS has been run on. Cloudflare Workers is experimental. Netlify is
+untried.
 </Aside>
 
 ## A timer, if you want one
