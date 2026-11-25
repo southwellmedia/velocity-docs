@@ -1,0 +1,86 @@
+---
+title: Working together
+description: What happens when several people, or a person and an AI agent, work on the same entry, contact, deal or setting at once
+sidebar:
+  order: 8.5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Several people can have the same entry open, and an agent can change it over MCP while they do. Nobody is locked
+out and nothing is saved over. The editor shows who is there, brings in what they save, and asks only when two
+people changed the very same field.
+
+There is nothing to switch on. It works on every site from 0.1.0-beta.24.
+
+## Who is there
+
+An open entry says who else has it open, and where in it they are:
+
+- **At the top of the entry**: "Maya is here too", or "Claude is working on this" for an agent that just read or
+  changed the entry over MCP.
+- **On a field**: a mark with the person's name beside the field they are in.
+- **On a section**: the same mark on the section's row in the form, in the list of sections of the visual editor,
+  and as an outline on the page itself.
+
+An agent that works in your own signed-in browser is shown as **Your agent**. An agent that uses an
+[access token](/cms/agents/) or a connected app is shown by its name, at the top of the entry.
+
+Presence is forgotten seconds after a tab is closed. It is kept apart from content: it has no history and never
+reaches the site.
+
+## What others save
+
+What someone else saves appears in your open form within seconds, and in the page beside it, together with
+whatever you have typed:
+
+- a field one of you changed and the other did not,
+- a field inside a section, however deep,
+- a section added, moved or removed.
+
+The editor says who changed what: "Maya changed Price", "Claude changed Sections", "You changed Title in another
+tab". Undo still takes back only what you did.
+
+While two people have one entry open, each one's typing is saved after about a second and reaches the other a
+second or two later. It moves field by field, as saves: you do not see each other's letters or carets.
+
+## When two people change the same field
+
+Only then does the editor stop and ask. It shows the two versions side by side, says who saved the newer one, and
+offers **Keep mine** or **Use the newer version**. Until you choose, nothing of yours is saved, by itself or by a
+press of Save, and nothing you typed is lost.
+
+Everything else in the entry is brought together without a question.
+
+<Aside>
+A tab left open for hours is safe. A form saves only after the version its values came from, so an older tab is
+refused, takes in what was saved since, and saves again.
+</Aside>
+
+## Contacts, deals, forms and settings
+
+The smaller windows follow the same idea in a simpler way. A window over a contact, a deal, a form's settings, the
+pipeline's stages or a part of Settings holds only what you changed in it. Everything else follows what is saved:
+
+- a change someone else makes meanwhile shows up in the open window,
+- your save sends only what you changed, so theirs stays,
+- when both of you changed the same thing, the window says so before you save.
+
+These windows do not show who else has them open.
+
+## Working beside an agent
+
+Keep the editor open while you ask an agent to change the same page. What the agent saves arrives in your form
+like anyone else's save, named as the agent's. If you were typing in a field the agent also changed, you are asked
+which version stands.
+
+An agent's changes are drafts until they are published, as yours are. See
+[Working with an AI agent](/cms/agents/).
+
+## What it does not do
+
+- **No letter-by-letter typing.** Two people in one field see each other's work when it is saved, and are asked
+  whose stands.
+- **No locks.** Nobody can hold an entry or a field for themselves.
+- **No presence outside entries.** Contacts, deals and settings are kept from overwriting each other, without the
+  marks that say who is there.
