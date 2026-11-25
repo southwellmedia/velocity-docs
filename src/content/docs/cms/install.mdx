@@ -186,8 +186,9 @@ For email, add a Resend key under **Settings**, **Email**, or set `VELOCITY_CMS_
 ## Deploy on Cloudflare Workers
 
 <Aside type="caution" title="Experimental">
-On Workers the CMS has run in the Workers runtime on a computer and in the project's own tests, and not yet on a
-deployed site. Try it on a site you can afford to set up twice.
+On Workers the CMS has run on a deployed site with D1, R2 and Cloudflare's Images binding: pages, the editor,
+publishing, scheduled publishing, uploads and forms. Email, passkeys and plugins that send out have not been tried
+there yet. Try it on a site you can afford to set up twice.
 </Aside>
 
 With the Cloudflare adapter the CMS is a Worker. The content lives in a D1 database and uploads in an R2 bucket,
