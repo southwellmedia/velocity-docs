@@ -18,7 +18,7 @@ what is missing, so nobody finds out the hard way.
 ## Database and hosts
 
 - SQLite and libSQL only. No Postgres or MySQL.
-- Tried on Node on a server and on Vercel. Netlify and Cloudflare are untried.
+- Tried on Node on a server and on Vercel. Cloudflare Workers is experimental: it has run on a deployed Worker with D1, R2 and the Images binding, and email, passkeys and plugins that send out have not been tried there. Netlify is untried.
 - A site on a hosted database takes uploads only when an S3-compatible bucket is set up.
 - With the in-memory page cache, a site running several servers clears a published page on the server that took
   the publish. The others follow when their copy runs out. Use a cache the servers share, such as your host's own.
