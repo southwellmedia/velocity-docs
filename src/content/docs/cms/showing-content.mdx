@@ -83,8 +83,13 @@ const post = found.entry.data;
 <div set:html={post.body?.html ?? ''} />
 ```
 
-A rich text field arrives as `{ html }`: HTML the CMS made, with every word escaped. A preview link shows the
-working version through the same code, and that answer is never cached.
+A rich text field arrives as `{ html, headings, parts }`: HTML the CMS made, with every word escaped, its
+headings with their ids (for a table of contents), and the same text a piece at a time for a template that draws
+pictures, tables or buttons with its own components. Links to entries already lead where the entry is today, and
+pictures are the library's, with their smaller copies. The HTML carries `cms-*` classes for the template's looks
+(`cms-colour-brand`, `cms-callout-tip`, `cms-image-wide`), which the site's stylesheet draws. A text that can
+show videos or maps calls `allowEmbeds(Astro, body)` where it is written, so the page's policy lets the frames in.
+A preview link shows the working version through the same code, and that answer is never cached.
 
 Name the types that work this way in the integration, `velocityCms({ entryPages: ['pages', 'posts'] })`, so their
 addresses join the sitemap and search.
